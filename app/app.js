@@ -7,38 +7,11 @@ const mysqlssh = require('mysql-ssh');
 var mysql = require('mysql');
 const fs = require('fs');
 const express = require('express');
-const expressValidator = require('express-validator');
-const flash = require('connect-flash');
 const session = require('express-session');
 
 
 // Init app
 const app = express();
-
-// Express Messages Middleware
-app.use(require('connect-flash')());
-app.use(function (req, res, next){
-    res.locals.message = require('express-messages')(req, res);
-    next();
-});
-
-// Express Validator Middleware
-app.use(expressValidator({
-    errorFormatter: function(param, msg, value) {
-        var namespace = param.split('.')
-        , root    = namespace.shift()
-        , formParam = root;
-  
-      while(namespace.length) {
-        formParam += '[' + namespace.shift() + ']';
-      }
-      return {
-        param : formParam,
-        msg   : msg,
-        value : value
-      };
-    }
-  }));
 
 var indexRouter = require('./routes/index');
 var apiRouter = require('./routes/api');
@@ -82,5 +55,4 @@ app.use(function(err, req, res, next) {
 });
 
 module.exports = app;
-
 

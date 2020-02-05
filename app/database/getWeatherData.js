@@ -99,26 +99,15 @@ module.exports = {
             async.each(station_id, function(id, callback){
 
                 var values =  [id,start_time, stop_time];
-
+                // Check if there is any data in results
                 conn.query(sql, values, function (err, results) {
                     if(results.length <= 0){
-                        console.log("Error");
-                        return;
+                        console.log("No data");
+                        if(true)
+                            console.log("True")
+                            return;
                     }
-                    console.log("Test");
-                    console.log(results);
-                    let flag = true;
-                    results.forEach (zeroPoint =>{
-                        console.log(zeroPoint, "TestforEach")
-                        if(zeroPoint.length <= 0){
-                            console.log("Testif");
-                            flag = true;
-                        }
-                    });
-                    if(flag === true){
-                        console.log("Test2");
-                       req.flash('success', 'There is no data for a selected date')
-                    }
+                    
 
                     let filtered_result = [];
                     // calculate the time difference between the first and last result
