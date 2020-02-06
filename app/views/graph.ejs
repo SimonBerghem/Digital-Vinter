@@ -4,12 +4,7 @@
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/graph.css' />
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-   <button onclick="message()">try it</button>
-<script>
-  function message(){
-    alert("Data is missing");
-  }
-</script>
+
 
   </head>
   <body>
@@ -20,7 +15,7 @@
     <a href="javascript:void(0)" class="dropbtn">Grafalternativ</a>
     <div class="dropdown-content">
 <div id="Checkboxes">
- <label id="3" class="container">Lufttemperatur
+ <label id="prov4" class="container">Lufttemperatur
   <input type="checkbox"  checked="checked" id="airtemp">
   <span class="checkmark"></span>
   <a id="jumper" href="#type1">Hoppa</a>
@@ -132,7 +127,7 @@
 </div>
 </div>
 </div>
-<button id="ButtonTimeIntervall" type="button" onclick="rungraphs(starttime,stoptime)">Tids intervall</button> 
+<button id="ButtonTimeIntervall" type="button" onclick="rungraphs(starttime,stoptime)">Time intervall</button> 
 </div>
 <a id="jumtotop" href="#options">HOPPA TILL TOPPEN</a>
 

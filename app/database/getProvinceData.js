@@ -46,7 +46,7 @@ module.exports = {
             station_data on t.station_id = station_data.id order by station_data.county_number asc`;
 
             conn.query(sql, function (err, results) {
-                
+            
                 
                 let temperatures = [];
                 
@@ -114,10 +114,13 @@ module.exports = {
             // do a async loop through the station_id list
             async.each(provinces, function(province, callback){
                 
+
                 let values = [province, start_time, stop_time]
 
                 conn.query(sql,values, function (err, results) {
-                    
+                    if(results.length <= 0){
+                        return;
+                    }
                     let filtered_result = [];
                     
                     // calculate the time difference between the first and last result

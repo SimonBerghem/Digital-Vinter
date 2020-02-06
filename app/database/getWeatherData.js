@@ -28,7 +28,7 @@ module.exports = {
                 const values =  [[id]];
 
                 conn.query(sql, [values], function (err, results) {
-                    
+                   
                     // convert timestamp and windspeed to wanted units
                     convertData(results[0])
                     
@@ -99,15 +99,13 @@ module.exports = {
             async.each(station_id, function(id, callback){
 
                 var values =  [id,start_time, stop_time];
-                // Check if there is any data in results
+
                 conn.query(sql, values, function (err, results) {
                     if(results.length <= 0){
-                        console.log("No data");
-                        if(true)
-                            console.log("True")
-                            return;
+                        console.log("Error");
+                        return;
                     }
-                    
+                   
 
                     let filtered_result = [];
                     // calculate the time difference between the first and last result
@@ -207,4 +205,3 @@ function convertData(result){
     result.wind_speed /=  3.6;
     result.wind_speed = result.wind_speed.toFixed(2);
 }
-
