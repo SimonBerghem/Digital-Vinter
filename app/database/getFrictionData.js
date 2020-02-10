@@ -59,13 +59,38 @@ module.exports = {
         authorization.getConnection(function(err, conn){
             if (err) throw err
             
-            const sql =`SELECT DISTINCT reporterorganisation FROM friction_data;`
+            const sql =`SELECT DISTINCT reporterorganisation FROM reporter_organisations;`
 
             
             conn.query(sql, function (err, results) {
-                // send data back to client
-                res.send(results);
-                conn.release();
+                // If no data try to query friction_data to get reporterOrganistaions
+                if(results.length == 0) {
+                    const sql =`SELECT DISTINCT reporterorganisation FROM friction_data;`
+                    conn.query(sql, function (err, results) {
+                        // If we have reporterOrganistaions update table reporter_organisations with new data
+                        if(results.length > 0) {
+                            let reporterOrganisations = []
+                            results.forEach(result => {
+                                reporterOrganisations.push([result.reporterorganisation])
+                            })
+
+                            const sqlInsert = `
+                                INSERT IGNORE INTO reporter_organisations
+                                VALUES ?;
+                            `
+                            conn.query(sqlInsert, [reporterOrganisations], (err, response) => {
+                                if(err) {
+                                    throw err
+                                }
+                            })
+                        }
+                        res.send(results)
+                        conn.release()
+                    })
+                } else {
+                    res.send(results);
+                    conn.release();
+                }
                 if (err) throw err
      
             });
