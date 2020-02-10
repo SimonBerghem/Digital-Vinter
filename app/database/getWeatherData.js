@@ -102,10 +102,10 @@ module.exports = {
 
                 conn.query(sql, values, function (err, results) {
                     if(results.length <= 0){
-                        console.log("Error");
+                        
                         return;
                     }
-                   
+                  
 
                     let filtered_result = [];
                     // calculate the time difference between the first and last result
