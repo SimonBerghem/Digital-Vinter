@@ -135,9 +135,6 @@
     <script src="javascripts/map/friction.js"></script>
     <script src="javascripts/graph/getFrictionData.js"></script>
     <script src="javascripts/map/cameraData.js"></script>
-    
-
-
 
     <script>
       // async function testDBConnection() {
@@ -146,14 +143,14 @@
       //       });
       //     }
       async function main (){
-        await getDistinctReporterorgFriction();
+        
         await getCameraData();
-
         await getLatestAvgCountyWeatherData();
         await drawMap();
         await getStations();
         await getAllLatestWeatherData();
         await createLayers(stationsData,cameraArrayData);
+        await getDistinctReporterorgFriction();
 
         // await getAllFrictionData();
         // await createFrictionLayer(frictionData);
