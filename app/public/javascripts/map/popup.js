@@ -96,12 +96,10 @@ var obj = {
  * @param {*} friction return popup content for frictiondata circlemarkers
  */
 function popupfriction(friction, circle){
-  var popupContent = document.createElement("table-data");
+   const popupContent = document.createElement("table-data");
     
     // Tar bort oönskade element i strängen.
-    var temp1 = friction.MeasureTimeUTC;
-    var temp2 = temp1.replace("T"," / ");
-    var timestring = temp2.replace("Z"," ");
+   const timestring = friction.MeasureTimeUTC.replace("T", " / ").replace("Z", " ");
 
   var obj = {
     Mätvärde  : [friction.MeasurementValue,""],
