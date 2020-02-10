@@ -8,6 +8,7 @@ var mysql = require('mysql');
 const fs = require('fs');
 const express = require('express');
 const session = require('express-session');
+var flash = require('connect-flash');
 
 
 // Init app
@@ -16,6 +17,12 @@ const app = express();
 var indexRouter = require('./routes/index');
 var apiRouter = require('./routes/api');
 
+// Flash middelware
+app.use(require('connect-flash')());
+app.use(function (req, res, next) {
+  res.locals.messages = require('express-messages')(req, res);
+  next();
+});
 
 app.use(session({
   secret: 'secret',
