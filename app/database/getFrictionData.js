@@ -61,7 +61,11 @@ module.exports = {
 
             
             conn.query(sql, function (err, results) {
-                // If no data try to query friction_data to get reporterOrganizations
+                // if there is no resluts return
+                if(results == null){
+                    return;
+                }
+                // If no data try to query friction_data to get reporterOrganistaions
                 if(results.length == 0) {
                     const sql =`SELECT DISTINCT reporterorganization FROM friction_data;`
                     conn.query(sql, function (err, results) {
