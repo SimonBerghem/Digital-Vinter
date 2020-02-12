@@ -79,30 +79,115 @@ function getColor(temperature) {
             temperature > -35   ? '#004C99' :
                                   '#003366';
 }
+/**
+ * This method returns a color depending on the friction value
+ * @param {*} temperature a float value 
+ */
+function getFrictionColor(frictionvalue) {
+    return  frictionvalue > 1.0  ? '#EDE285' :
+    frictionvalue > 0.9 ? '#C9E36F' :
+    frictionvalue > 0.8  ? '#96D858' :
+    frictionvalue > 0.7  ? '#60CB42' :
+    frictionvalue > 0.6   ? '#33BD3B' :
+    frictionvalue > 0.5   ? '#27AC55' :
+    frictionvalue > 0.4   ? '#1D9A6C' :
+    frictionvalue > 0.3  ? '#18907C' :
+    frictionvalue > 0.2 ? '#138386' :
+    frictionvalue > 0.1  ? '#0C4571' :
+    frictionvalue > 0.0  ? '#082B65' :
+    '#041531';
+}
+
 
 
 /**
  * Controls the temperature scale box on map.
  */
-const temperatureScale = L.control({position: 'bottomleft'});
+
+const temperatureScale = L.control({position: 'bottomright'});
 
 temperatureScale.onAdd = function (map) {
 
+    const maindiv = L.DomUtil.create('div');
     const div = L.DomUtil.create('div', 'info legend'),
-        scales = [35, 30, 25, 20, 15, 10, 5, 0, -5, -10, -15, -20, -25, -30, -35],
-        labels = [];
+          title = "Temp",
+          scales = [35, 30, 25, 20, 15, 10, 5, 0, -5, -10, -15, -20, -25, -30, -35],
+          labels = [];
+
+
+    maindiv.innerHTML+= '<button id="tempButton" class="oButton">'+title+'</button>';
+
     for (var i = 0; i < scales.length; i++) {
         if(i == 0){
-            div.innerHTML +=  '<i style="background:' + getColor(scales[i]) + '"></i> >' + scales[i] + '<br> ';
+            div.innerHTML +=  '<div class ="scalediv tempdiv"> <i style="background:' + getColor(scales[i]) + '"></i> >' + scales[i] + '<br>' + '</div>';
         }else if(i == scales.length -1) {
-            div.innerHTML +=  '<i style="background:' + getColor(scales[i]) + '"></i> <' + scales[i];
+            div.innerHTML +=  '<div class ="scalediv tempdiv"> <i style="background:' + getColor(scales[i]) + '"></i> <' + scales[i] + '</div>';
         }else {
-            div.innerHTML +=  '<i style="background:' + getColor(scales[i]) + '"></i> ' + (scales[i]) + '<br>';
+            div.innerHTML +=  '<div class ="scalediv tempdiv"> <i style="background:' + getColor(scales[i]) + '"></i> ' + (scales[i]) + '<br>'+ '</div>';
+        }
     }
-}
-    return div;
+    maindiv.append(div);
+    return maindiv;
 };
 temperatureScale.addTo(map);
+
+
+
+
+
+/**
+ * Controls the friction scale box on map.
+ */
+const frictionScale = L.control({position: 'bottomright'});
+
+frictionScale.onAdd = function (map) {
+
+    const maindiv = L.DomUtil.create('div');
+    const div = L.DomUtil.create('div', 'info legend'),
+          title = "Friktion",
+          scales = [1.0,0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.2,0.1,0.0],
+          labels = [];
+
+    maindiv.innerHTML+= '<button id="friktionButton" class="oButton">'+title+'</button>';
+
+    for (var i = 0; i < scales.length; i++) {
+        if(i == 0){
+            div.innerHTML +=  '<div class ="scalediv frikdiv"> <i style="background:' + getFrictionColor(scales[i]) + '"></i> >' + scales[i] + '<br>' + '</div>';
+        }else if(i == scales.length -1) {
+            div.innerHTML +=  '<div class ="scalediv frikdiv"> <i style="background:' + getFrictionColor(scales[i]) + '"></i> <' + scales[i] + '</div>';
+        }else {
+            div.innerHTML +=  '<div class ="scalediv frikdiv"> <i style="background:' + getFrictionColor(scales[i]) + '"></i> ' + (scales[i]) + '<br>'+ '</div>';
+        }
+    }
+    maindiv.append(div);
+    return maindiv;
+};
+frictionScale.addTo(map);
+
+
+
+
+/*
+    This function minimizes the scalediv for the button associated with it.
+*/
+
+$(".oButton").click(function(){
+    //alert(this.id);
+    $(this).toggleClass('buttonminimize');
+
+    switch(this.id){
+        case "friktionButton":
+            $(".frikdiv").slideToggle();
+            break;
+        case "tempButton":
+            $(".tempdiv").slideToggle();
+            break;
+        default:
+            //
+            break;
+
+    }
+});
 
 
 

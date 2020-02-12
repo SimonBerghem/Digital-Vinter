@@ -12,7 +12,7 @@ module.exports = {
     */
 
 
-    // Check connection to MySQL 
+    // GET FRICTION DATA
     getFrictionData : function(req, res, next, reporter){
        
         // ssh to database server and then connect to db
@@ -20,16 +20,31 @@ module.exports = {
         
         authorization.getConnection(function(err, conn){
             if (err) throw err
-            
-            const sql =`select t.id, t.MeasureTimeUTC, t.ReportTimeUTC, t.lat, t.lon, t.RoadCondition, t.MeasurementType, t.NumberOfMeasurements, t.MeasurementValue, 
-            t.MeasurementConfidence, t.MeasurementsVelocity, t.ReporterOrganisation, t.EquipmentType
-                        from friction_data t
-                        inner join(
-                            select  lat, lon,  max(id) as MaxID
-                            from friction_data
-                            WHERE reporterOrganisation = ?
-                            group by lat, lon
-                        ) tm on t.lat = tm.lat and t.lon = tm.lon and t.id = tm.MaxID;`
+
+            const sql =`
+                SELECT
+                    t.id,
+                    t.MeasureTimeUTC,
+                    t.ReportTimeUTC,
+                    t.Latitude,
+                    t.Longitude,
+                    t.RoadCondition,
+                    t.MeasurementType,
+                    t.NumberOfMeasurements,
+                    t.MeasurementValue, 
+                    t.MeasurementConfidence,
+                    t.MeasurementsVelocity,
+                    t.ReporterOrganisation
+                FROM friction_data t
+                INNER JOIN(
+                    SELECT
+                        latitude,
+                        longitude,
+                        max(id) as MaxID
+                    FROM friction_data
+                    WHERE reporterOrganisation = ?
+                    GROUP BY latitude, longitude
+                ) tm ON t.latitude = tm.latitude and t.longitude = tm.longitude and t.id = tm.MaxID;`
             conn.query(sql, [reporter], function (err, results) {
                 res.send(results);
                 conn.release();
@@ -38,32 +53,57 @@ module.exports = {
 
         });
     },
-        
+    // GET REPORTER ORGANIZATIONS (this query might be uneffective?)
     getDistinctReporterorgFriction : function(req, res, next){
             
         authorization.getConnection(function(err, conn){
             if (err) throw err
             
-            const sql =`select distinct reporterorganisation from friction_data;`
+            const sql =`SELECT DISTINCT reporterorganisation FROM reporter_organisations;`
 
             
             conn.query(sql, function (err, results) {
-                // send data back to client
-                res.send(results);
-                conn.release();
+                // If no data try to query friction_data to get reporterOrganistaions
+                if(results.length == 0) {
+                    const sql =`SELECT DISTINCT reporterorganisation FROM friction_data;`
+                    conn.query(sql, function (err, results) {
+                        // If we have reporterOrganistaions update table reporter_organisations with new data
+                        if(results.length > 0) {
+                            let reporterOrganisations = []
+                            results.forEach(result => {
+                                reporterOrganisations.push([result.reporterorganisation])
+                            })
+
+                            const sqlInsert = `
+                                INSERT IGNORE INTO reporter_organisations
+                                VALUES ?;
+                            `
+                            conn.query(sqlInsert, [reporterOrganisations], (err, response) => {
+                                if(err) {
+                                    throw err
+                                }
+                            })
+                        }
+                        res.send(results)
+                        conn.release()
+                    })
+                } else {
+                    res.send(results);
+                    conn.release();
+                }
                 if (err) throw err
      
             });
 
         });
     },
-    // Check connection to MySQL 
+    // GET ALL FRICTION DATA
     getAllFrictionData : function(req, res, next){
             
         authorization.getConnection(function(err, conn){
             if (err) throw err
             
-            const sql =`select * from friction_data;`
+            const sql =`SEELCT * FROM friction_data;`
 
             
             conn.query(sql, function (err, results) {
@@ -77,13 +117,16 @@ module.exports = {
         });
     },
 
-     // Check connection to MySQL 
+     // Get friction data in a certain rectangle, probably used when drawing a rectangle on map
      getFrictionDataRect : function(req, res, next, reporter, SWlat, NElat, SWlon, NElon){
         
         authorization.getConnection(function(err, conn){
             if (err) throw err
             
-            const sql =`select * from friction_data where reporterOrganisation = ? and lat between ? and ? and lon between ? and ?;`
+            const sql =`
+                SELECT * 
+                FROM friction_data 
+                WHERE reporterOrganisation = ? AND latitude BETWEEN ? AND ? AND longitude BETWEEN ? AND ?;`
             var values = [reporter, SWlat, NElat, SWlon, NElon];
             
             conn.query(sql, values, function (err, results) {
@@ -99,7 +142,7 @@ module.exports = {
 
     },
 
-     // Check connection to MySQL 
+     // Get friction data in a certain circle, probably used when drawing a circle on map
      getFrictionDataCirc : function(req, res, next, reporter, lat, lon, radius){
        
 
@@ -108,9 +151,9 @@ module.exports = {
             
             const sql =`SELECT * FROM friction_data a 
             WHERE (
-                      acos(sin(a.lat * 0.0175) * sin(? * 0.0175) 
-                           + cos(a.lat * 0.0175) * cos(? * 0.0175) *    
-                             cos((? * 0.0175) - (a.lon * 0.0175))
+                      acos(sin(a.latitude * 0.0175) * sin(? * 0.0175) 
+                           + cos(a.latitude * 0.0175) * cos(? * 0.0175) *    
+                             cos((? * 0.0175) - (a.longitude * 0.0175))
                           ) * 6371 <= ?
                   ) and ReporterOrganisation = ?;`
 
@@ -127,6 +170,7 @@ module.exports = {
             });
         });
     },
+
     getLatestFrictionData : function(req, res, next, friction_id){
         
 
@@ -157,10 +201,8 @@ module.exports = {
                 res.send(friction_data);
                 conn.release();
 
-              
                 if (err) throw err
 
-                
             });
          });
     }

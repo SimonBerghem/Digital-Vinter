@@ -285,6 +285,10 @@ const stateChangingButton = L.easyButton({
     ]
 }).addTo(map);
 
+const modalButton = L.easyButton('fas fa-upload', function(btn, map) {
+    $('#exampleModal').modal('show');
+}, 'Ladda upp ny friktionsdata').addTo(map);
+
 const toggleFriction = L.control({position: 'topleft'});
 
 

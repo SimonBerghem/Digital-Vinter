@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
-var async = require("async");
+var multer  = require('multer');
+var fs = require('fs');
+const { promisify } = require('util')
 
 var test = require('../database/testConnection');
 var station = require('../database/getStationData');
@@ -8,6 +10,10 @@ var weather = require('../database/getWeatherData');
 var province = require('../database/getProvinceData');
 var friction = require('../database/getFrictionData');
 var camera = require('../database/getCameraData');
+var uploadFrictionData = require('../database/uploadFrictionData');
+
+const upload = multer({dest:'uploads/'});
+const unlinkAsync = promisify(fs.unlink)
 
 /* GET dATA CAMERA_DATA */
 router.get('/getCameraData', function(req, res, next) {
@@ -131,5 +137,15 @@ router.get('/getAverageWeatherData', function(req, res, next) {
     
     weather.getAverageWeatherData(req,res,next,station_id, start_time, stop_time);
 });
+
+/* POST frictiondata to db. Request contains a .csv file. */
+router.post('/uploadFrictionData', upload.single('file'), async (req, res, next) => {
+    await uploadFrictionData.uploadFrictionData(req.file)
+
+    // Delete the file
+    await unlinkAsync(req.file.path)
+    res.end("Upload completed!")
+
+})
 
 module.exports = router;

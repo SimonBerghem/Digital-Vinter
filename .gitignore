@@ -1,3 +1,5 @@
 backend/target/*
 !backend/target/debian/
 node_modules/
+
+backend/e6.txt

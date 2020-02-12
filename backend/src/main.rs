@@ -22,7 +22,7 @@ fn main() {
     database::create_mysql_tables(pool.clone());
     let station_pool = pool.clone();
     let weather_pool = pool.clone();
-    // let friction_pool = pool.clone();
+    let friction_pool = pool.clone();
     let camera_pool = pool.clone();
 
 
@@ -32,6 +32,8 @@ fn main() {
     let station_data = parse_xml::parse_station("station_data_cache.xml");
     database::insert_station_data(station_pool.clone(), station_data);
 
+
+    
     thread::spawn(move || loop {
         let fetch_thread = thread::spawn(|| {
             fetch::fetch_xml(auth::URL_C, auth::USER_DATEX, auth::PASS_DATEX, "camera_data_cache.xml");
@@ -67,6 +69,8 @@ fn main() {
     
     
     });
+    //Friction data 
+    
 
 
     loop { 

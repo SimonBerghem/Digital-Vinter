@@ -10,6 +10,11 @@
     <link rel="stylesheet" href="stylesheets/map.css" />
     <!--JQuery script-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <!-- Bootstrap-->
+      <!-- Latest compiled and minified CSS -->
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+      <!-- Latest compiled JavaScript -->
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <!-- Styling script-->
     <script src="https://use.fontawesome.com/440d818026.js"></script>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
@@ -18,7 +23,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
     <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
     <script src="https://unpkg.com/leaflet-draw@1.0.2/dist/leaflet.draw.js"></script>
-
 
   </head>
   <body>
@@ -38,8 +42,78 @@
           <button class="button-two" id="obj-button" onclick="updateStationField()">Visa valda objekt</button>
           <button class="button-two" onclick="removeAllObj()">Ta bort alla valda objekt</button>
       </div>
-    
     </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Upload new friction data</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <script type="text/javascript">
+            $(function () {
+              $("#upload").bind("click", function () {
+                var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.csv)$/;
+                if (regex.test($("#fileUpload").val().toLowerCase())) {
+                  $.ajax({
+                    // Your server script to process the upload
+                    url: '/api/uploadFrictionData',
+                    type: 'POST',
+
+                    // Form data
+                    data: new FormData($('form')[0]),
+
+                    // Tell jQuery not to process data or worry about content-type
+                    // You *must* include these options!
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+
+                    // Custom XMLHttpRequest
+                    xhr: function () {
+                      var myXhr = $.ajaxSettings.xhr();
+                      if (myXhr.upload) {
+                        // For handling the progress of the upload
+                        myXhr.upload.addEventListener('progress', function (e) {
+                          if (e.lengthComputable) {
+                            $('progress').attr({
+                              value: e.loaded,
+                              max: e.total,
+                            });
+                          }
+                        }, false);
+                      }
+                      return myXhr;
+                    }
+                  });
+                } else {
+                    alert("Filen kunde inte tolkas som en lämplig .csv fil.");
+                }
+            });
+          });
+          </script>
+          <div>
+            Ladda upp ny friktionsdata genom att välja en .csv fil från disk och vänta tills att uppladdningen är klar. Efter att uppladdningen är gjord från användare till server måste även servern ladda upp friktionsdatan till databasen, detta kan ta några minuter.
+          </div>
+          <hr>
+          <form enctype="multipart/form-data">
+            <input name="file" type="file" id="fileUpload" style="margin:5px">
+            <input type="button" value="Upload" id="upload" style="margin:5px"/>
+          </form>
+          <progress></progress>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
       
 
     <!--Map scripts-->
@@ -62,8 +136,6 @@
     <script src="javascripts/graph/getFrictionData.js"></script>
     <script src="javascripts/map/cameraData.js"></script>
 
-
-
     <script>
       // async function testDBConnection() {
       //       await $.getJSON("/api/testDbConnection", function(data) {
@@ -71,18 +143,21 @@
       //       });
       //     }
       async function main (){
-        await getDistinctReporterorgFriction();
+        
         await getCameraData();
-
         await getLatestAvgCountyWeatherData();
         await drawMap();
         await getStations();
         await getAllLatestWeatherData();
         await createLayers(stationsData,cameraArrayData);
+        await getDistinctReporterorgFriction();
+
         // await getAllFrictionData();
         // await createFrictionLayer(frictionData);
 
         // await testDBConnection();
+        //test = ['4005047', '2019-02-01 00:00:10', '2019-02-01 00:30:01', '576,703,127,523', '121,210,512,813', '-1', '1', '34', '623,529', '5', '52', 'RoadCloud', NULL];
+        //await uploadFrictionData(test);
 
       }
       main();

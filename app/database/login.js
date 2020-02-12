@@ -15,6 +15,7 @@ module.exports = {
             if (err) throw err
             
             let secret_key = [SHA256("keon135ntaik304ngaop3" + req.body.secret_key).toString("hex")];
+            console.log(secret_key);
             //2a0db2eba7e496f9daf3f7dbe6aa533a7fb7e2c8b9e658003e2006eeba5f0050 = secret
             let sql = 'SELECT * FROM secrets WHERE password = ?';
             conn.query(sql, "2a0db2eba7e496f9daf3f7dbe6aa533a7fb7e2c8b9e658003e2006eeba5f0050", function (err, results) {

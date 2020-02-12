@@ -82,7 +82,7 @@ function createFrictionLayer(filteredfrictionData) {
     //frictionCanvas.clearLayers();
 
     for (var i = 0; i < filteredfrictionData.length; i += 1) { 
-        let circle = L.circleMarker([filteredfrictionData[i].lat, filteredfrictionData[i].lon], {
+        let circle = L.circleMarker([filteredfrictionData[i].Latitude, filteredfrictionData[i].Longitude], {
         renderer: frictionCanvas,
         color: '#0a7bf5'
         });
