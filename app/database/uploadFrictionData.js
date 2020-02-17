@@ -38,30 +38,44 @@ const parse = (data, delay) => {
   // Papa parse with a worker thread
   papa.parse(data, {
     worker: true,
-    header: false,
+    header: true,
     delimiter: ';',
     newline: '\n',
+    transformHeader: h => h.trim(),
     skipEmptyLines: true,
-    beforeFirstChunk: (data) => {
-      // Remove header field
-      return data.split('\n').slice(1).join('\n')
-    },
     complete: ({ data }) => {
       try{
-        let reporterOrganisations = []
-        let addedReporterOrganisations = []
+        // remove header
+        data.splice(0,1)
+        /* The arrays reporterOragnisations, addedReporterOrganizations and frictionData are used to gather repoterOrganizations
+        *  and frictionData into arrays ready to be inserted into the database.
+        */ 
+        let reporterOrganizations = []
+        let addedReporterOrganizations = []
+        let frictionData = []
         data.forEach(row => {
-          if(!addedReporterOrganisations.includes(row[11])) {
-            reporterOrganisations.push([row[11]])
-            addedReporterOrganisations.push(row[11])
+          if(!addedReporterOrganizations.includes(row.ReporterOrganization)) {
+            reporterOrganizations.push([row.ReporterOrganization])
+            addedReporterOrganizations.push(row.ReporterOrganization)
           }
+          frictionData.push([
+            row.Id,
+            row.ObservationTimeUTC,
+            row.ReportTimeUTC,
+            row.Longitude,
+            row.Latitude,
+            row.AreaCode,
+            row.NumberOfMeasurements,
+            row.MeasureValue,
+            row.MeasureConfidence,
+            row.ReporterOrganization
+            ])
         })
-        updateReporterOrganisationsTable(reporterOrganisations)
+        updateReporterOrganizationsTable(reporterOrganizations)
 
         // Upload the data sequentially in rounds, do 1000 rows each insert (did some testing to see which insert size is fastest)
         const t0 = performance.now()
-        sendFrictionData(data, 1000, delay, t0)
-       
+        sendFrictionData(frictionData, 1000, delay, t0)
       } catch(error) {
         console.log(error)
       }
@@ -73,39 +87,35 @@ const parse = (data, delay) => {
 * @param data, stepSize, delay
 */
 const sendFrictionData = (data, stepSize, delay, t0) => {
-  //console.log(data.length)
+  console.log(data.length)
   // Make sql query to insert frictiondata
   authorization.getConnection(async function(err, pool){
     if(err){
       throw (err)
     }
-    
     const sql = `
       INSERT INTO db.friction_data (
         Id,
-        MeasureTimeUTC,
+        ObservationTimeUTC,
         ReportTimeUTC,
-        Latitude,
         Longitude,
-        RoadCondition,
-        MeasurementType,
+        Latitude,
+        AreaCode,
         NumberOfMeasurements,
-        MeasurementValue,
-        MeasurementConfidence,
-        MeasurementsVelocity,
-        ReporterOrganisation)
+        MeasureValue,
+        MeasureConfidence,
+        ReporterOrganization)
       VALUES ?
-      ON DUPLICATE KEY UPDATE MeasureTimeUTC=VALUES(MeasureTimeUTC),
+      ON DUPLICATE KEY UPDATE
+        ObservationTimeUTC=VALUES(ObservationTimeUTC),
         ReportTimeUTC=VALUES(ReportTimeUTC),
-        Latitude=VALUES(Latitude),
         Longitude=VALUES(Longitude),
-        RoadCondition=VALUES(RoadCondition),
-        MeasurementType=VALUES(MeasurementType),
+        Latitude=VALUES(Latitude),
+        AreaCode=VALUES(AreaCode),
         NumberOfMeasurements=VALUES(NumberOfMeasurements),
-        MeasurementValue=VALUES(MeasurementValue),
-        MeasurementConfidence=VALUES(MeasurementConfidence),
-        MeasurementsVelocity=VALUES(MeasurementsVelocity),
-        ReporterOrganisation=VALUES(ReporterOrganisation)
+        MeasureValue=VALUES(MeasureValue),
+        MeasureConfidence=VALUES(MeasureConfidence),
+        ReporterOrganization=VALUES(ReporterOrganization)
       ;`
 
     // CASE: the data left to add to DB is less then stepSize, no need to splice just add the data and we are done
@@ -134,16 +144,16 @@ const sendFrictionData = (data, stepSize, delay, t0) => {
 /* Helper function to send reporterOrganistaions to db
 * @param data
 */
-const updateReporterOrganisationsTable = (data) => {
-  // Make sql query to insert into reporterOrganisations table
+const updateReporterOrganizationsTable = (data) => {
+  // Make sql query to insert into reporterOrganizations table
   authorization.getConnection(async function(err, pool) {
     if(err){
       throw (err)
     }
     
-    // INSERT IGNORE reporterOrganisations, notice that this query will not show errors but this is not required since the table is simple (no constraints, foreing keys etc.)
+    // INSERT IGNORE reporterOrganizations, notice that this query will not show errors but this is not required since the table is simple (no constraints, foreing keys etc.)
     const sql = `
-      INSERT IGNORE INTO reporter_organisations
+      INSERT IGNORE INTO reporter_organizations
       VALUES ?;
       `
 
