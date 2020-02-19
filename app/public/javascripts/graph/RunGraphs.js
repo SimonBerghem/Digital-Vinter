@@ -28,7 +28,7 @@ async function rungraphs(starttime, stoptime){
       let lat = boundscircle[0]._latlng.lat;
       let lon = boundscircle[0]._latlng.lng;
       let radius = boundscircle[0]._mRadius;
-      await getFrictionDataCirc(frictiondatafrommap[0].ReporterOrganisation,lat,lon,radius);
+      await getFrictionDataCirc(frictiondatafrommap[0].ReporterOrganization,lat,lon,radius);
     }
 
     if(boundsrect.length >0 && layerGroups.length == 0){
@@ -36,7 +36,7 @@ async function rungraphs(starttime, stoptime){
       let NElon = boundsrect[0]._bounds._northEast.lng;
       let SWlat = boundsrect[0]._bounds._southWest.lat;
       let SWlon = boundsrect[0]._bounds._southWest.lng;
-      await getFrictionDataRect(frictiondatafrommap[0].ReporterOrganisation, SWlat, NElat, SWlon, NElon);
+      await getFrictionDataRect(frictiondatafrommap[0].ReporterOrganization, SWlat, NElat, SWlon, NElon);
     }
     if(stationsarrayid.length>0){
       await getWeatherData(stationsarrayid,starttime,stoptime,stationname);
