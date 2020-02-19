@@ -115,7 +115,7 @@ pub fn get_opts(user: &str, pass: &str, addr: &str, database: &str) -> Opts {
 pub fn create_mysql_tables(pool: Pool) {
 
 
-    pool.prep_exec(r"create table reporter_organisations
+    pool.prep_exec(r"create table if not exists reporter_organisations
     (
     ReporterOrganisation varchar(50) not null,
     primary key (ReporterOrganisation)
@@ -147,20 +147,26 @@ pub fn create_mysql_tables(pool: Pool) {
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;", ()).expect("Failed to create table: weather_data");
     pool.prep_exec(r"create table if not exists friction_data 
     (
-        Id                    int         not null
+        Id                   int         not null
             primary key,
-        MeasureTimeUTC        timestamp   null,
-        ReportTimeUTC         timestamp   null,
-        Latitude              text        null,
-        Longitude             text        null,
-        RoadCondition         int         null,
-        MeasurementType       int         null,
-        NumberOfMeasurements  int         null,
-        MeasurementValue      text        null,
-        MeasurementConfidence int         null,
-        MeasurementsVelocity  int         null,
-        ReporterOrganisation  varchar(50) null
+        ObservationTimeUTC   timestamp   null,
+        ReportTimeUTC        timestamp   null,
+        Longitude            text        null,
+        Latitude             text        null,
+        AreaCode             int         null,
+        NumberOfMeasurements int         null,
+        MeasureValue         text        null,
+        MeasureConfidence    int         null,
+        ReporterOrganization varchar(50) null
     )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;", ()).expect("Failed to create table: friction_data");
+    pool.prep_exec(r"create table if not exists reporter_organizations
+    (
+        ReporterOrganization varchar(255) not null
+            primary key
+    );",()).expect("Failed to create table: friction_data");
+    
+    
+    
     pool.prep_exec(r"CREATE TABLE IF NOT EXISTS camera_data (
                     id INT(8) NOT NULL,
                     time TIMESTAMP NULL DEFAULT NULL,
