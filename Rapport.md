@@ -329,4 +329,10 @@ Det ska finnas en knapp som tar upp en ruta där man kan bläddra och välja en 
 * Tidsåtgång: 4 timmar, utvecklarna är bekväma med MySQL
 * Risk: Låg
 
+### 4.3 Etik
+Relationen mellan samhället och Projektet är att projektet visar en vy av samhället, vägnätet samt vägnätets tillstånd i realtid. Detta kan positivt gynna samhället genom att använda projektets arbete till att informera bilister tillståndet av vägen de åker på och är påväg till. Detta kan även ses som något negativt då viss data som projektet hanterat är bundet till individer vilket kan anses vara inkräktande. 
+
+Det finns en stor mängd data som projektet hanterar där majoriteten inte är känslig. Friktonsdatan är dock känslig och hanteras separat från resterande datan och laddas upp till databasen i stället för hämtas från Datex II. Friktionsdatan är då skyddad och utsätts inte för någon säkerhetsrisk.  
+
+I testning av projektet har inte någon etik fråga lyfts då detta projekt inte behöver någon testning med personer eller personlig data. Projektgruppen har tänkt på etiken kring det vi har arbetat med men har inte kunnat hitta någon etisk problematik. 
 
