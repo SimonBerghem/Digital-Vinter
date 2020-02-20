@@ -24,17 +24,15 @@ module.exports = {
             const sql =`
                 SELECT
                     t.id,
-                    t.MeasureTimeUTC,
+                    t.ObservationTimeUTC,
                     t.ReportTimeUTC,
-                    t.Latitude,
                     t.Longitude,
-                    t.RoadCondition,
-                    t.MeasurementType,
+                    t.Latitude,
+                    t.AreaCode,
                     t.NumberOfMeasurements,
-                    t.MeasurementValue, 
-                    t.MeasurementConfidence,
-                    t.MeasurementsVelocity,
-                    t.ReporterOrganisation
+                    t.MeasureValue,
+                    t.MeasureConfidence,
+                    t.ReporterOrganization
                 FROM friction_data t
                 INNER JOIN(
                     SELECT
@@ -42,7 +40,7 @@ module.exports = {
                         longitude,
                         max(id) as MaxID
                     FROM friction_data
-                    WHERE reporterOrganisation = ?
+                    WHERE reporterOrganization = ?
                     GROUP BY latitude, longitude
                 ) tm ON t.latitude = tm.latitude and t.longitude = tm.longitude and t.id = tm.MaxID;`
             conn.query(sql, [reporter], function (err, results) {
@@ -59,26 +57,26 @@ module.exports = {
         authorization.getConnection(function(err, conn){
             if (err) throw err
             
-            const sql =`SELECT DISTINCT reporterorganisation FROM reporter_organisations;`
+            const sql =`SELECT DISTINCT reporterorganization FROM reporter_organizations;`
 
             
             conn.query(sql, function (err, results) {
-                // If no data try to query friction_data to get reporterOrganistaions
+                // If no data try to query friction_data to get reporterOrganizations
                 if(results.length == 0) {
-                    const sql =`SELECT DISTINCT reporterorganisation FROM friction_data;`
+                    const sql =`SELECT DISTINCT reporterorganization FROM friction_data;`
                     conn.query(sql, function (err, results) {
-                        // If we have reporterOrganistaions update table reporter_organisations with new data
+                        // If we have reporterOrganizations update table reporter_organizations with new data
                         if(results.length > 0) {
-                            let reporterOrganisations = []
+                            let reporterOrganizations = []
                             results.forEach(result => {
-                                reporterOrganisations.push([result.reporterorganisation])
+                                reporterOrganizations.push([result.reporterorganization])
                             })
 
                             const sqlInsert = `
-                                INSERT IGNORE INTO reporter_organisations
+                                INSERT IGNORE INTO reporter_organizations
                                 VALUES ?;
                             `
-                            conn.query(sqlInsert, [reporterOrganisations], (err, response) => {
+                            conn.query(sqlInsert, [reporterOrganizations], (err, response) => {
                                 if(err) {
                                     throw err
                                 }
@@ -126,7 +124,7 @@ module.exports = {
             const sql =`
                 SELECT * 
                 FROM friction_data 
-                WHERE reporterOrganisation = ? AND latitude BETWEEN ? AND ? AND longitude BETWEEN ? AND ?;`
+                WHERE reporterOrganiation = ? AND latitude BETWEEN ? AND ? AND longitude BETWEEN ? AND ?;`
             var values = [reporter, SWlat, NElat, SWlon, NElon];
             
             conn.query(sql, values, function (err, results) {
@@ -155,7 +153,7 @@ module.exports = {
                            + cos(a.latitude * 0.0175) * cos(? * 0.0175) *    
                              cos((? * 0.0175) - (a.longitude * 0.0175))
                           ) * 6371 <= ?
-                  ) and ReporterOrganisation = ?;`
+                  ) and ReporterOrganiation = ?;`
 
             var variablesql = [lat,lat,lon,(radius/1000),reporter];
             conn.query(sql, variablesql, function (err, results) {

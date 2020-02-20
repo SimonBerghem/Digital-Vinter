@@ -299,7 +299,7 @@ const toggleFriction = L.control({position: 'topleft'});
 function addtoMAPtoggle(data){
     let stringreport = '<select><option>WeatherStationData</option>'
     for(var i=0; i<data.length; i++){
-        stringreport += '<option>'+data[i].reporterorganisation+'</option>';
+        stringreport += '<option>'+data[i].reporterorganization+'</option>';
     }
     stringreport += '</select>';
 

@@ -99,14 +99,14 @@ function popupfriction(friction, circle){
    const popupContent = document.createElement("table-data");
     
     // Tar bort oönskade element i strängen.
-   const timestring = friction.MeasureTimeUTC.replace("T", " / ").replace("Z", " ");
+   const timestring = friction.ObservationTimeUTC.replace("T", " / ").replace("Z", " ");
 
   var obj = {
-    Mätvärde  : [friction.MeasurementValue,""],
+    Mätvärde  : [friction.MeasureValue,""],
     Tid  : [timestring,""],
     Latitude  : [friction.Latitude,""],
     Longitud  : [friction.Longitude,""],
-    Konfidensintervall: [friction.MeasurementConfidence,""],
+    Konfidensintervall: [friction.MeasureConfidence,""],
       
   };
   var strings = "";
