@@ -51,12 +51,13 @@ Utförandet har gått bra men har varit långsam på grund av många problem som
 
 Flash messages var initialt menat att bli implementerat men på grund av stora problem med implementationen samt en väldigt liten användningsområde. Beslutet togs då att inte implementera flash messages i och med även ta bort alla bibliotek och allt som hade men flash messages att göra.    
 
-Se Appendix för *Datagrafer*
+[Se Appendix för *Datagrafer*](#datagrafer)
 
-Tidsfördelning i storleksordning
-Planerade tasks
-Buggar
-Oplanerade tasks
+ * Tidsfördelning i storleksordning
+ * Planerade tasks
+ * Buggar
+ * Oplanerade tasks
+
 
 
 #### Friktionsvärdesskala
