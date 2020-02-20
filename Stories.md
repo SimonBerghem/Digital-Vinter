@@ -51,7 +51,7 @@ Den bör vara lätt att avläsa, inte förbruka mycket kraft samt att designen �
 ## Testfall:
 ### Fall 1
 * Handling: Observera friktionvärdeskalan och dess färger och jämför dem med färgerna utritade på kartan.
-* Förväntat Resultat: Friktionsvärdesskalan bör ge en visuell uppfattning om hur friktionsvärdet skiljer sig över landet. Så användaren lätt kan se var det är kallt och varmt.
+* Förväntat Resultat: Friktionsvärdesskalan bör ge en visuell uppfattning om hur friktionsvärdet skiljer sig över landet. Så användaren lätt kan se var det är halt.
 ### Fall 2
 * Handling: Tryck på knappen i botten av temperatur- eller friktionvärdeskalan.
 * Förväntat Resultat: Den valda skalan bör minimeras så att endast knappen kvarstår.
