@@ -54,6 +54,16 @@ Tre Stories gjordes för sprint 1
 
 Utförandet har gått bra i allmänhet även om det tog längre tid än beräknat. Eftersom vi har övertagit redan existerande kod så tog det lite tid att avgöra var koden bör skrivas. Samt att skalorna använde sig av ett Leaftlet API och inte ren javascript, vilket krävde ytterligare inlärning som ej var förväntad. Detta kan förbättras till nästa sprint genom att ta reda på exakt vad som krävs och därmed kan man göra en mer träffsäker tidsestimering.
 
+Tidsfördelning i storleksordning
+
+  * Planerade tasks
+  
+  * Skaffat kunskap om Leaflet API:et
+  
+  * Oplanerade tasks
+  
+  * Fixa bugs
+
 **Uppladdning av XML fil**
 
 Tasks följdes i sin ordning, den större skillnaden som gjordes var att formatet på filen inte var XML utan CSV (Comma Separated Values) detta fick tas i hänsyn vid parsing samt val av bibliotek. Vid uppladdning av mycket stora filer med filstorlek>300mb så fick “heapsize” ökas, samt att filen sparas på disk innan parsing. 
