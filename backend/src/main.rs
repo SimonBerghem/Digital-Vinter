@@ -16,6 +16,8 @@ mod database;
 
 fn main() {
 
+    testPost();
+
     let opts = database::get_opts(auth::USER_DB, auth::PASS_DB, auth::ADDR_DB, auth::NAME_DB);
     // // // Create new pool connections 
     let pool = mysql::Pool::new(opts).expect("Pool failed to get opts!");
@@ -96,4 +98,30 @@ fn main() {
    
 
 
+}
+
+
+fn testPost(){
+    println!("Hello, world");
+
+  //<LOGIN authenticationkey="{AUTH}" />
+    let client = reqwest::Client::new();
+    let res = client.post("https://api.trafikinfo.trafikverket.se/v2/data.xml")
+    .body("<REQUEST>
+    <LOGIN authenticationkey=\"d8b542b2dafe40f999f223c7aff04046\" />
+    <QUERY objecttype=\"Situation\" schemaversion=\"1.2\">
+          <FILTER>
+                <EQ name=\"Deviation.MessageType\" value=\"Olycka\" />
+          </FILTER>
+          <INCLUDE>Deviation.Id</INCLUDE>
+          <INCLUDE>Deviation.Header</INCLUDE>
+          <INCLUDE>Deviation.IconId</INCLUDE>
+          <INCLUDE>Deviation.Geometry.WGS84</INCLUDE>
+    </QUERY>
+</REQUEST>")
+    .send()
+    .expect("Connection något, jag vet inte");
+   
+
+println!("{}",res.status())
 }
