@@ -62,7 +62,8 @@ Flash messages var initialt menat att bli implementerat men på grund av stora p
 
 #### Friktionsvärdesskala
 Utförandet har gått bra i allmänhet även om det tog längre tid än beräknat. Eftersom vi har övertagit redan existerande kod så tog det lite tid att avgöra var koden bör skrivas. Samt att skalorna använde sig av ett Leaftlet API och inte ren javascript, vilket krävde ytterligare inlärning som ej var förväntad. Detta kan förbättras till nästa sprint genom att ta reda på exakt vad som krävs och därmed kan man göra en mer träffsäker tidsestimering.
-See Appendix för *Friktionsvärdesskala*
+
+[Se Appendix för *Friktionsvärdesskala*](#friktionsvärdesskala)
 
 Tidsfördelning i storleksordning
 
