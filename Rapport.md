@@ -25,60 +25,63 @@ Figuren nedan är ett modul-diagram över nuvarande lösning. Då uppgiften är 
      style="float: left; margin-right: 10px;" />
 
 
+
 ### 3.2 Arbetstillvägagång
 
-Vi har först suttit tillsammans i grupp och skrivit ihop stories och medföljande tasks efter vad vår produktägare Sofie har begärt. Därefter har vi delegerat ut dem efter intresse så att alla känt sig nöjda. Då vi är ett udda antal i gruppen så delade vi upp oss 2-2-1 då vi hade två stora stories och en mindre. Detta har lett till en ökad flexibilitet då vi har haft möjligheten att omfördela arbetsuppgifter efter behov.  Till nästa sprint kanske vi sitter 2 och 3 istället för att öka robustheten i projektet ifall någon skulle bli sjuk eller dylikt.
+Vi har först suttit tillsammans i grupp och skrivit ihop stories och medföljande tasks efter vad vår produktägare Sofia Sollén (expert)  har begärt. Därefter har vi delegerat ut dem efter intresse så att alla känt sig nöjda. Då vi är ett udda antal i gruppen så delade vi upp oss 2-2-1 då vi hade två stora stories och en mindre. Detta har lett till en ökad flexibilitet då vi har haft möjligheten att omfördela arbetsuppgifter efter behov.  Till nästa sprint kanske vi sitter 2 och 3 istället för att öka robustheten i projektet ifall någon skulle bli sjuk eller dylikt.
 
 Vi har jobbat effektivt med våra stories, både jobbat hemifrån och sen träffats och skrivit tillsammans i grupp. Två gånger i veckan, i starten och slutet, så har vi genomfört scrum-möten där vi gått igenom vad vi gjort på våra stories, eventuella svårigheter och sedan bestämt vad som skall göras inför nästa möte. Det har fungerat bra och vi har fått en bra översikt vad alla gör under sprinten. 
 
 Det vi kan förbättra till nästa sprint är kanske att jobba mer tillsammans i grupp, då kan vi lättare diskutera problem och få ännu bättre insikt i vad alla i gruppen gör. Vi bör även vara mer gedigna med att begära och slutföra pull-requests så att vi snabbare kan hitta eventuella problem och även merge:a våra branches med master-branchen.
 
 ### 3.2.1 Sprint 1
-
-Temat för sprint 1 är Friktionsdata, efter vårt möte med Sofia Sollén(expert) fick vi insikt på vilka funktioner som önskades. Friktionsdatan som förses av Trafikverket ska kunnas laddas upp till sidan och sedan visualiseras. Visualisering ska bestå av en övergripande färgskalad vy, och en mer detaljerad informationsruta vid varje datapunkt. 
-
+Temat för sprint 1 är Friktionsdata, efter vårt möte med Sofia Sollén fick vi insikt på vilka funktioner som önskades. Friktionsdatan som förses av Trafikverket ska kunnas laddas upp till sidan och sedan visualiseras. Visualisering ska bestå av en övergripande färgskalad vy, och en mer detaljerad informationsruta vid varje datapunkt. 
 Den andra funktionen som efterfrågades var en reparation och utökande av det redan existerande graf-verktyget. En väderstation eller region ska kunna väljas och graf av vald datatyp ska visas över tid, tidsintervallet ska kunna ändras. 
 
 Tre Stories gjordes för sprint 1 
-
-  *  Datagrafer
-
-  *  Friktionsvärdesskala 
-
-  *  Uppladdning av XML Fil
+Datagrafer
+Friktionsvärdesskala 
+Uppladdning av XML Fil
 
 
-**Datagrafer**
 
-**Friktionsvärdesskala**
 
+#### Datagrafer
+Utförandet har gått bra men har varit långsam på grund av många problem som inte var beräknade initialt i storien. Det mesta av problematiken kom från buggar som härstammade från den befintliga koden. Dessa buggar gjorde att arbetet stod stilla vid vissa punkter och på andra gjorde att man var tvungen att tänka om och utföra det på ett helt annat sätt.
+
+Flash messages var initialt menat att bli implementerat men på grund av stora problem med implementationen samt en väldigt liten användningsområde. Beslutet togs då att inte implementera flash messages i och med även ta bort alla bibliotek och allt som hade men flash messages att göra.    
+
+Se Appendix för *Datagrafer*
+
+Tidsfördelning i storleksordning
+Planerade tasks
+Buggar
+Oplanerade tasks
+
+
+#### Friktionsvärdesskala
 Utförandet har gått bra i allmänhet även om det tog längre tid än beräknat. Eftersom vi har övertagit redan existerande kod så tog det lite tid att avgöra var koden bör skrivas. Samt att skalorna använde sig av ett Leaftlet API och inte ren javascript, vilket krävde ytterligare inlärning som ej var förväntad. Detta kan förbättras till nästa sprint genom att ta reda på exakt vad som krävs och därmed kan man göra en mer träffsäker tidsestimering.
+See Appendix för *Friktionsvärdesskala*
 
 Tidsfördelning i storleksordning
 
-  * Planerade tasks
-  
-  * Skaffat kunskap om Leaflet API:et
-  
-  * Oplanerade tasks
-  
-  * Fixa bugs
+ * Planerade tasks
+ * Skaffat kunskap om Leaflet API:et
+ * Oplanerade tasks
+ * Fixa bugs
 
-**Uppladdning av XML fil**
 
+#### Uppladdning av XML fil
 Tasks följdes i sin ordning, den större skillnaden som gjordes var att formatet på filen inte var XML utan CSV (Comma Separated Values) detta fick tas i hänsyn vid parsing samt val av bibliotek. Vid uppladdning av mycket stora filer med filstorlek>300mb så fick “heapsize” ökas, samt att filen sparas på disk innan parsing. 
-
-Tiden det tog att utföra Storien var längre än förutsatt vilken inte var helt oväntat då utvecklarna var nya till att arbeta med strukturen som implementerats av tidigare utvecklare.
+Tiden det tog att utföra Storien var längre än förutsatt vilken inte var helt oväntat då utvecklarna var nya till att arbeta med strukturen som implementerats av tidigare utvecklare. Under utvecklingen av storien så noterades att stora mängder av data fick systemet att gå märkvärt långsammare och en diskussion om hur hanteringen av stora mängder data skulle hanteras effektivt och smidigt inleddes. En framtida story skapades för att i Sprint 2 hantera de problem som skulle kunna uppstå med stora mängder data. Trafikverkets struktur på friktionsdatan har ej varit konsekvent och en story för Sprint 2 för att göra databasen mer robust för förändringar gjordes.
+[Se Appendix för *Uppladdning av XML fil*](#uppladdning-av-xml-fil)
 
 Tidsfördelning i storleksordning
+Planerade tasks 
+Oplanerade tasks
+Diskussion och omdesign
+Fixa bugs
 
-  *  Planerade tasks 
-
-  *  Oplanerade tasks
-
-  *  Diskussion och omdesign
-
-  *  Fixa bugs
 
 
 ### 4.2.2 Regressionsrisker
