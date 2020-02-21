@@ -124,7 +124,7 @@ module.exports = {
             const sql =`
                 SELECT * 
                 FROM friction_data 
-                WHERE reporterOrganiation = ? AND latitude BETWEEN ? AND ? AND longitude BETWEEN ? AND ?;`
+                WHERE reporterOrganization = ? AND latitude BETWEEN ? AND ? AND longitude BETWEEN ? AND ?;`
             var values = [reporter, SWlat, NElat, SWlon, NElon];
             
             conn.query(sql, values, function (err, results) {
@@ -153,7 +153,7 @@ module.exports = {
                            + cos(a.latitude * 0.0175) * cos(? * 0.0175) *    
                              cos((? * 0.0175) - (a.longitude * 0.0175))
                           ) * 6371 <= ?
-                  ) and ReporterOrganiation = ?;`
+                  ) and ReporterOrganization = ?;`
 
             var variablesql = [lat,lat,lon,(radius/1000),reporter];
             conn.query(sql, variablesql, function (err, results) {
