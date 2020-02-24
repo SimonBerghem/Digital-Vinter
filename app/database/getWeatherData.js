@@ -68,7 +68,9 @@ module.exports = {
             ) tm on t.station_id = tm.station_id and t.id = tm.MaxID`
             
             conn.query(sql, function (err, results) { //   client.query(sql, [[parseInt(length)]], function (err, results) {
-                
+                if(results.length <= 0){
+                    return;
+                }
                 // convert timestamp and windspeed to wanted units
                 results.forEach(result => {
                     convertData(result)
