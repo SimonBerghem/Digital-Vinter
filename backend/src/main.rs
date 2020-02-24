@@ -7,6 +7,8 @@ extern crate mysql;
 
 use std::{thread, time::{Duration}};
 use mysql::chrono::{Local};
+//NYTT
+use reqwest::header::USER_AGENT;
 
 mod auth;
 mod fetch;
@@ -104,9 +106,10 @@ fn main() {
 fn testPost(){
     println!("Hello, world");
 
-  //<LOGIN authenticationkey="{AUTH}" />
+  //<LOGIN authenticationkey="{AUTH}" />´
     let client = reqwest::Client::new();
     let res = client.post("https://api.trafikinfo.trafikverket.se/v2/data.xml")
+    .header(USER_AGENT,"HalladiGOing")
     .body("<REQUEST>
     <LOGIN authenticationkey=\"d8b542b2dafe40f999f223c7aff04046\" />
     <QUERY objecttype=\"Situation\" schemaversion=\"1.2\">
@@ -122,6 +125,6 @@ fn testPost(){
     .send()
     .expect("Connection något, jag vet inte");
    
-
-println!("{}",res.status())
+println!("Status: {}",res.status());
+println!("Headers:\n{:#?}", res.headers());
 }
