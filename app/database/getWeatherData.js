@@ -28,7 +28,7 @@ module.exports = {
                 const values =  [[id]];
 
                 conn.query(sql, [values], function (err, results) {
-                    
+                   
                     // convert timestamp and windspeed to wanted units
                     convertData(results[0])
                     
@@ -68,7 +68,9 @@ module.exports = {
             ) tm on t.station_id = tm.station_id and t.id = tm.MaxID`
             
             conn.query(sql, function (err, results) { //   client.query(sql, [[parseInt(length)]], function (err, results) {
-                
+                if(results.length <= 0){
+                    return;
+                }
                 // convert timestamp and windspeed to wanted units
                 results.forEach(result => {
                     convertData(result)
@@ -101,7 +103,12 @@ module.exports = {
                 var values =  [id,start_time, stop_time];
 
                 conn.query(sql, values, function (err, results) {
-                    
+                    if(results.length <= 0){
+                        
+                        return;
+                    }
+                  
+
                     let filtered_result = [];
                     // calculate the time difference between the first and last result
                     let time_diff = results[results.length - 1].timestamp.getTime() - results[0].timestamp.getTime();
@@ -109,8 +116,10 @@ module.exports = {
                     //change time_diff from ms to h
                     time_diff = time_diff / (3.6*(10**6));
                     
+                    console.log(results);
+
                     let i = 0;
-     
+                    
                     results.forEach (result =>{
                         
                         // convert timestamp and windspeed to wanted units
@@ -198,4 +207,3 @@ function convertData(result){
     result.wind_speed /=  3.6;
     result.wind_speed = result.wind_speed.toFixed(2);
 }
-
