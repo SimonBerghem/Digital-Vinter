@@ -101,7 +101,25 @@ module.exports = {
                 var values =  [id,start_time, stop_time];
 
                 conn.query(sql, values, function (err, results) {
-                    
+                    if(results.length <= 0){
+                        console.log("Error");
+                        return;
+                    }
+                    console.log("Test");
+                    console.log(results);
+                    let flag = true;
+                    results.forEach (zeroPoint =>{
+                        console.log(zeroPoint, "TestforEach")
+                        if(zeroPoint.length <= 0){
+                            console.log("Testif");
+                            flag = true;
+                        }
+                    });
+                    if(flag === true){
+                        console.log("Test2");
+                       req.flash('success', 'There is no data for a selected date')
+                    }
+
                     let filtered_result = [];
                     // calculate the time difference between the first and last result
                     let time_diff = results[results.length - 1].timestamp.getTime() - results[0].timestamp.getTime();
@@ -109,8 +127,10 @@ module.exports = {
                     //change time_diff from ms to h
                     time_diff = time_diff / (3.6*(10**6));
                     
+                    console.log(results);
+
                     let i = 0;
-     
+                    
                     results.forEach (result =>{
                         
                         // convert timestamp and windspeed to wanted units
