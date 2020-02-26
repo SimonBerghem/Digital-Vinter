@@ -79,26 +79,6 @@ function getColor(temperature) {
             temperature > -35   ? '#004C99' :
                                   '#003366';
 }
-/**
- * This method returns a color depending on the friction value
- * @param {*} temperature a float value 
- */
-function getFrictionColor(frictionvalue) {
-    return  frictionvalue > 1.0  ? '#EDE285' :
-    frictionvalue > 0.9 ? '#C9E36F' :
-    frictionvalue > 0.8  ? '#96D858' :
-    frictionvalue > 0.7  ? '#60CB42' :
-    frictionvalue > 0.6   ? '#33BD3B' :
-    frictionvalue > 0.5   ? '#27AC55' :
-    frictionvalue > 0.4   ? '#1D9A6C' :
-    frictionvalue > 0.3  ? '#18907C' :
-    frictionvalue > 0.2 ? '#138386' :
-    frictionvalue > 0.1  ? '#0C4571' :
-    frictionvalue > 0.0  ? '#082B65' :
-    '#041531';
-}
-
-
 
 /**
  * Controls the temperature scale box on map.
@@ -145,18 +125,18 @@ frictionScale.onAdd = function (map) {
     const maindiv = L.DomUtil.create('div');
     const div = L.DomUtil.create('div', 'info legend'),
           title = "Friktion",
-          scales = [1.0,0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.2,0.1,0.0],
+          scales = ["0.35 - 1.00","0.25 - 0.35","0.00 - 0.25"],
           labels = [];
 
     maindiv.innerHTML+= '<button id="friktionButton" class="oButton">'+title+'</button>';
 
     for (var i = 0; i < scales.length; i++) {
         if(i == 0){
-            div.innerHTML +=  '<div class ="scalediv frikdiv"> <i style="background:' + getFrictionColor(scales[i]) + '"></i> >' + scales[i] + '<br>' + '</div>';
+            div.innerHTML +=  '<div class ="scalediv frikdiv"> <i style="background:' + "#007000" + '"></i>' + scales[i] + '<br>' + '</div>';
         }else if(i == scales.length -1) {
-            div.innerHTML +=  '<div class ="scalediv frikdiv"> <i style="background:' + getFrictionColor(scales[i]) + '"></i> <' + scales[i] + '</div>';
+            div.innerHTML +=  '<div class ="scalediv frikdiv"> <i style="background:' + "#CC0000" + '"></i>' + scales[i] + '</div>';
         }else {
-            div.innerHTML +=  '<div class ="scalediv frikdiv"> <i style="background:' + getFrictionColor(scales[i]) + '"></i> ' + (scales[i]) + '<br>'+ '</div>';
+            div.innerHTML +=  '<div class ="scalediv frikdiv"> <i style="background:' + "#FFBF00" + '"></i>' + (scales[i]) + '<br>'+ '</div>';
         }
     }
     maindiv.append(div);
