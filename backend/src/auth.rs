@@ -5,6 +5,7 @@ pub const URL_O: &'static str = "HUR I HELA FRIDEN FICK DE TAG I DESSA URL;er???
 
 pub const USER_DATEX: &'static str = "LTU";
 pub const PASS_DATEX: &'static str = "DatexLTU2018#";
+//DatexLTU2020#
 
 
 

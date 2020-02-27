@@ -4,4 +4,4 @@ node_modules/
 
 backend/e6.txt
 
-*.xml
+./backend/*.xml
