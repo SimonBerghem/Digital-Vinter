@@ -1,42 +1,42 @@
 
 /* .map-container {
-    width: 100%; 
-    height: 100%;
+width: 100%; 
+height: 100%;
 } */
 
 #mapid { 
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        
-        
-    }.info { 
-        padding: 6px 8px; 
-        font: 14px/16px Arial, Helvetica, sans-serif; 
-        background: #E8E8E8; 
-        box-shadow: 0 0 15px rgba(0,0,0,0.2); 
-        border-radius: 5px; 
-    }.info h4 { 
-        margin: 0 0 5px; 
-        color: #555; }
-	.legend { 
-       /* width: 70px;                             skaldivarna.         */
-		text-align: right; 
-		line-height: 20px; 
-        color: #555; 
-    }.legend i { 
-        width: 20px; 
-        height: 20px; 
-        float: left; 
-        margin-right: 4px; 
-        opacity: 0.7; 
-    }
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+
+
+}.info { 
+    padding: 6px 8px; 
+    font: 14px/16px Arial, Helvetica, sans-serif; 
+    background: #E8E8E8; 
+    box-shadow: 0 0 15px rgba(0,0,0,0.2); 
+    border-radius: 5px; 
+}.info h4 { 
+    margin: 0 0 5px; 
+    color: #555; }
+.legend { 
+    /* width: 70px;                             skaldivarna.         */
+    text-align: right; 
+    line-height: 20px; 
+    color: #555; 
+}.legend i { 
+    width: 20px; 
+    height: 20px; 
+    float: left; 
+    margin-right: 4px; 
+    opacity: 0.7; 
+}
 .leaflet-top.leaflet-right {
 
     right: 21vw;
-    
+
 }
 .button {
     display: inline-block;
@@ -138,7 +138,7 @@
     border-radius: 4px;
     padding-left: 10px;
     position: absolute;
-    
+
 }
 
 #suggestion-field{
@@ -184,24 +184,103 @@
     opacity: 1;
 }
 .oButton:active{
- box-shadow:inset 0 0.6em 2em -0.3em rgba(0,0,0,0.15),inset 0 0 0em 0.05em rgba(255,255,255,0.12);
+    box-shadow:inset 0 0.6em 2em -0.3em rgba(0,0,0,0.15),inset 0 0 0em 0.05em rgba(255,255,255,0.12);
 }
 .oButton.buttonminimize {
     background-color: #cc201b;
 }
 .scalediv{
-    
+
 }
 .scalediv legend{
-    
-    
+
+
 }
 /* CSS för popups */
 
 #marker-data{
     font-size: 15px;
-    
-    
-    
+
+
+
 }
 
+/*  CSS för den övre slidern.*/
+
+#slider{
+    top: 74%; 
+    right: 1px; 
+    margin: 100px 250px;
+    z-index: 500;
+    width: 65%;
+    float:left;
+    height: 40px;
+    display: none;
+    border: 1px solid black;
+    border-radius: 4px;
+    position: absolute;
+}
+#slider .noUi-connect {
+    background: #56bf9a;
+}
+#slider .noUi-handle {
+    width: 37px;
+    height: 45px;
+}
+
+#slider .noUi-tooltip {
+    display: none;
+}
+#slider .noUi-active .noUi-tooltip {
+    display: block;
+}
+
+/*  CSS för den nedre slidern.*/
+
+#slider-snap{
+    cursor: pointer;
+    top: 80%; 
+    right: 1px; 
+    margin: 100px 250px;
+    z-index: 500;
+    width: 65%;
+    float:left;
+    height: 40px;
+    display: none;
+    border: 1px solid black;
+    border-radius: 4px;
+    position: absolute;
+
+}
+#slider-snap .noUi-handle {
+    width: 37px;
+    height: 45px;
+}
+
+/* CSS för knappen som togglar sliders*/
+
+.slidertoggle{
+    z-index: 500;
+    top: 43%;
+    left: 10px ;
+    position: absolute;
+    font-size: 18px; 
+    background-color: #346791; 
+    color: #fff; 
+    border: 0px; 
+    border-radius: 3px; 
+    padding: 6px;
+    cursor: pointer;
+    width: 100px;
+    opacity: 0.8;
+    text-align: center;
+    text-decoration:none;
+    box-shadow:inset 0 -0.6em 1em -0.35em rgba(0,0,0,0.17),inset 0 0.6em 2em -0.3em rgba(255,255,255,0.15),inset 0 0 0em 0.05em rgba(255,255,255,0.12);
+
+}
+.slidertoggle:hover{
+    opacity: 1;
+}
+.slidertoggle:active{
+    box-shadow:inset 0 0.6em 2em -0.3em rgba(0,0,0,0.15),inset 0 0 0em 0.05em rgba(255,255,255,0.12);
+}

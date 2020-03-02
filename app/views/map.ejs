@@ -23,6 +23,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
     <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
     <script src="https://unpkg.com/leaflet-draw@1.0.2/dist/leaflet.draw.js"></script>
+    <!-- noUIslider -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/8.5.1/nouislider.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/8.5.1/nouislider.min.js"></script>
 
   </head>
   <body>
@@ -33,6 +36,13 @@
           <input type="text" id="searchbar">
             <div id="suggestion-field"></div>
         </div>
+          
+          <!-- Slider -->
+          <div id="slider" class="sliderclass"></div> 
+          <div id="slider-snap" class="sliderclass"></div>
+          <button class ="slidertoggle" onclick="sliderToggle()">Sliders</button>   
+          
+          
   
 
       <!-- Station field to the right and button -->
@@ -44,7 +54,10 @@
       </div>
     </div>
   </div>
-
+      
+    
+      
+      
   <!-- Modal -->
   <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -168,7 +181,20 @@
       function openewgraphtab(){
         var w = window.open("/graph");
       }
-    
+        
+     /* Funktion för att toggla sliders */    
+      function sliderToggle(){
+          var slider1 = document.getElementById("slider");
+          var slider2 = document.getElementById("slider-snap");
+            if (slider1.style.display === "none") {
+                slider1.style.display = "block";
+                slider2.style.display = "block";
+            } else {
+                slider1.style.display = "none";
+                slider2.style.display = "none";
+            }    
+      }
     </script>
+      
   </body>
 </html>

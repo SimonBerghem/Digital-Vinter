@@ -14,8 +14,8 @@ const standardTileLayer = L.TileLayer.boundaryCanvas(mapboxURL, {
     minZoom: 5,
     maxBoundsViscosity: 1.0,
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-        '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-        'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+    'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
     id: 'mapbox.streets'
     // boundary: countyData
 });
@@ -68,8 +68,8 @@ const roadTileLayer = L.TileLayer.boundaryCanvas(swedenRoads, {
     minZoom: 5,
     maxBoundsViscosity: 1.0,
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-        '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-        'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+    'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
     id: 'mapbox.streets',
     //boundary: countyData
 });
@@ -135,12 +135,12 @@ function highlightFeature(event) {
     }else {
         let layer = event.target;
         layer.setStyle({
-        weight: 2,
-        color: 'black',
-        dashArray: '',
-        fillOpacity: 0
+            weight: 2,
+            color: 'black',
+            dashArray: '',
+            fillOpacity: 0
         });
-    info.update(layer.feature.properties);
+        info.update(layer.feature.properties);
     }
 }
 
@@ -159,10 +159,10 @@ function createCountyPopup(event) {
     let button = document.createElement("div");
     let popupContent = document.createElement("table-data");
     popupContent.innerHTML  = '<table id = "county-data" >' +
-    '<tr> <td> Län: </td><td>' + countyNames[avg[0]] + '</td></tr>' + 
-    '<tr> <td>Lufttemperatur: </td><td>' + avg[1].toFixed(1)+ '\xB0C' + '</td></tr>' +
-    '<tr> <td>Vägtemperatur: </td><td>' + avg[2].toFixed(1)+ '\xB0C' + '</td></tr>' +
-    '</table>';
+        '<tr> <td> Län: </td><td>' + countyNames[avg[0]] + '</td></tr>' + 
+        '<tr> <td>Lufttemperatur: </td><td>' + avg[1].toFixed(1)+ '\xB0C' + '</td></tr>' +
+        '<tr> <td>Vägtemperatur: </td><td>' + avg[2].toFixed(1)+ '\xB0C' + '</td></tr>' +
+        '</table>';
 
 
     for(let i = 0; i < chosenCounties.length; i++) {
@@ -176,8 +176,8 @@ function createCountyPopup(event) {
         button.className = "add-button";
         button.innerText = "Lägg till";
     }
-    
-    
+
+
     button.addEventListener("click" , function() {
         if(chosenCountyExists == true) {
             removeCounty(countyCode, button); 
@@ -205,8 +205,8 @@ function resetHighlight(event) {
 
     }else {
         info.update();
-        }
     }
+}
 
 /**
  * Enables mouse hover and click events to a specific GeoJSON feature on a specific layer.
@@ -261,12 +261,12 @@ const stateChangingButton = L.easyButton({
         {
             stateName: 'Ta-bort-färgmarkering',        
             icon:      'fas fa-toggle-off',               
-            title:     'Ta bort färmarkering',      
+            title:     'Ta bort färgmarkering',      
             onClick: function(btn, map) {      
                 btn.state('Lägg-till-färgmarkering');    
                 geojson.eachLayer(function (layer) {    
-                     layer.setStyle({fillOpacity :0 }) 
-                     noColor = true;
+                    layer.setStyle({fillOpacity :0 }) 
+                    noColor = true;
                 });
             }
         }, 
@@ -279,7 +279,7 @@ const stateChangingButton = L.easyButton({
                 geojson.eachLayer(function (layer) {    
                     layer.setStyle({fillOpacity : 0.7 }) 
                     noColor = false;
-               });
+                });
             }
         }
     ]
@@ -304,11 +304,11 @@ function addtoMAPtoggle(data){
     stringreport += '</select>';
 
     toggleFriction.onAdd = function (map) {
-       var div = L.DomUtil.create('div');
-       //div.innerHTML = '<select><option>WeatherStationData</option><option>RoadCloud</option><option>Volvo Cars</option><option>NIRA Dynamics</option></select>';
-       div.innerHTML = stringreport;
-       div.firstChild.onmousedown = div.firstChild.ondblclick = L.DomEvent.stopPropagation;
-       return div;
+        var div = L.DomUtil.create('div');
+        //div.innerHTML = '<select><option>WeatherStationData</option><option>RoadCloud</option><option>Volvo Cars</option><option>NIRA Dynamics</option></select>';
+        div.innerHTML = stringreport;
+        div.firstChild.onmousedown = div.firstChild.ondblclick = L.DomEvent.stopPropagation;
+        return div;
     };
     toggleFriction.addTo(map);
 
@@ -318,7 +318,7 @@ function addtoMAPtoggle(data){
                 geojson.eachLayer(function (layer) {    
                     layer.setStyle({fillOpacity : 0.7 }) 
                     noColor = false;
-               });
+                });
                 info.addTo(map);
                 //temperatureScale.addTo(map);
                 $( "#search-container" ).show();
@@ -331,5 +331,56 @@ function addtoMAPtoggle(data){
         });
     });
 }
+
+
+/*  Övre Slidern */
+
+var slidervar = document.getElementById('slider');
+noUiSlider.create(slidervar, {
+    connect: true,
+    start: [ 1, 35676000 ],
+    range: {
+        min: 1,
+        max: 35676000
+    }
+});
+
+
+/*  Nedre Slidern */
+
+var snapSlider = document.getElementById('slider-snap');
+noUiSlider.create(snapSlider, {
+    start: [250],
+    snap: true,
+    //connect: [true,false],
+    range: {
+        'min': 0,
+        '10%': 50,
+        '20%': 100,
+        '30%': 150,
+        '40%': 200,
+        '50%': 250,
+        '60%': 300,
+        '70%': 350,
+        '80%': 400,
+        '90%': 450,
+        'max': 500
+    },
+    pips: {
+        mode: 'steps',
+        stepped: true,
+        density: 10
+    }
+
+});
+
+
+
+
+
+
+
+
+
 
 
