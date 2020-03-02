@@ -82,15 +82,30 @@ function createFrictionLayer(filteredfrictionData) {
     //frictionCanvas.clearLayers();
 
     for (var i = 0; i < filteredfrictionData.length; i += 1) { 
+
+        if(filteredfrictionData[i].MeasureValue >= 0.35 && filteredfrictionData[i].MeasureValue < 1.00){
+            var frictionPointColor ='#007000';
+
+        }else if(filteredfrictionData[i].MeasureValue >= 0.25 && filteredfrictionData[i].MeasureValue < 0.34){
+            var frictionPointColor ='#FFBF00';
+
+        }else{
+            // 0.00-0.25 and Measurevalues that aren't valid.
+            var frictionPointColor ='#CC0000';
+        }
+        
         let circle = L.circleMarker([filteredfrictionData[i].Latitude, filteredfrictionData[i].Longitude], {
-        renderer: frictionCanvas,
-        color: '#0a7bf5'
+            renderer: frictionCanvas,
+            color: frictionPointColor
+          
         });
+
         circle.bindPopup(popupfriction(filteredfrictionData[i], circle));
         circleGroup.push(circle);
         circle.addTo(map);
-        
+    
     }
+    
 
 
     //Det är här för att det ska ladda snyggare. Motsvarande för att sätta igång är i maptilelayers.js i början av funktionen.
