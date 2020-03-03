@@ -1,1 +1,0 @@
-<RESPONSE><RESULT><Situation><Deviation><Geometry><WGS84>POINT (17.5723667 59.84947)</WGS84></Geometry><IconId>roadAccident</IconId><Id>SE_STA_TRISSID_1_16042719</Id></Deviation></Situation></RESULT></RESPONSE>

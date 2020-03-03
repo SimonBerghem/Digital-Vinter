@@ -44,6 +44,21 @@ pub struct WeatherData {
     _secret: (),
 
 }
+//NYTT
+#[derive(Debug)]
+pub struct DeviationData {
+    pub Deviation_id: String,
+    pub Deviation_icon_id: String,
+    pub Deviation_Geometry_SWEREF99TM: String,
+    pub Deviation_Geometry_WGS84: String,
+    pub Deviation_SeverityCode: String,
+    _secret: (),
+
+}
+
+
+//<RESPONSE><RESULT><Situation><Deviation><Geometry><SWEREF99TM>POINT (730069.97 7094714.13)</SWEREF99TM><WGS84>POINT (19.6907749 63.9034)</WGS84></Geometry><IconId>roadAccident</IconId><Id>SE_STA_TRISSID_1_4798382</Id><SeverityCode>4</SeverityCode></Deviation></Situation><Situation><Deviation><Geometry><SWEREF99TM>POINT (568274.04 6366488.85)</SWEREF99TM><WGS84>POINT (16.1372547 57.43597)</WGS84></Geometry><IconId>roadAccident</IconId><Id>SE_STA_TRISSID_1_8509792</Id><SeverityCode>4</SeverityCode></Deviation></Situation></RESULT></RESPONSE>
+
 pub fn parse_cameras(xmlfile: &str) -> Vec<CameraData> {
 
     #[derive(Clone, Copy)]
@@ -54,6 +69,7 @@ pub fn parse_cameras(xmlfile: &str) -> Vec<CameraData> {
         Thumb,
 
     };
+
     let mut xml = Reader::from_file(xmlfile).expect("Failed to open file!");
     xml.trim_text(true); //remove whitespaces
 
@@ -154,6 +170,76 @@ pub fn parse_cameras(xmlfile: &str) -> Vec<CameraData> {
 
 }
 
+//
+pub fn parse_deviation(xmlfile: &str) -> Vec<DeviationData>{
+
+
+    let mut xml = Reader::from_file(xmlfile).expect("Failed to open file!");
+    xml.trim_text(true);
+
+    let mut deviation_data = Vec::new();
+    let mut buf = Vec::new();
+
+    loop {
+         
+        match xml.read_event(&mut buf){
+            Ok(Event::Start(ref e)) => match e.name() {
+                b"Deviation" => {
+                    let deviation = DeviationData {
+                        Deviation_id : String::new(),
+                        Deviation_icon_id : String::new(),
+                        Deviation_Geometry_SWEREF99TM : String::new(),
+                        Deviation_Geometry_WGS84 : String::new(),
+                        Deviation_SeverityCode : String::new(),
+                        _secret: (),
+
+
+                    };
+                    deviation_data.push(deviation);
+                    let deviation = deviation_data.last_mut().unwrap();
+                    
+                }
+                b"Id" => {
+                    let deviation = deviation_data.last_mut().unwrap();
+                    deviation.Deviation_id = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+
+                    
+
+                }
+                b"IconId" => {
+                    let deviation = deviation_data.last_mut().unwrap();
+                    //println!("{:?}: IconID",xml.read_text(e.name(), &mut Vec::new()).unwrap());
+                    deviation.Deviation_icon_id = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+
+                }
+                b"SWEREF99TM" => {
+                    let deviation = deviation_data.last_mut().unwrap();
+                    deviation.Deviation_Geometry_SWEREF99TM = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+                }
+                b"WGS84" => {
+                    let deviation = deviation_data.last_mut().unwrap();
+                    deviation.Deviation_Geometry_WGS84 = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+                }
+                b"SeverityCode" => {
+                    let deviation = deviation_data.last_mut().unwrap();
+                    deviation.Deviation_SeverityCode = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+
+                }
+                _ => (), //Resten av Cases
+
+
+            }
+            Ok(Event::Eof) => break,
+            Err(e) => panic!("Error at pos {}: {:?}", xml.buffer_position(), e),_ => (),
+
+
+        }
+        buf.clear();
+
+    }
+    deviation_data
+}
+
 // Parse xml file and return station_data vector
 pub fn parse_station(xmlfile: &str) -> Vec<StationData> {
 
@@ -241,6 +327,7 @@ pub fn parse_station(xmlfile: &str) -> Vec<StationData> {
     station_data
 
 }
+
 
 pub fn parse_weather(xmlfile: &str) -> Vec<WeatherData> {
     // Used for nested tags
