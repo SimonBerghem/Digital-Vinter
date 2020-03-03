@@ -11,6 +11,7 @@ repository = "https://github.com/dynematic/xml_to_mysql"
 keywords = ["xml", "mysql", "parse"]
 
 [dependencies]
+xmlparser = {version = "0.13.0"}
 reqwest = {version = "0.10.2", features = ["blocking"]}
 hyper = "0.13"
 tokio = { version = "0.2", features = ["full"] }
