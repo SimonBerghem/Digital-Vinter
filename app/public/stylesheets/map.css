@@ -205,14 +205,13 @@ height: 100%;
 
 }
 
-/*  CSS för den övre slidern.*/
+/*  CSS för slidern.*/
 
 #slider{
-    top: 74%; 
-    right: 1px; 
-    margin: 100px 250px;
+    top: 87%; 
+    left: 15%;
     z-index: 500;
-    width: 65%;
+    width: 70%;
     float:left;
     height: 40px;
     display: none;
@@ -235,27 +234,35 @@ height: 100%;
     display: block;
 }
 
-/*  CSS för den nedre slidern.*/
-
-#slider-snap{
-    cursor: pointer;
-    top: 80%; 
-    right: 1px; 
-    margin: 100px 250px;
+/* CSS för datumutskrifterna */
+#event-start{
     z-index: 500;
-    width: 65%;
-    float:left;
-    height: 40px;
-    display: none;
-    border: 1px solid black;
-    border-radius: 4px;
+    height: 200px;
+    width: 400px;
+    top: 93%;
+    right: 45%;
     position: absolute;
+    font-weight: 800;
+    font-size: 20px;
+    color: #ad1c1c;
+    display: none;
+    
+}
+#event-end{
+    z-index: 500;
+    height: 200px;
+    width: 400px;
+    top: 93%;
+    right: 25%;
+    position: absolute;
+    font-weight: 800;
+    font-size: 20px;
+    color: #ad1c1c;
+    display: none;
+    
+}
 
-}
-#slider-snap .noUi-handle {
-    width: 37px;
-    height: 45px;
-}
+
 
 /* CSS för knappen som togglar sliders*/
 

@@ -38,9 +38,11 @@
         </div>
           
           <!-- Slider -->
-          <div id="slider" class="sliderclass"></div> 
-          <div id="slider-snap" class="sliderclass"></div>
-          <button class ="slidertoggle" onclick="sliderToggle()">Sliders</button>   
+          
+          <div id="slider" class="sliderclass"></div>
+          <div id ="event-start"></div>
+          <div id ="event-end"></div>
+          <button class ="slidertoggle" onclick="sliderToggle()">Slider</button>   
           
           
   
@@ -184,14 +186,17 @@
         
      /* Funktion för att toggla sliders */    
       function sliderToggle(){
-          var slider1 = document.getElementById("slider");
-          var slider2 = document.getElementById("slider-snap");
-            if (slider1.style.display === "none") {
-                slider1.style.display = "block";
-                slider2.style.display = "block";
+          var slider = document.getElementById("slider");
+          var tooltip1 = document.getElementById("event-start");
+          var tooltip2 = document.getElementById("event-end");
+            if (slider.style.display === "none") {
+                slider.style.display = "block";
+                tooltip1.style.display = "block";
+                tooltip2.style.display = "block";
             } else {
-                slider1.style.display = "none";
-                slider2.style.display = "none";
+                slider.style.display = "none";
+                tooltip1.style.display = "none";
+                tooltip2.style.display = "none";
             }    
       }
     </script>

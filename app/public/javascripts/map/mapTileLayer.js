@@ -313,7 +313,7 @@ function addtoMAPtoggle(data){
     toggleFriction.addTo(map);
 
     $('select').change(function(){
-        $('select option:selected').each(function(){
+        $('select option:selected').each(function(){                        /*  GET /api/getFrictionData?reporter=Radie3 200 35767.192 ms - 2   Denna inkluderar radiemeny och tidsmenyn (fix)     */
             if($(this).text()=="WeatherStationData"){
                 geojson.eachLayer(function (layer) {    
                     layer.setStyle({fillOpacity : 0.7 }) 
@@ -333,52 +333,150 @@ function addtoMAPtoggle(data){
 }
 
 
-/*  Övre Slidern */
 
-var slidervar = document.getElementById('slider');
-noUiSlider.create(slidervar, {
+/* Välj radie */ 
+const radiemeny = L.control({position: 'topleft'});
+let radieoptions = '<select><option>Radie1</option><option>Radie2</option><option>Radie3</option><option>Radie4</option><option>Radie5</option></select>';
+
+radiemeny.onAdd = function (map) {
+    var div = L.DomUtil.create('div');
+    div.innerHTML = radieoptions;
+    div.firstChild.onmousedown = div.firstChild.ondblclick = L.DomEvent.stopPropagation;
+    return div;
+};
+radiemeny.addTo(map);
+
+
+
+
+
+/* Välj tidsaggretation */ 
+const tidsaggregationmeny = L.control({position: 'topleft'});
+let tidoptions = '<select><option>Tid1</option><option>Tid2</option><option>Tid3</option><option>Tid4</option><option>Tid5</option></select>';
+
+tidsaggregationmeny.onAdd = function (map) {
+    var div = L.DomUtil.create('div');
+    div.innerHTML = tidoptions;
+    div.firstChild.onmousedown = div.firstChild.ondblclick = L.DomEvent.stopPropagation;
+    return div;
+};
+tidsaggregationmeny.addTo(map);
+
+
+
+
+//////////////////////////////////////////////////////////////////////// Sliders ///////////////////////////////////////////////////////////////////////////
+
+
+
+/* Datum för slidern */
+function timestamp(str) {
+    return new Date(str).getTime();
+}
+var weekdays = [
+    "Söndag", "Måndag", "Tisdag",
+    "Onsdag", "Torsdag", "Fredag",
+    "Lördag"
+];
+
+var months = [
+    "Januari", "Februari", "Mars",
+    "April", "Maj", "Juni", "Juli",
+    "Augusti", "September", "Oktober",
+    "November", "December"
+];
+
+// Suffix för datum n.
+function nth(d) {
+    if (d > 3 && d < 32) return ':de';
+    switch (d % 10) {
+        case 1:
+            return ":a";
+        case 2:
+            return ":a";
+        default:
+            return ":de";
+    }
+}
+
+// En sträng av hela datumet
+function formatDate(date) {
+    return weekdays[date.getDay()] + " den " +
+        date.getDate() + nth(date.getDate()) + " " +
+        months[date.getMonth()] + " " +
+        date.getFullYear();
+}
+
+
+var date = new Date();
+var previousMonth = new Date();
+previousMonth.setMonth(previousMonth.getMonth() - 1);
+
+
+function toFormat ( v ) {
+    return formatDate(new Date(v));
+}
+
+
+
+/* Datum slidern  */
+var dateSlider = document.getElementById('slider');
+noUiSlider.create(dateSlider, {
+
+    behaviour: 'tap',
     connect: true,
-    start: [ 1, 35676000 ],
+    tooltips: [ true, true ],
+    format: { to: toFormat, from: Number },
+
     range: {
-        min: 1,
-        max: 35676000
-    }
-});
-
-
-/*  Nedre Slidern */
-
-var snapSlider = document.getElementById('slider-snap');
-noUiSlider.create(snapSlider, {
-    start: [250],
-    snap: true,
-    //connect: [true,false],
-    range: {
-        'min': 0,
-        '10%': 50,
-        '20%': 100,
-        '30%': 150,
-        '40%': 200,
-        '50%': 250,
-        '60%': 300,
-        '70%': 350,
-        '80%': 400,
-        '90%': 450,
-        'max': 500
+        min: timestamp('2019'),
+        max: timestamp(date)
     },
-    pips: {
-        mode: 'steps',
-        stepped: true,
-        density: 10
-    }
+
+    // Steps of one week
+    step: 1 * 24 * 60 * 60 * 1000,
+
+    start: [timestamp(previousMonth), timestamp(date)],
+
 
 });
 
+var dateValues = [
+    document.getElementById('event-start'),
+    document.getElementById('event-end')
+];
 
 
+// Tooltips på handles
+dateSlider.noUiSlider.on('update', function (values, handle) {
+    dateValues[handle].innerHTML = values[handle]; 
+});
 
+//  Fråntar kontrollen av kartan medans man drar i slidern.
+dateSlider.noUiSlider.on('start', function (values, handle) {    
+    map.dragging.disable();
+    map.touchZoom.disable();
+    map.doubleClickZoom.disable();
+    map.scrollWheelZoom.disable();
+    map.boxZoom.disable();
+    map.keyboard.disable();  
+});
 
+// Återger kontrollen efter man släppt slidern.
+dateSlider.noUiSlider.on('end', function (values, handle) {
+    map.dragging.enable();
+    map.touchZoom.enable();
+    map.doubleClickZoom.enable();
+    map.scrollWheelZoom.enable();
+    map.boxZoom.enable();
+    map.keyboard.enable();
+});
 
+// Returnerar Datumsträngen
+function getDates(){
+    return [dateValues[0].innerHTML , dateValues[1].innerHTML];
+
+}
 
 
 
