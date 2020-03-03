@@ -3,27 +3,28 @@ extern crate quick_xml;
 #[macro_use] // params! 
 extern crate mysql;
 
-
-
 use std::{thread, time::{Duration}};
 use mysql::chrono::{Local};
 //NYTT
 use reqwest::ClientBuilder;
 use reqwest::header::USER_AGENT;
 use reqwest::header::CONTENT_TYPE;
+use quick_xml::Reader;
+use quick_xml::events::Event;
+
 use std::io;
 use std::fs::File;
-//use reqwest::blocking;
 mod auth;
 mod fetch;
 mod parse_xml;
 mod database;
 
-
-
 fn main() {
 
+    let deviation_data = parse_xml::parse_deviation("TESTFILE.xml");
+    println!("{:?}: Deviation Data", deviation_data);
     testPost();
+    //testParse();
     //testPost_2();
     let opts = database::get_opts(auth::USER_DB, auth::PASS_DB, auth::ADDR_DB, auth::NAME_DB);
     // // // Create new pool connections 
@@ -121,35 +122,71 @@ fn testPost(){
     let mut res = client.post("https://api.trafikinfo.trafikverket.se/v2/data.xml").header(USER_AGENT,"DATAEXLTU20").header(CONTENT_TYPE,"text/xml")
     .body("
     <REQUEST>
-        <LOGIN authenticationkey=\"d8b542b2dafe40f999f223c7aff04046\" />
-        <QUERY objecttype=\"Situation\" schemaversion=\"1.2\">
-            <FILTER>
-                <EQ name=\"Deviation.MessageType\" value=\"Olycka\" />
-            </FILTER>
-            <INCLUDE>Deviation.Id</INCLUDE>
-            <INCLUDE>Deviation.Header</INCLUDE>
-            <INCLUDE>Deviation.IconId</INCLUDE>
-            <INCLUDE>Deviation.Geometry.WGS84</INCLUDE>
-        </QUERY>
-    </REQUEST>")
+    <LOGIN authenticationkey=\"d8b542b2dafe40f999f223c7aff04046\" />
+    <QUERY objecttype=\"Situation\" schemaversion=\"1.2\">
+        <FILTER>
+            <EQ name=\"Deviation.MessageType\" value=\"Olycka\" />
+            <EQ name=\"Deviation.IconId\" value=\"roadAccident\" />
+        </FILTER>
+        <INCLUDE>Deviation.Id</INCLUDE>
+        <INCLUDE>Deviation.Header</INCLUDE>
+        <INCLUDE>Deviation.IconId</INCLUDE>
+        <INCLUDE>Deviation.Geometry.SWEREF99TM</INCLUDE>
+        <INCLUDE>Deviation.Geometry.WGS84</INCLUDE>
+        <INCLUDE>Deviation.SeverityCode</INCLUDE>
+    </QUERY>
+</REQUEST>")
     .send()
     .unwrap();
    
 println!("Status: {}",res.status());
-let mut file = File::create("TESTFILE.txt")
+let mut file = File::create("TESTFILE.xml")
         .expect("Error creating file, station_data");
 io::copy(&mut res, &mut file)
     .expect("Failed to read response to file");
 //println!("Status: {}",res.text());
 //println!("Headers:\n{}", res.headers());
-
 let c = reqwest::blocking::Client::new();
 let res = c.get("https://rust-lang.org").send().unwrap();
     println!("Status: {}", res.status());
 
- 
+
     
 let cl = reqwest::blocking::Client::new();
 let res = cl.post("http://httpbin.org/post").body("the exact body that is sent").send().unwrap();
  println!("Status: {}", res.status());
 }
+
+
+// fn testParse(){
+
+        
+//     let xml = r#"<RESPONSE><RESULT><Situation><Deviation><Geometry><SWEREF99TM>POINT (568274.04 6366488.85)</SWEREF99TM><WGS84>POINT (16.1372547 57.43597)</WGS84></Geometry><IconId>roadAccident</IconId><Id>SE_STA_TRISSID_1_8509792</Id><SeverityCode>4</SeverityCode></Deviation></Situation></RESULT></RESPONSE>"#;
+//     let mut reader = Reader::from_str(xml);
+//     reader.trim_text(true);
+
+//     let mut count = 0;
+//     let mut txt = Vec::new();
+//     let mut buf = Vec::new();
+
+//     // The `Reader` does not implement `Iterator` because it outputs borrowed data (`Cow`s)
+//         loop {
+//             match reader.read_event(&mut buf) {
+//                 Ok(Event::Start(ref e)) => {
+//                     match e.name() {
+//                     b"SeverityCode" => {
+//                         println!("attributes values: {:?}", xml.read_text(e.name(), &mut Vec::new()).unwrap());
+//                     }
+//                 _ => (),
+//                 }
+//             },
+//             Ok(Event::Text(e)) => txt.push(e.unescape_and_decode(&reader).unwrap()),
+//             Ok(Event::Eof) => break, // exits the loop when reaching end of file
+//             Err(e) => panic!("Error at position {}: {:?}", reader.buffer_position(), e),
+//             _ => (), // There are several other `Event`s we do not consider here
+//         }
+
+//         // if we don't keep a borrow elsewhere, we can clear the buffer to keep memory usage low
+//         buf.clear();
+//     }
+// }
