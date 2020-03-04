@@ -39,12 +39,14 @@ fn main() {
     //database::insert_road_accident_data(road_accident_pool.clone(), roadAccident_data);
 
     //fetch::fetch_xml(auth::URL_S, auth::USER_DATEX, auth::PASS_DATEX, "station_data_cache.xml");
-    println!("{:?}: First fetch, station file fetched from DATEX II", Local::now().naive_local());
+    //println!("{:?}: First fetch, station file fetched from DATEX II", Local::now().naive_local());
     // First insert
     let station_data = parse_xml::parse_station("station_data_cache.xml");
     //println!("{:?}: StationData", station_data);
     database::insert_station_data(station_pool.clone(), station_data);
 
+
+    //Accident Data
     thread::spawn(move || loop {
         let fetch_thread = thread::spawn(|| {
             testPost();
@@ -56,7 +58,8 @@ fn main() {
 
 
         let roadAccident_data = parse_xml::parse_roadAccident("TESTFILE.xml");
-        database::insert_road_accident_data(road_accident_pool.clone(),roadAccident_data);
+        //println!("{:?}: Deviation Data", roadAccident_data);
+        database::insert_road_accident_row(road_accident_pool.clone(),roadAccident_data);
 
         // Sleep for 15 min
         thread::sleep(Duration::from_secs(900));
