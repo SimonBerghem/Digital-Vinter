@@ -20,9 +20,9 @@ mod parse_xml;
 mod database;
 
 fn main() {
-
-    let deviation_data = parse_xml::parse_deviation("TESTFILE.xml");
-    println!("{:?}: Deviation Data", deviation_data);
+    
+    let roadAccident_data = parse_xml::parse_roadAccident("TESTFILE.xml");
+    println!("{:?}: Deviation Data", roadAccident_data);
     testPost();
     //testParse();
     //testPost_2();
@@ -123,7 +123,7 @@ fn testPost(){
     .body("
     <REQUEST>
     <LOGIN authenticationkey=\"d8b542b2dafe40f999f223c7aff04046\" />
-    <QUERY objecttype=\"Situation\" schemaversion=\"1.2\">
+    <QUERY objecttype=\"Situation\" schemaversion=\"1.2\" includedeletedobjects=\"true\">
         <FILTER>
             <EQ name=\"Deviation.MessageType\" value=\"Olycka\" />
             <EQ name=\"Deviation.IconId\" value=\"roadAccident\" />
@@ -134,6 +134,8 @@ fn testPost(){
         <INCLUDE>Deviation.Geometry.SWEREF99TM</INCLUDE>
         <INCLUDE>Deviation.Geometry.WGS84</INCLUDE>
         <INCLUDE>Deviation.SeverityCode</INCLUDE>
+        <INCLUDE>Deviation.CreationTime</INCLUDE>
+        <INCLUDE>Deviation.EndTime</INCLUDE>
     </QUERY>
 </REQUEST>")
     .send()
