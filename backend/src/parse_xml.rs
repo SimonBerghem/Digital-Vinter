@@ -53,7 +53,7 @@ pub struct roadAccidentData {
     pub RoadAccident_Geometry_WGS84: String,
     pub RoadAccident_SeverityCode: String,
     pub RoadAccident_EndTime: String,
-    pub RoadAccident_CreationTime String,
+    pub RoadAccident_CreationTime: String,
     _secret: (),
 
 }

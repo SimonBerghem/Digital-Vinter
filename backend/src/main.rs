@@ -21,9 +21,9 @@ mod database;
 
 fn main() {
     
-    let roadAccident_data = parse_xml::parse_roadAccident("TESTFILE.xml");
-    println!("{:?}: Deviation Data", roadAccident_data);
-    testPost();
+    //let roadAccident_data = parse_xml::parse_roadAccident("TESTFILE.xml");
+    //println!("{:?}: Deviation Data", roadAccident_data);
+    //testPost();
     //testParse();
     //testPost_2();
     let opts = database::get_opts(auth::USER_DB, auth::PASS_DB, auth::ADDR_DB, auth::NAME_DB);
@@ -34,15 +34,35 @@ fn main() {
     let weather_pool = pool.clone();
     let friction_pool = pool.clone();
     let camera_pool = pool.clone();
+    let road_accident_pool = pool.clone();
 
+    //database::insert_road_accident_data(road_accident_pool.clone(), roadAccident_data);
 
-    fetch::fetch_xml(auth::URL_S, auth::USER_DATEX, auth::PASS_DATEX, "station_data_cache.xml");
+    //fetch::fetch_xml(auth::URL_S, auth::USER_DATEX, auth::PASS_DATEX, "station_data_cache.xml");
     println!("{:?}: First fetch, station file fetched from DATEX II", Local::now().naive_local());
     // First insert
     let station_data = parse_xml::parse_station("station_data_cache.xml");
+    //println!("{:?}: StationData", station_data);
     database::insert_station_data(station_pool.clone(), station_data);
 
+    thread::spawn(move || loop {
+        let fetch_thread = thread::spawn(|| {
+            testPost();
+            println!("{:?}: Road Accident Data file fethed from DATEX II",Local::now().naive_local());
 
+
+        });
+        fetch_thread.join().unwrap();
+
+
+        let roadAccident_data = parse_xml::parse_roadAccident("TESTFILE.xml");
+        database::insert_road_accident_data(road_accident_pool.clone(),roadAccident_data);
+
+        // Sleep for 15 min
+        thread::sleep(Duration::from_secs(900));
+
+
+    });
     
     thread::spawn(move || loop {
         let fetch_thread = thread::spawn(|| {

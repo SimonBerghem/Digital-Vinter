@@ -43,8 +43,6 @@ pub fn insert_camera_data(pool: Pool, camera_data: Vec<CameraData>) {
 // Insert the data to MYSQL, TABLE assumed to exist
 pub fn insert_station_data(pool: Pool, station_data: Vec<StationData>) {
 
-
-
     let insert_stmt = r"INSERT INTO station_data (id, lat, lon, name, road_number, county_number) 
                                     VALUES (:id, :latitude, :longitude, :name, :road_number, :county_number)
                                     ON DUPLICATE KEY UPDATE lat=:latitude, lon=:longitude, name=:name, road_number=:road_number,
@@ -68,9 +66,9 @@ pub fn insert_station_data(pool: Pool, station_data: Vec<StationData>) {
 // Insert the data to MYSQ, TABLE assumed to exist ROAD
 pub fn insert_road_accident_data(pool: Pool, road_accident_data: Vec<roadAccidentData>){
 
-    let insert_stmt = r"INSERT IGNORE INTO road_accident_data (Id, CreationTime, EndTime, IconId, SWEREF99TM, WGS84, SeverityCode)
-                        VALUES (:Id, NULLIF(:CreationTime, NULL), NULLIF(:EndTime, NULL), NULLIF(IconId, NULL), 
-                        NULLIF(SWEREF99TM, NULL), NULLIF(WGS84, NULL), NULLIF(SeverityCode, NULL))";
+    let insert_stmt = r"INSERT INTO road_accident_data (Id, CreationTime, EndTime, IconId, SWEREF99TM, WGS84, SeverityCode)
+                        VALUES(:Id, :CreationTime, :EndTime, :IconId, 
+                        :SWEREF99TM, :WGS84, :SeverityCode);";
 
     for mut stmt in pool.prepare(insert_stmt).into_iter(){
 
@@ -88,11 +86,12 @@ pub fn insert_road_accident_data(pool: Pool, road_accident_data: Vec<roadAcciden
             }).expect("Failed to execute statement when reading from Road Accident Data");
         }
     }
+    println!("{:?}:", "Road Accident Inserted");
 }
 
 // Insert the data to MYSQL, TABLE assumed to exist
 pub fn insert_weather_data(pool: Pool, weather_data: Vec<WeatherData>) {
-
+   
     let insert_stmt = r"INSERT IGNORE INTO weather_data 
                         (station_id, timestamp, air_temperature, road_temperature, precipitation_type, precipitation_millimetres, air_humidity, wind_speed, wind_direction) 
                         VALUES (:station_id, NULLIF(:timestamp, NULL), NULLIF(:air_temperature, ''), NULLIF(:road_temperature, ''),
