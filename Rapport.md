@@ -23,10 +23,15 @@ Figuren nedan är ett modul-diagram över nuvarande lösning. Då uppgiften är 
 <img src="ModulDiagram.png"
      alt="Modul-diagram"
      style="float: left; margin-right: 10px;" />
+# 3 Genomförande
 
+### 3.1 Arbetsmodell
 
+### 3.1.1 SCRUM reflektioner
 
-### 3.2 Arbetstillvägagång
+### 3.1.1.X Roller
+
+### 3.2 Projektgenomförande
 
 Vi har först suttit tillsammans i grupp och skrivit ihop stories och medföljande tasks efter vad vår produktägare Sofia Sollén (expert)  har begärt. Därefter har vi delegerat ut dem efter intresse så att alla känt sig nöjda. Då vi är ett udda antal i gruppen så delade vi upp oss 2-2-1 då vi hade två stora stories och en mindre. Detta har lett till en ökad flexibilitet då vi har haft möjligheten att omfördela arbetsuppgifter efter behov.  Till nästa sprint kanske vi sitter 2 och 3 istället för att öka robustheten i projektet ifall någon skulle bli sjuk eller dylikt.
 
@@ -42,8 +47,6 @@ Tre Stories gjordes för sprint 1
 Datagrafer
 Friktionsvärdesskala 
 Uppladdning av XML Fil
-
-
 
 
 #### Datagrafer
@@ -84,7 +87,11 @@ Oplanerade tasks
 Diskussion och omdesign
 Fixa bugs
 
+## 3.2.2 Sprint 2
 
+## 3.2.3.X Producerad kod
+
+## 3.3.3 Reflektioner, planering, genomförande och tidsuppföljning
 
 ### 4.2.2 Regressionsrisker
 En regression är då en av systemets funktioner upphör att fungera i samband med att kod i systemet ändrats. Det finns tre huvudsakliga typer av regression som är aktuella för projektet.
@@ -177,12 +184,20 @@ Målet med testet är att testa en stor del av systemt. Kontrollera funktionalit
 * Förväntat Resultat: Datapunkterna visas korrekt.
 * Tidsestimering: 2 dagar.
 
-### 4.3 Etik
+### 4.3 Etisk bedömning
 Relationen mellan samhället och Projektet är att projektet visar en vy av samhället, vägnätet samt vägnätets tillstånd i realtid. Detta kan positivt gynna samhället genom att använda projektets arbete till att informera bilister tillståndet av vägen de åker på och är påväg till. Detta kan även ses som något negativt då viss data som projektet hanterat är bundet till individer vilket kan anses vara inkräktande. 
 
 Det finns en stor mängd data som projektet hanterar där majoriteten inte är känslig. Friktonsdatan är dock känslig och hanteras separat från resterande datan och laddas upp till databasen i stället för hämtas från Datex II. Friktionsdatan är då skyddad och utsätts inte för någon säkerhetsrisk.  
 
 I testning av projektet har inte någon etik fråga lyfts då detta projekt inte behöver någon testning med personer eller personlig data. Projektgruppen har tänkt på etiken kring det vi har arbetat med men har inte kunnat hitta någon etisk problematik. 
+
+### 4.4 Fortsättning
+
+# 5. Slutsats
+
+# 6. Referenser
+
+# 7. Annex A - Instruktioner
 
 
 # Appendix
