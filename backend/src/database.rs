@@ -3,7 +3,7 @@ use mysql::OptsBuilder;
 use mysql::chrono::{DateTime, FixedOffset};
 // use mysql::from_row;
 
-use crate::parse_xml::{StationData, WeatherData, CameraData};
+use crate::parse_xml::{StationData, WeatherData, CameraData, roadAccidentData};
 
 pub fn insert_friction_data(mut conn: PooledConn, url: &str) {
     //conn.query(r"LOAD DATA LOCAL INFILE ".to_owned() + "'" + url + "'" + " INTO TABLE friction_data LINES TERMINATED BY '\r\n' IGNORE 1 LINES SET `lat`= REPLACE(`lat`, ',', '.'), `lon`=REPLACE(`lon`, ',', '.'), `MeasurementValue`=REPLACE(`MeasurementValue`, ',', '.');").unwrap();
@@ -65,6 +65,31 @@ pub fn insert_station_data(pool: Pool, station_data: Vec<StationData>) {
         }
     }
 }
+// Insert the data to MYSQ, TABLE assumed to exist ROAD
+pub fn insert_road_accident_data(pool: Pool, road_accident_data: Vec<roadAccidentData>){
+
+    let insert_stmt = r"INSERT IGNORE INTO road_accident_data (Id, CreationTime, EndTime, IconId, SWEREF99TM, WGS84, SeverityCode)
+                        VALUES (:Id, NULLIF(:CreationTime, NULL), NULLIF(:EndTime, NULL), NULLIF(IconId, NULL), 
+                        NULLIF(SWEREF99TM, NULL), NULLIF(WGS84, NULL), NULLIF(SeverityCode, NULL))";
+
+    for mut stmt in pool.prepare(insert_stmt).into_iter(){
+
+        for i in road_accident_data.iter(){
+            //Någon jävla rust grej
+            stmt.execute(params!{
+                "Id" => i.RoadAccident_id.clone(),
+                "CreationTime" => i.RoadAccident_CreationTime.clone(),
+                "EndTime" => i.RoadAccident_EndTime.clone(),
+                "IconId" => i.RoadAccident_icon_id.clone(),
+                "SWEREF99TM" => i.RoadAccident_Geometry_SWEREF99TM.clone(),
+                "WGS84" => i.RoadAccident_Geometry_WGS84.clone(),
+                "SeverityCode" => i.RoadAccident_SeverityCode.clone(),
+
+            }).expect("Failed to execute statement when reading from Road Accident Data");
+        }
+    }
+}
+
 // Insert the data to MYSQL, TABLE assumed to exist
 pub fn insert_weather_data(pool: Pool, weather_data: Vec<WeatherData>) {
 
@@ -159,6 +184,17 @@ pub fn create_mysql_tables(pool: Pool) {
         MeasureConfidence    int         null,
         ReporterOrganization varchar(50) null
     )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;", ()).expect("Failed to create table: friction_data");
+
+    pool.prep_exec(r#"CREATE TABLE IF NOT EXISTS road_accident_data (
+        `Id` VARCHAR(32) NOT NULL,
+        `CreationTime` DATETIME NULL,
+        `EndTime` DATETIME NULL,
+        `IconId` VARCHAR(45) NULL,
+        `SWEREF99TM` VARCHAR(45) NULL,
+        `WGS84` VARCHAR(45) NULL,
+        `SeverityCode` VARCHAR(45) NULL,
+        PRIMARY KEY (`Id`))ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;;"#,()).expect("Failed to create table: road_accident_data");
+
     pool.prep_exec(r"create table if not exists reporter_organizations
     (
         ReporterOrganization varchar(255) not null

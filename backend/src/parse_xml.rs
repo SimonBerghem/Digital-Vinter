@@ -52,6 +52,8 @@ pub struct roadAccidentData {
     pub RoadAccident_Geometry_SWEREF99TM: String,
     pub RoadAccident_Geometry_WGS84: String,
     pub RoadAccident_SeverityCode: String,
+    pub RoadAccident_EndTime: String,
+    pub RoadAccident_CreationTime String,
     _secret: (),
 
 }
@@ -189,6 +191,8 @@ pub fn parse_roadAccident(xmlfile: &str) -> Vec<roadAccidentData>{
                         RoadAccident_Geometry_SWEREF99TM : String::new(),
                         RoadAccident_Geometry_WGS84 : String::new(),
                         RoadAccident_SeverityCode : String::new(),
+                        RoadAccident_EndTime : String::new(),
+                        RoadAccident_CreationTime : String::new(),
                         _secret: (),
 
 
@@ -197,17 +201,14 @@ pub fn parse_roadAccident(xmlfile: &str) -> Vec<roadAccidentData>{
                     let RoadAccident = RoadAccident_data.last_mut().unwrap();
                     
                 }
-                b"Id" => {
+                b"CreationTime" => {
                     let RoadAccident = RoadAccident_data.last_mut().unwrap();
-                    RoadAccident.RoadAccident_id = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+                    RoadAccident.RoadAccident_CreationTime = xml.read_text(e.name(), &mut Vec::new()).unwrap();
 
-                    
-        
                 }
-                b"IconId" => {
+                b"EndTime" => {
                     let RoadAccident = RoadAccident_data.last_mut().unwrap();
-                    //println!("{:?}: IconID",xml.read_text(e.name(), &mut Vec::new()).unwrap());
-                    RoadAccident.RoadAccident_icon_id = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+                    RoadAccident.RoadAccident_EndTime = xml.read_text(e.name(), &mut Vec::new()).unwrap();
 
                 }
                 b"SWEREF99TM" => {
@@ -218,6 +219,18 @@ pub fn parse_roadAccident(xmlfile: &str) -> Vec<roadAccidentData>{
                     let RoadAccident = RoadAccident_data.last_mut().unwrap();
                     RoadAccident.RoadAccident_Geometry_WGS84 = xml.read_text(e.name(), &mut Vec::new()).unwrap();
                 }
+                b"IconId" => {
+                    let RoadAccident = RoadAccident_data.last_mut().unwrap();
+                    //println!("{:?}: IconID",xml.read_text(e.name(), &mut Vec::new()).unwrap());
+                    RoadAccident.RoadAccident_icon_id = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+
+                }
+                b"Id" => {
+                    let RoadAccident = RoadAccident_data.last_mut().unwrap();
+                    RoadAccident.RoadAccident_id = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+
+                }
+               
                 b"SeverityCode" => {
                     let RoadAccident = RoadAccident_data.last_mut().unwrap();
                     RoadAccident.RoadAccident_SeverityCode = xml.read_text(e.name(), &mut Vec::new()).unwrap();
