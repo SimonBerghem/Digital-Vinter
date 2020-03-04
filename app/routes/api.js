@@ -60,6 +60,16 @@ router.get('/getFrictionData', function(req, res, next) {
     friction.getFrictionData(req, res, next, reporter);
 });
 
+/* GET FROM AGGREGATED FRICTION DATA  */
+router.get('/getAggregatedFrictionData', function(req, res, next) {
+    const radius = req["query"]["radius"];
+    const timeAggregation = req["query"]["timeAggregation"];
+    const startTime = req["query"]["startTime"];
+    const endTime = req["query"]["endTime"];
+    const reporterOrganization = req["query"]["reporterOrganization"]
+    friction.getAggregatedFrictionData(req, res, next, radius, timeAggregation, startTime, endTime, reporterOrganization);
+});
+
 /* GET ALL FROM FRICTION DATA */
 router.get('/getAllFrictionData', function(req, res, next) {
     friction.getAllFrictionData(req, res, next);

@@ -138,6 +138,51 @@ function popupfriction(friction, circle){
   return popupContent;
 }
 
+/**
+ * 
+ * @param {*} friction return popup content for aggregated frictiondata circlemarkers
+ */
+function popupAggregatedFriction(friction, circle){
+  const popupContent = document.createElement("table-data");
+   // Tar bort oönskade element i strängen.
+  const timestring = friction.time.replace("T", " / ").replace("Z", " ");
+
+ var obj = {
+   Mätvärde  : [friction.MeasureValueMedian,""],
+   Tid  : [timestring,""],
+   Latitude  : [friction.Latitude,""],
+   Longitud  : [friction.Longitude,""],
+   Konfidensintervall: [friction.MeasureConfidenceMedian,""],
+     
+ };
+ var strings = "";
+ Object.keys(obj).forEach(function(key){
+   if(obj[key][0] != null){
+     strings+='<tr> <td>'+ key +'</td> <td> &nbsp '+ obj[key][0] + obj[key][1] +'</td> </tr> '
+   }
+ });
+
+ var htmlvar = '<table id = "marker-data" >' +strings + '</table>'
+ strings = ""    
+
+ popupContent.innerHTML  = htmlvar;
+
+ let button = document.createElement("button");
+ button.id = friction.id;
+ if(chosenFriction.includes(friction)){
+   button.className = "remove-button";
+   button.innerText = "Ta bort";
+ }else{
+   button.className = "add-button";
+   button.innerText = "Lägg till";
+ }
+ button.addEventListener("click" , function() {
+       handleChosenFriction(friction, circle, this);
+ });
+ popupContent.appendChild(button);
+
+ return popupContent;
+}
 
 
 function windDirection(data) {

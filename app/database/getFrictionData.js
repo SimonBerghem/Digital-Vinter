@@ -51,7 +51,46 @@ module.exports = {
 
         });
     },
-    // GET REPORTER ORGANIZATIONS (this query might be uneffective?)
+
+    // GET AGGREGATED FRICTION DATA
+    getAggregatedFrictionData : function(req, res, next, radius, timeAggregation, startTime, endTime, reporterOrganization){
+       
+        // ssh to database server and then connect to db
+        // mysqlssh.connect(auth.ssh, auth.database).then(client => {
+        
+        authorization.getConnection(function(err, conn){
+            if (err) throw err
+
+            const sql =`
+                SELECT
+                    id,
+                    time,
+                    timeAggregation,
+                    radius,
+                    reporterOrganization,
+                    longitude,
+                    latitude,
+                    numberOfMeasurements,
+                    measureValueMedian,
+                    measureValueMax,
+                    measureValueMin,
+                    measureConfidenceMedian,
+                    measureConfidenceMax,
+                    measureConfidenceMin,
+                    nrOfAddedPoints
+                FROM aggregated_friction_data
+                WHERE radius = ? AND timeAggregation = ? AND time BETWEEN ? AND ? AND reporterOrganization = ?
+                `
+            conn.query(sql, [radius, timeAggregation, startTime, endTime, reporterOrganization], function (err, results) {
+                res.send(results);
+                conn.release();
+                if (err) throw err
+            });
+
+        });
+    },
+
+    // GET REPORTER ORGANIZATIONS
     getDistinctReporterorgFriction : function(req, res, next){
             
         authorization.getConnection(function(err, conn){

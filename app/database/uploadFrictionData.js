@@ -2,6 +2,7 @@ const fs = require('fs')
 const papa = require('papaparse')
 const authorization = require('./authorization').pool;
 const { performance } = require('perf_hooks');
+const aggregate = require('./aggregateFrictionData')
 
 /* Functions in the DB class that is usable by other files */
     /*
@@ -12,16 +13,15 @@ const { performance } = require('perf_hooks');
 
 module.exports = {
 
-  /* Parses and uploads friction data to database. Contains a couple of constants which might be worth experimenting with if server is running bad. "delay" and "nrOfChunks"
+  /* Parses and uploads friction data to database. Contains a couple of constants which might be worth experimenting with if server is running bad. "nrOfChunks"
   * @param file
   */
   uploadFrictionData: function (file) {
     try {
-      const delay = 250
       // Read file from temporary localstorage /uploads
       fs.readFile(file.path, 'utf-8', (err, data) => {
-        parse(data, delay)
-      }) 
+        parse(data)
+      })
     } catch(error) {
         throw(error)
     }
@@ -29,9 +29,9 @@ module.exports = {
 }
 
 /* Helper function to parse and send data.
-* @param data, delay, chuckSize
+* @param data, chuckSize
 */
-const parse = (data, delay) => {
+const parse = (data) => {
   // Replace mixed linebreaks \r\n with just \n
   data = data.replace(/[\r\n]+/g, '\n');
 
@@ -50,6 +50,9 @@ const parse = (data, delay) => {
         /* The arrays reporterOragnisations, addedReporterOrganizations and frictionData are used to gather repoterOrganizations
         *  and frictionData into arrays ready to be inserted into the database.
         */ 
+        let startDate = data[0].ObservationTimeUTC
+        let endDate = data[0].ObservationTimeUTC
+        
         let reporterOrganizations = []
         let addedReporterOrganizations = []
         let frictionData = []
@@ -57,6 +60,12 @@ const parse = (data, delay) => {
           if(!addedReporterOrganizations.includes(row.ReporterOrganization)) {
             reporterOrganizations.push([row.ReporterOrganization])
             addedReporterOrganizations.push(row.ReporterOrganization)
+          }
+          if(startDate > row.ObservationTimeUTC) {
+            startDate = row.ObservationTimeUTC
+          }
+          if(endDate< row.ObservationTimeUTC) {
+            endDate = row.ObservationTimeUTC
           }
           frictionData.push([
             row.Id,
@@ -73,9 +82,12 @@ const parse = (data, delay) => {
         })
         updateReporterOrganizationsTable(reporterOrganizations)
 
+        let startDateObject = new Date(startDate)
+        let endDateObject = new Date(endDate)
+
         // Upload the data sequentially in rounds, do 1000 rows each insert (did some testing to see which insert size is fastest)
         const t0 = performance.now()
-        sendFrictionData(frictionData, 1000, delay, t0)
+        sendFrictionData(frictionData, 1000, t0, startDateObject, endDateObject)
       } catch(error) {
         console.log(error)
       }
@@ -84,10 +96,9 @@ const parse = (data, delay) => {
 }
 
 /* Helper function to send fricitondata to db
-* @param data, stepSize, delay
+* @param data, stepSize
 */
-const sendFrictionData = (data, stepSize, delay, t0) => {
-  console.log(data.length)
+const sendFrictionData = (data, stepSize, t0, startDate, endDate) => {
   // Make sql query to insert frictiondata
   authorization.getConnection(async function(err, pool){
     if(err){
@@ -119,11 +130,13 @@ const sendFrictionData = (data, stepSize, delay, t0) => {
       ;`
 
     // CASE: the data left to add to DB is less then stepSize, no need to splice just add the data and we are done
+    // After this begin aggregation on the previous data
     if(stepSize >= data.length) {
       await pool.query(sql, [data],(err, response) => {
         const t1 = performance.now()
         console.log("Upload of frictiondata finished in time: " + (t1-t0) + " ms.")
         pool.release()
+        aggregate.aggregateFrictionData(startDate, endDate)
         if(err) {
             throw (err)
         }
@@ -131,7 +144,7 @@ const sendFrictionData = (data, stepSize, delay, t0) => {
     } else {
       // CASE: part of the data is uploaded to db, after this request is done start to upload new part.
       await pool.query(sql, [data.splice(0, stepSize)], async (err, response) => {
-        sendFrictionData(data, stepSize, delay, t0)
+        sendFrictionData(data, stepSize, t0, startDate, endDate)
         pool.release()
         if(err) {
             throw (err)

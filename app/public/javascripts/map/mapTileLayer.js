@@ -118,6 +118,15 @@ function drawFriction(filteredfrictionData) {
     createFrictionLayer(filteredfrictionData);
 }
 
+function drawAggregatedFriction(aggregatedFrictionData) {
+    for (let i = 0; i < layerGroups.length; i++) {
+        map.removeLayer(layerGroups[i]);
+
+    }
+    layerGroups = [];
+    createAggregatedFrictionLayer(aggregatedFrictionData);
+}
+
 /**
  * Modifies the county polyline css.
  * @param {*} event the triggered event from user input.
@@ -289,78 +298,87 @@ const modalButton = L.easyButton('fas fa-upload', function(btn, map) {
     $('#exampleModal').modal('show');
 }, 'Ladda upp ny friktionsdata').addTo(map);
 
-const toggleFriction = L.control({position: 'topleft'});
-
 
 /**
  * This is wrapped around a function because it is called when the data is fetched from the databases so it loaded at the same time
  * @param {*} data distinct reportorgs from friction_data;
  */
 function addtoMAPtoggle(data){
-    let stringreport = '<select><option>WeatherStationData</option>'
-    for(var i=0; i<data.length; i++){
-        stringreport += '<option>'+data[i].reporterorganization+'</option>';
-    }
-    stringreport += '</select>';
+    /* Välj WeatherStationData eller friction reporterOrganization */
+    const toggleFriction = L.control({position: 'topleft'});
+    let stringreport = '<select id="frictionOrWeatherStation"><option>WeatherStationData</option>';
+        for(var i=0; i<data.length; i++){
+            stringreport += '<option>'+data[i].reporterorganization+'</option>';
+        }
+        stringreport += '</select>';
 
-    toggleFriction.onAdd = function (map) {
+        toggleFriction.onAdd = function (map) {
+            var div = L.DomUtil.create('div');
+            //div.innerHTML = '<select><option>WeatherStationData</option><option>RoadCloud</option><option>Volvo Cars</option><option>NIRA Dynamics</option></select>';
+            div.innerHTML = stringreport;
+            div.firstChild.onmousedown = div.firstChild.ondblclick = L.DomEvent.stopPropagation;
+            return div;
+        };
+        toggleFriction.addTo(map);
+
+
+    /* Välj radie */ 
+    const radiemeny = L.control({position: 'topleft'});
+    let radieoptions = '<select id="radius"><option>Radie1</option><option>Radie2</option><option>Radie3</option><option>Radie4</option><option>Radie5</option></select>';
+
+    radiemeny.onAdd = function (map) {
         var div = L.DomUtil.create('div');
-        //div.innerHTML = '<select><option>WeatherStationData</option><option>RoadCloud</option><option>Volvo Cars</option><option>NIRA Dynamics</option></select>';
-        div.innerHTML = stringreport;
+        div.innerHTML = radieoptions;
         div.firstChild.onmousedown = div.firstChild.ondblclick = L.DomEvent.stopPropagation;
         return div;
     };
-    toggleFriction.addTo(map);
+    radiemeny.addTo(map);
 
-    $('select').change(function(){
-        $('select option:selected').each(function(){                        /*  GET /api/getFrictionData?reporter=Radie3 200 35767.192 ms - 2   Denna inkluderar radiemeny och tidsmenyn (fix)     */
-            if($(this).text()=="WeatherStationData"){
-                geojson.eachLayer(function (layer) {    
-                    layer.setStyle({fillOpacity : 0.7 }) 
-                    noColor = false;
-                });
-                info.addTo(map);
-                //temperatureScale.addTo(map);
-                $( "#search-container" ).show();
-                circleGroup = [];
-                createLayers(stationsData,cameraArrayData);
-            }
-            else{
-                getFrictionData($(this).text());
-            }
+
+
+
+
+    /* Välj tidsaggretation */ 
+    const tidsaggregationmeny = L.control({position: 'topleft'});
+    let tidoptions = '<select id="timeAggregation"><option>Tid1</option><option>Tid2</option><option>Tid3</option><option>Tid4</option><option>Tid5</option></select>';
+
+    tidsaggregationmeny.onAdd = function (map) {
+        var div = L.DomUtil.create('div');
+        div.innerHTML = tidoptions;
+        div.firstChild.onmousedown = div.firstChild.ondblclick = L.DomEvent.stopPropagation;
+        return div;
+    };
+    tidsaggregationmeny.addTo(map);
+    
+
+   /*  $('select').change(function(){
+        $('select option:selected').each(function(){  */
+    let radius = document.getElementById('radius').value
+    let timeAggregation = document.getElementById('timeAggregation').value
+    let dates = getDates()
+    let frictionOrWeatherStation = document.getElementById('frictionOrWeatherStation').value
+    if(frictionOrWeatherStation=="WeatherStationData"){
+        geojson.eachLayer(function (layer) {    
+            layer.setStyle({fillOpacity : 0.7 }) 
+            noColor = false;
         });
-    });
+        info.addTo(map);
+        //temperatureScale.addTo(map);
+        $( "#search-container" ).show();
+        circleGroup = [];
+        createLayers(stationsData,cameraArrayData);
+    }
+    else{
+        console.log(radius)
+        console.log(timeAggregation)
+        console.log(dates)
+        console.log(frictionOrWeatherStation)
+        getFrictionData(frictionOrWeatherStation);
+        getAggregatedFrictionData(radius, timeAggregation, dates[0], dates[1], frictionOrWeatherStation)
+    }
 }
 
 
-
-/* Välj radie */ 
-const radiemeny = L.control({position: 'topleft'});
-let radieoptions = '<select><option>Radie1</option><option>Radie2</option><option>Radie3</option><option>Radie4</option><option>Radie5</option></select>';
-
-radiemeny.onAdd = function (map) {
-    var div = L.DomUtil.create('div');
-    div.innerHTML = radieoptions;
-    div.firstChild.onmousedown = div.firstChild.ondblclick = L.DomEvent.stopPropagation;
-    return div;
-};
-radiemeny.addTo(map);
-
-
-
-
-
-/* Välj tidsaggretation */ 
-const tidsaggregationmeny = L.control({position: 'topleft'});
-let tidoptions = '<select><option>Tid1</option><option>Tid2</option><option>Tid3</option><option>Tid4</option><option>Tid5</option></select>';
-
-tidsaggregationmeny.onAdd = function (map) {
-    var div = L.DomUtil.create('div');
-    div.innerHTML = tidoptions;
-    div.firstChild.onmousedown = div.firstChild.ondblclick = L.DomEvent.stopPropagation;
-    return div;
-};
-tidsaggregationmeny.addTo(map);
 
 
 
@@ -373,18 +391,6 @@ tidsaggregationmeny.addTo(map);
 function timestamp(str) {
     return new Date(str).getTime();
 }
-var weekdays = [
-    "Söndag", "Måndag", "Tisdag",
-    "Onsdag", "Torsdag", "Fredag",
-    "Lördag"
-];
-
-var months = [
-    "Januari", "Februari", "Mars",
-    "April", "Maj", "Juni", "Juli",
-    "Augusti", "September", "Oktober",
-    "November", "December"
-];
 
 // Suffix för datum n.
 function nth(d) {
@@ -401,10 +407,7 @@ function nth(d) {
 
 // En sträng av hela datumet
 function formatDate(date) {
-    return weekdays[date.getDay()] + " den " +
-        date.getDate() + nth(date.getDate()) + " " +
-        months[date.getMonth()] + " " +
-        date.getFullYear();
+    return date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate()
 }
 
 
