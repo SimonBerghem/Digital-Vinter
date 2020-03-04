@@ -14,8 +14,8 @@ const standardTileLayer = L.TileLayer.boundaryCanvas(mapboxURL, {
     minZoom: 5,
     maxBoundsViscosity: 1.0,
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-        '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-        'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+    'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
     id: 'mapbox.streets'
     // boundary: countyData
 });
@@ -68,8 +68,8 @@ const roadTileLayer = L.TileLayer.boundaryCanvas(swedenRoads, {
     minZoom: 5,
     maxBoundsViscosity: 1.0,
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-        '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-        'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+    'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
     id: 'mapbox.streets',
     //boundary: countyData
 });
@@ -135,12 +135,12 @@ function highlightFeature(event) {
     }else {
         let layer = event.target;
         layer.setStyle({
-        weight: 2,
-        color: 'black',
-        dashArray: '',
-        fillOpacity: 0
+            weight: 2,
+            color: 'black',
+            dashArray: '',
+            fillOpacity: 0
         });
-    info.update(layer.feature.properties);
+        info.update(layer.feature.properties);
     }
 }
 
@@ -159,10 +159,10 @@ function createCountyPopup(event) {
     let button = document.createElement("div");
     let popupContent = document.createElement("table-data");
     popupContent.innerHTML  = '<table id = "county-data" >' +
-    '<tr> <td> Län: </td><td>' + countyNames[avg[0]] + '</td></tr>' + 
-    '<tr> <td>Lufttemperatur: </td><td>' + avg[1].toFixed(1)+ '\xB0C' + '</td></tr>' +
-    '<tr> <td>Vägtemperatur: </td><td>' + avg[2].toFixed(1)+ '\xB0C' + '</td></tr>' +
-    '</table>';
+        '<tr> <td> Län: </td><td>' + countyNames[avg[0]] + '</td></tr>' + 
+        '<tr> <td>Lufttemperatur: </td><td>' + avg[1].toFixed(1)+ '\xB0C' + '</td></tr>' +
+        '<tr> <td>Vägtemperatur: </td><td>' + avg[2].toFixed(1)+ '\xB0C' + '</td></tr>' +
+        '</table>';
 
 
     for(let i = 0; i < chosenCounties.length; i++) {
@@ -176,8 +176,8 @@ function createCountyPopup(event) {
         button.className = "add-button";
         button.innerText = "Lägg till";
     }
-    
-    
+
+
     button.addEventListener("click" , function() {
         if(chosenCountyExists == true) {
             removeCounty(countyCode, button); 
@@ -205,8 +205,8 @@ function resetHighlight(event) {
 
     }else {
         info.update();
-        }
     }
+}
 
 /**
  * Enables mouse hover and click events to a specific GeoJSON feature on a specific layer.
@@ -261,12 +261,12 @@ const stateChangingButton = L.easyButton({
         {
             stateName: 'Ta-bort-färgmarkering',        
             icon:      'fas fa-toggle-off',               
-            title:     'Ta bort färmarkering',      
+            title:     'Ta bort färgmarkering',      
             onClick: function(btn, map) {      
                 btn.state('Lägg-till-färgmarkering');    
                 geojson.eachLayer(function (layer) {    
-                     layer.setStyle({fillOpacity :0 }) 
-                     noColor = true;
+                    layer.setStyle({fillOpacity :0 }) 
+                    noColor = true;
                 });
             }
         }, 
@@ -279,7 +279,7 @@ const stateChangingButton = L.easyButton({
                 geojson.eachLayer(function (layer) {    
                     layer.setStyle({fillOpacity : 0.7 }) 
                     noColor = false;
-               });
+                });
             }
         }
     ]
@@ -304,21 +304,21 @@ function addtoMAPtoggle(data){
     stringreport += '</select>';
 
     toggleFriction.onAdd = function (map) {
-       var div = L.DomUtil.create('div');
-       //div.innerHTML = '<select><option>WeatherStationData</option><option>RoadCloud</option><option>Volvo Cars</option><option>NIRA Dynamics</option></select>';
-       div.innerHTML = stringreport;
-       div.firstChild.onmousedown = div.firstChild.ondblclick = L.DomEvent.stopPropagation;
-       return div;
+        var div = L.DomUtil.create('div');
+        //div.innerHTML = '<select><option>WeatherStationData</option><option>RoadCloud</option><option>Volvo Cars</option><option>NIRA Dynamics</option></select>';
+        div.innerHTML = stringreport;
+        div.firstChild.onmousedown = div.firstChild.ondblclick = L.DomEvent.stopPropagation;
+        return div;
     };
     toggleFriction.addTo(map);
 
     $('select').change(function(){
-        $('select option:selected').each(function(){
+        $('select option:selected').each(function(){                        /*  GET /api/getFrictionData?reporter=Radie3 200 35767.192 ms - 2   Denna inkluderar radiemeny och tidsmenyn (fix)     */
             if($(this).text()=="WeatherStationData"){
                 geojson.eachLayer(function (layer) {    
                     layer.setStyle({fillOpacity : 0.7 }) 
                     noColor = false;
-               });
+                });
                 info.addTo(map);
                 //temperatureScale.addTo(map);
                 $( "#search-container" ).show();
@@ -331,5 +331,154 @@ function addtoMAPtoggle(data){
         });
     });
 }
+
+
+
+/* Välj radie */ 
+const radiemeny = L.control({position: 'topleft'});
+let radieoptions = '<select><option>Radie1</option><option>Radie2</option><option>Radie3</option><option>Radie4</option><option>Radie5</option></select>';
+
+radiemeny.onAdd = function (map) {
+    var div = L.DomUtil.create('div');
+    div.innerHTML = radieoptions;
+    div.firstChild.onmousedown = div.firstChild.ondblclick = L.DomEvent.stopPropagation;
+    return div;
+};
+radiemeny.addTo(map);
+
+
+
+
+
+/* Välj tidsaggretation */ 
+const tidsaggregationmeny = L.control({position: 'topleft'});
+let tidoptions = '<select><option>Tid1</option><option>Tid2</option><option>Tid3</option><option>Tid4</option><option>Tid5</option></select>';
+
+tidsaggregationmeny.onAdd = function (map) {
+    var div = L.DomUtil.create('div');
+    div.innerHTML = tidoptions;
+    div.firstChild.onmousedown = div.firstChild.ondblclick = L.DomEvent.stopPropagation;
+    return div;
+};
+tidsaggregationmeny.addTo(map);
+
+
+
+
+//////////////////////////////////////////////////////////////////////// Sliders ///////////////////////////////////////////////////////////////////////////
+
+
+
+/* Datum för slidern */
+function timestamp(str) {
+    return new Date(str).getTime();
+}
+var weekdays = [
+    "Söndag", "Måndag", "Tisdag",
+    "Onsdag", "Torsdag", "Fredag",
+    "Lördag"
+];
+
+var months = [
+    "Januari", "Februari", "Mars",
+    "April", "Maj", "Juni", "Juli",
+    "Augusti", "September", "Oktober",
+    "November", "December"
+];
+
+// Suffix för datum n.
+function nth(d) {
+    if (d > 3 && d < 32) return ':de';
+    switch (d % 10) {
+        case 1:
+            return ":a";
+        case 2:
+            return ":a";
+        default:
+            return ":de";
+    }
+}
+
+// En sträng av hela datumet
+function formatDate(date) {
+    return weekdays[date.getDay()] + " den " +
+        date.getDate() + nth(date.getDate()) + " " +
+        months[date.getMonth()] + " " +
+        date.getFullYear();
+}
+
+
+var date = new Date();
+var previousMonth = new Date();
+previousMonth.setMonth(previousMonth.getMonth() - 1);
+
+
+function toFormat ( v ) {
+    return formatDate(new Date(v));
+}
+
+
+
+/* Datum slidern  */
+var dateSlider = document.getElementById('slider');
+noUiSlider.create(dateSlider, {
+
+    behaviour: 'tap',
+    connect: true,
+    tooltips: [ true, true ],
+    format: { to: toFormat, from: Number },
+
+    range: {
+        min: timestamp('2019'),
+        max: timestamp(date)
+    },
+
+    // Steps of one week
+    step: 1 * 24 * 60 * 60 * 1000,
+
+    start: [timestamp(previousMonth), timestamp(date)],
+
+
+});
+
+var dateValues = [
+    document.getElementById('event-start'),
+    document.getElementById('event-end')
+];
+
+
+// Tooltips på handles
+dateSlider.noUiSlider.on('update', function (values, handle) {
+    dateValues[handle].innerHTML = values[handle]; 
+});
+
+//  Fråntar kontrollen av kartan medans man drar i slidern.
+dateSlider.noUiSlider.on('start', function (values, handle) {    
+    map.dragging.disable();
+    map.touchZoom.disable();
+    map.doubleClickZoom.disable();
+    map.scrollWheelZoom.disable();
+    map.boxZoom.disable();
+    map.keyboard.disable();  
+});
+
+// Återger kontrollen efter man släppt slidern.
+dateSlider.noUiSlider.on('end', function (values, handle) {
+    map.dragging.enable();
+    map.touchZoom.enable();
+    map.doubleClickZoom.enable();
+    map.scrollWheelZoom.enable();
+    map.boxZoom.enable();
+    map.keyboard.enable();
+});
+
+// Returnerar Datumsträngen
+function getDates(){
+    return [dateValues[0].innerHTML , dateValues[1].innerHTML];
+
+}
+
+
+
 
 
