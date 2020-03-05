@@ -353,6 +353,7 @@ function addtoMAPtoggle(data){
     sliderButton.addTo(map)
 
     $('select').change(async function() {       
+        const mapBounds = { northEastLat: map.getBounds()._northEast.lat, northEastLong:map.getBounds()._northEast.lng, southWestLat:map.getBounds()._southWest.lat, southWestLong:map.getBounds()._southWest.lng}
         const radius = document.getElementById('radius').value
         let timeAggregation = '1'
         // Translate timeAggregation value to a numeric hourly value
@@ -379,13 +380,12 @@ function addtoMAPtoggle(data){
                 noColor = false;
             });
             info.addTo(map);
-            //temperatureScale.addTo(map);
             $( "#search-container" ).show();
             circleGroup = [];
             createLayers(stationsData,cameraArrayData);
         } else{
             await getFrictionData(frictionOrWeatherStation);
-            getAggregatedFrictionData(radius, timeAggregation, dates[0], dates[1], frictionOrWeatherStation)
+            getAggregatedFrictionData(radius, timeAggregation, dates[0], dates[1], frictionOrWeatherStation, mapBounds)
         }
     })
 }
