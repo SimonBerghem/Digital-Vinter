@@ -119,6 +119,35 @@ function createFrictionLayer(filteredfrictionData) {
     $( "#search-container" ).hide();
 }
 
+function createAggregatedFrictionLayer(aggregatedFrictionData) {
+    circleGroup = [];
+    //map.removeLayer(frictionCanvas);
+    frictionCanvas = L.canvas({ padding: 0.5, pane: "circlemarkers", });
+    //frictionCanvas.clearLayers();
+
+    for (var i = 0; i < aggregatedFrictionData.length; i += 1) { 
+        let circle = L.circleMarker([aggregatedFrictionData[i].latitude, aggregatedFrictionData[i].longitude], {
+        renderer: frictionCanvas,
+        color: '#9400D3'
+        });
+        circle.bindPopup(popupAggregatedFriction(aggregatedFrictionData[i], circle));
+        circleGroup.push(circle);
+        circle.addTo(map);
+        
+    }
+
+
+    //Det är här för att det ska ladda snyggare. Motsvarande för att sätta igång är i maptilelayers.js i början av funktionen.
+    geojson.eachLayer(function (layer) {    
+        layer.setStyle({fillOpacity :0 }) 
+        noColor = true;
+    });
+
+    info.remove(map);
+    //temperatureScale.remove(map);
+    $( "#search-container" ).hide();
+}
+
 /**
  * Adds a station to a specific layer group.
  * @param {*} station a station data JSON object.
