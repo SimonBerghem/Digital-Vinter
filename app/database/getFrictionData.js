@@ -61,7 +61,6 @@ module.exports = {
         
         authorization.getConnection(function(err, conn){
             if (err) throw err
-            console.log(mapBounds)
             const { northEastLat, northEastLong, southWestLat, southWestLong } = mapBounds
             const sql =`
                 SELECT
