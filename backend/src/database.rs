@@ -258,26 +258,27 @@ pub fn create_mysql_tables(pool: Pool) {
         ReporterOrganization varchar(255) not null
             primary key
     );",()).expect("Failed to create table: friction_data");
-    
+
     pool.prep_exec(r"create table if not exists aggregated_friction_data
     (
         Id                      int auto_increment
             primary key,
-        Time                    timestamp   not null,
-        TimeAggregation         int         not null,
-        Radius                  int         not null,
-        ReporterOrganization    varchar(50) not null,
-        Longitude               varchar(20) not null,
-        Latitude                varchar(20) not null,
-        NumberOfMeasurements    int         null,
-        MeasureValueMedian      float       null,
-        MeasureValueMax         float       null,
-        MeasureValueMin         float       null,
-        MeasureConfidenceMedian float       null,
-        MeasureConfidenceMax    float       null,
-        MeasureConfidenceMin    float       null,
-        NrOfAddedPoints         int         null
+        Time                    timestamp       not null,
+        TimeAggregation         int             not null,
+        Radius                  int             not null,
+        ReporterOrganization    varchar(50)     not null,
+        Longitude               decimal(15, 13) not null,
+        Latitude                decimal(15, 13) not null,
+        NumberOfMeasurements    int             null,
+        MeasureValueMedian      float           null,
+        MeasureValueMax         float           null,
+        MeasureValueMin         float           null,
+        MeasureConfidenceMedian float           null,
+        MeasureConfidenceMax    float           null,
+        MeasureConfidenceMin    float           null,
+        NrOfAddedPoints         int             null
     );",()).expect("Failed to create table aggregated friction data");
+    
     
     pool.prep_exec("create index aggregated_friction_data_Time_MULTI_index on aggregated_friction_data (Time, TimeAggregation, Longitude, Latitude, Radius, MeasureValueMin);",()).expect("Failed to create index: aggregated_friction_data_Time_MULTI_index ");
     
