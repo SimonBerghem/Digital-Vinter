@@ -42,7 +42,6 @@
           <div id="slider" class="sliderclass"></div>
           <div id ="event-start"></div>
           <div id ="event-end"></div>
-          <button class ="slidertoggle" onclick="sliderToggle()">Slider</button>   
           
           
   
@@ -158,7 +157,6 @@
       //       });
       //     }
       async function main (){
-        
         await getCameraData();
         await getLatestAvgCountyWeatherData();
         await drawMap();
@@ -189,7 +187,7 @@
           var slider = document.getElementById("slider");
           var tooltip1 = document.getElementById("event-start");
           var tooltip2 = document.getElementById("event-end");
-            if (slider.style.display === "none") {
+            if (slider.style.display === "none" || slider.style.display === "") {
                 slider.style.display = "block";
                 tooltip1.style.display = "block";
                 tooltip2.style.display = "block";

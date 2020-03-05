@@ -44,6 +44,7 @@ module.exports = {
                     GROUP BY latitude, longitude
                 ) tm ON t.latitude = tm.latitude and t.longitude = tm.longitude and t.id = tm.MaxID;`
             conn.query(sql, [reporter], function (err, results) {
+                console.log(results.length)
                 res.send(results);
                 conn.release();
                 if (err) throw err
@@ -82,8 +83,15 @@ module.exports = {
                 WHERE radius = ? AND timeAggregation = ? AND time BETWEEN ? AND ? AND reporterOrganization = ?
                 `
             conn.query(sql, [radius, timeAggregation, startTime, endTime, reporterOrganization], function (err, results) {
+                console.log(results.length)
+                if(results.length > 20000) {
+                    res.send([])
+                    conn.release();
+                } else {
+                
                 res.send(results);
                 conn.release();
+                }
                 if (err) throw err
             });
 

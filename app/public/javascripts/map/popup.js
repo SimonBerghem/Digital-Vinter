@@ -148,11 +148,16 @@ function popupAggregatedFriction(friction, circle){
   const timestring = friction.time.replace("T", " / ").replace("Z", " ");
 
  var obj = {
-   Mätvärde  : [friction.MeasureValueMedian,""],
+   MätvärdeMedian  : [friction.measureValueMedian,""],
+   MätvärdeMax  : [friction.measureValueMax,""],
+   MätvärdeMin  : [friction.measureValueMin,""],
    Tid  : [timestring,""],
-   Latitude  : [friction.Latitude,""],
-   Longitud  : [friction.Longitude,""],
-   Konfidensintervall: [friction.MeasureConfidenceMedian,""],
+   Latitude  : [friction.latitude,""],
+   Longitud  : [friction.longitude,""],
+   KonfidensMedian: [friction.measureConfidenceMedian,""],
+   KonfidensMax: [friction.measureConfidenceMax,""],
+   KonfidensMin: [friction.measureConfidenceMin,""],
+   AggregeradePunkter: [friction.nrOfAddedPoints,""],
      
  };
  var strings = "";

@@ -266,10 +266,8 @@ height: 100%;
 
 /* CSS för knappen som togglar sliders*/
 
-.slidertoggle{
+#slidertoggle{
     z-index: 500;
-    top: 43%;
-    left: 10px ;
     position: absolute;
     font-size: 18px; 
     background-color: #346791; 

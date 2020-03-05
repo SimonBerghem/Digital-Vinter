@@ -314,17 +314,14 @@ function addtoMAPtoggle(data){
 
         toggleFriction.onAdd = function (map) {
             var div = L.DomUtil.create('div');
-            //div.innerHTML = '<select><option>WeatherStationData</option><option>RoadCloud</option><option>Volvo Cars</option><option>NIRA Dynamics</option></select>';
             div.innerHTML = stringreport;
             div.firstChild.onmousedown = div.firstChild.ondblclick = L.DomEvent.stopPropagation;
             return div;
         };
         toggleFriction.addTo(map);
-
-
     /* Välj radie */ 
     const radiemeny = L.control({position: 'topleft'});
-    let radieoptions = '<select id="radius"><option>Radie1</option><option>Radie2</option><option>Radie3</option><option>Radie4</option><option>Radie5</option></select>';
+    let radieoptions = '<p>Aggregationsradie</p><select id="radius"><option>1</option><option>10</option><option>100</option></select>';
 
     radiemeny.onAdd = function (map) {
         var div = L.DomUtil.create('div');
@@ -334,13 +331,9 @@ function addtoMAPtoggle(data){
     };
     radiemeny.addTo(map);
 
-
-
-
-
     /* Välj tidsaggretation */ 
     const tidsaggregationmeny = L.control({position: 'topleft'});
-    let tidoptions = '<select id="timeAggregation"><option>Tid1</option><option>Tid2</option><option>Tid3</option><option>Tid4</option><option>Tid5</option></select>';
+    let tidoptions = '<p>Aggregationstid</p><select id="timeAggregation"><option>Timme</option><option>Dag</option><option>Vecka</option><option>Månad</option></select>';
 
     tidsaggregationmeny.onAdd = function (map) {
         var div = L.DomUtil.create('div');
@@ -349,33 +342,52 @@ function addtoMAPtoggle(data){
         return div;
     };
     tidsaggregationmeny.addTo(map);
-    
 
-   /*  $('select').change(function(){
-        $('select option:selected').each(function(){  */
-    let radius = document.getElementById('radius').value
-    let timeAggregation = document.getElementById('timeAggregation').value
-    let dates = getDates()
-    let frictionOrWeatherStation = document.getElementById('frictionOrWeatherStation').value
-    if(frictionOrWeatherStation=="WeatherStationData"){
-        geojson.eachLayer(function (layer) {    
-            layer.setStyle({fillOpacity : 0.7 }) 
-            noColor = false;
-        });
-        info.addTo(map);
-        //temperatureScale.addTo(map);
-        $( "#search-container" ).show();
-        circleGroup = [];
-        createLayers(stationsData,cameraArrayData);
+    const sliderButton = L.control({position: 'topleft'})
+    let sliderHTML= '<button id="slidertoggle" onclick="sliderToggle()">Välj datum</button>'
+    sliderButton.onAdd = () => {
+        var div = L.DomUtil.create('div')
+        div.innerHTML = sliderHTML
+        return div
     }
-    else{
-        console.log(radius)
-        console.log(timeAggregation)
-        console.log(dates)
-        console.log(frictionOrWeatherStation)
-        getFrictionData(frictionOrWeatherStation);
-        getAggregatedFrictionData(radius, timeAggregation, dates[0], dates[1], frictionOrWeatherStation)
-    }
+    sliderButton.addTo(map)
+
+    $('select').change(async function() {       
+        const radius = document.getElementById('radius').value
+        let timeAggregation = '1'
+        // Translate timeAggregation value to a numeric hourly value
+        switch (document.getElementById('timeAggregation').value) {
+            case 'Timme':
+                timeAggregation = 1
+                break
+            case 'Dag':
+                timeAggregation = 24
+                break
+            case 'Vecka':
+                timeAggregation = 24*7
+                break
+            case 'Månad':
+                timeAggregation = 24*7*4
+                break
+        }
+        let dates = getDates() 
+        
+        let frictionOrWeatherStation = document.getElementById('frictionOrWeatherStation').value
+        if(frictionOrWeatherStation=="WeatherStationData"){
+            geojson.eachLayer(function (layer) {    
+                layer.setStyle({fillOpacity : 0.7 }) 
+                noColor = false;
+            });
+            info.addTo(map);
+            //temperatureScale.addTo(map);
+            $( "#search-container" ).show();
+            circleGroup = [];
+            createLayers(stationsData,cameraArrayData);
+        } else{
+            await getFrictionData(frictionOrWeatherStation);
+            getAggregatedFrictionData(radius, timeAggregation, dates[0], dates[1], frictionOrWeatherStation)
+        }
+    })
 }
 
 
