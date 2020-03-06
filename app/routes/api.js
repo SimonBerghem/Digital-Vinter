@@ -56,7 +56,6 @@ router.get('/getFrictionDataCirc', function(req,res,next){
 
 /* GET FROM FRICTION BY REPORTERORG  */
 router.get('/getFrictionData', function(req, res, next) {
-    console.log("okok");
     reporter = req["query"]["reporter"];
     friction.getFrictionData(req, res, next, reporter);
 });
