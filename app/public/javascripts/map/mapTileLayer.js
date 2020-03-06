@@ -307,18 +307,20 @@ function addtoMAPtoggle(data){
     /* Välj WeatherStationData eller friction reporterOrganization */
     const toggleFriction = L.control({position: 'topleft'});
     let stringreport = '<p class="selectparagraph">Datatyp</p><select id="frictionOrWeatherStation"><option>WeatherStationData</option>';
-        for(var i=0; i<data.length; i++){
-            stringreport += '<option>'+data[i].reporterorganization+'</option>';
-        }
-        stringreport += '</select>';
+    for(var i=0; i<data.length; i++){
+        stringreport += '<option>'+data[i].reporterorganization+'</option>';
+    }
+    stringreport += '</select>';
 
-        toggleFriction.onAdd = function (map) {
-            var div = L.DomUtil.create('div');
-            div.innerHTML = stringreport;
-            div.firstChild.onmousedown = div.firstChild.ondblclick = L.DomEvent.stopPropagation;
-            return div;
-        };
-        toggleFriction.addTo(map);
+    toggleFriction.onAdd = function (map) {
+        var div = L.DomUtil.create('div');
+        div.innerHTML = stringreport;
+        div.firstChild.onmousedown = div.firstChild.ondblclick = L.DomEvent.stopPropagation;
+        return div;
+    };
+    toggleFriction.addTo(map);
+
+
     /* Välj radie */ 
     const radiemeny = L.control({position: 'topleft'});
     let radieoptions = '<p class="selectparagraph">Aggregationsradie</p><select id="radius"><option>1</option><option>10</option><option>100</option></select>';
@@ -331,7 +333,8 @@ function addtoMAPtoggle(data){
     };
     radiemeny.addTo(map);
 
-    /* Välj tidsaggretation */ 
+
+    /* Välj tidsaggreation */ 
     const tidsaggregationmeny = L.control({position: 'topleft'});
     let tidoptions = '<p class="selectparagraph">Aggregationstid</p><select id="timeAggregation"><option>Timme</option><option>Dag</option><option>Vecka</option><option>Månad</option></select>';
 
@@ -343,10 +346,10 @@ function addtoMAPtoggle(data){
     };
     tidsaggregationmeny.addTo(map);
 
-    
-    /* Välj radie */ 
+
+    /* Välj högsta friktionsvärdet */ 
     const frictionValueForm = L.control({position: 'topleft'});
-    let frictionValueFormHTML = '<p class="selectparagraph">Välj högsta friktionsvärdet</p><form> <input type="number" placeholder="1.00" step="0.01" min="0.0" max ="1.0" oninput="checkFormLength(this)"> </form>';
+    let frictionValueFormHTML = '<p class="selectparagraph">Välj högsta friktionsvärdet</p><form> <input type="number" value="1.00" step="0.01" min="0.0" max ="1.0" oninput="checkFormLength(this)"> </form>';
 
     frictionValueForm.onAdd = function (map) {
         var div = L.DomUtil.create('div');
@@ -355,7 +358,8 @@ function addtoMAPtoggle(data){
         return div;
     };
     frictionValueForm.addTo(map);
-    
+
+    /*  Visar slidern för datum */
     const sliderButton = L.control({position: 'topleft'})
     let sliderHTML= '<button id="slidertoggle" onclick="sliderToggle()">Välj datum</button>'
     sliderButton.onAdd = () => {
@@ -363,6 +367,8 @@ function addtoMAPtoggle(data){
         div.innerHTML = sliderHTML
         return div
     }
+
+    /* Utför friktionsqueryn */
     sliderButton.addTo(map)
     const searchButton = L.control({position: 'topleft'})
     let searchButtonHTML= '<button id="searchButton" onclick="searchButtonQuery()">Sök</button>'
@@ -373,8 +379,15 @@ function addtoMAPtoggle(data){
     }
     searchButton.addTo(map)
 
+    /* Infoknapp */
+    const infoButton = L.easyButton('fas fa-info', function(btn, map) {
+        $('#infoModal').modal('show');
+    }, 'Informationsmeny').addTo(map);
+
+
+
     $('select').change(async function() {       
-        
+
         let frictionOrWeatherStation = document.getElementById('frictionOrWeatherStation').value
         if(frictionOrWeatherStation=="WeatherStationData"){
             geojson.eachLayer(function (layer) {    

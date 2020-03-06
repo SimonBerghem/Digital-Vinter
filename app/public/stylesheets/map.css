@@ -318,3 +318,9 @@ height: 100%;
     
     
 }
+/* CSS för informationsmenyn */
+
+#infoLabel{
+    font-size: 26px;
+    
+}
