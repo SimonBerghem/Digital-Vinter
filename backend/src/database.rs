@@ -278,8 +278,8 @@ pub fn create_mysql_tables(pool: Pool) {
         MeasureConfidenceMin    float       null,
         NrOfAddedPoints         int         null
     );",()).expect("Failed to create table aggregated friction data");
-    
-    pool.prep_exec("create index aggregated_friction_data_Time_MULTI_index on aggregated_friction_data (Time, TimeAggregation, Longitude, Latitude, Radius, MeasureValueMin);",()).expect("Failed to create index: aggregated_friction_data_Time_MULTI_index ");
+
+    pool.prep_exec("ALTER TABLE aggregated_friction_data ADD INDEX (Time, TimeAggregation, Longitude, Latitude, Radius, MeasureValueMin);",()).expect("Failed to create index: aggregated_friction_data_Time_MULTI_index ");
     
     pool.prep_exec(r"CREATE TABLE IF NOT EXISTS camera_data (
                     id INT(8) NOT NULL,
