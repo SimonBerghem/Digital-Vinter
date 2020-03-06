@@ -240,7 +240,7 @@ height: 100%;
     height: 200px;
     width: 400px;
     top: 93%;
-    right: 45%;
+    right: 40%;
     position: absolute;
     font-weight: 800;
     font-size: 20px;
@@ -253,7 +253,7 @@ height: 100%;
     height: 200px;
     width: 400px;
     top: 93%;
-    right: 25%;
+    right: 20%;
     position: absolute;
     font-weight: 800;
     font-size: 20px;
@@ -268,7 +268,6 @@ height: 100%;
 
 #slidertoggle{
     z-index: 500;
-    position: absolute;
     font-size: 18px; 
     background-color: #346791; 
     color: #fff; 
@@ -283,9 +282,39 @@ height: 100%;
     box-shadow:inset 0 -0.6em 1em -0.35em rgba(0,0,0,0.17),inset 0 0.6em 2em -0.3em rgba(255,255,255,0.15),inset 0 0 0em 0.05em rgba(255,255,255,0.12);
 
 }
-.slidertoggle:hover{
+#slidertoggle:hover{
     opacity: 1;
 }
-.slidertoggle:active{
+#slidertoggle:active{
     box-shadow:inset 0 0.6em 2em -0.3em rgba(0,0,0,0.15),inset 0 0 0em 0.05em rgba(255,255,255,0.12);
+}
+
+#searchButton{
+    z-index: 500;
+    font-size: 18px; 
+    background-color: #346791; 
+    color: #fff; 
+    border: 0px; 
+    border-radius: 3px; 
+    padding: 6px;
+    cursor: pointer;
+    width: 100px;
+    opacity: 0.8;
+    text-align: center;
+    text-decoration:none;
+    box-shadow:inset 0 -0.6em 1em -0.35em rgba(0,0,0,0.17),inset 0 0.6em 2em -0.3em rgba(255,255,255,0.15),inset 0 0 0em 0.05em rgba(255,255,255,0.12);
+
+}
+#searchButton:hover{
+    opacity: 1;
+}
+#searchButton:active{
+    box-shadow:inset 0 0.6em 2em -0.3em rgba(0,0,0,0.15),inset 0 0 0em 0.05em rgba(255,255,255,0.12);
+}
+
+.selectparagraph{
+    font-size: 16px;
+    font-weight: bold;
+    
+    
 }
