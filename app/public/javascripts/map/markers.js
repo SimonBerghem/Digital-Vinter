@@ -124,12 +124,38 @@ let markers = L.markerClusterGroup({ chunkedLoading: true });
 function createAggregatedFrictionLayer(aggregatedFrictionData) {
     markerGroup = [];
     map.removeLayer(markers);
-    markers = L.markerClusterGroup({ chunkedLoading: true });
+    markers = L.markerClusterGroup({ chunkedLoading: true,
+        iconCreateFunction: function (cluster) {
+            children = cluster.getAllChildMarkers()
+            childCount = cluster.getChildCount()
+            let measureValueMin = 1
 
-    console.log(aggregatedFrictionData[0])
+            children.forEach(child => {
+                if(measureValueMin > child.measureValueMin) {
+                    measureValueMin = child.measureValueMin
+                }
+            })
+
+            var c = 'marker-cluster-';
+            if (measureValueMin < 0.26) {
+              c += 'red';
+            } 
+            else if (measureValueMin < 0.36) {
+              c += 'yellow';
+            } 
+            else {
+              c += 'green';
+            }
+            console.log(c)
+           
+            return new L.DivIcon({ html: '<div><span>' + childCount + '</span></div>', 
+             className: "marker-cluster" + " " + c, iconSize: new L.Point(40, 40) });
+            } });
+
     aggregatedFrictionData.map(data => {
-        var marker = L.marker(L.latLng(data.latitude, data.longitude, { title: "" }));
-        marker.bindPopup("ASD");
+        var marker = L.marker(L.latLng(data.latitude, data.longitude));
+        marker.measureValueMin = data.measureValueMin
+        marker.bindPopup(popupAggregatedFriction(data));
         markerGroup.push(marker);
     })
     
