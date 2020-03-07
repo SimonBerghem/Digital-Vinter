@@ -1,203 +1,262 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title><%= title %></title>
-    <!--Leflet-->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin=""></script>
-    <!--Custom styling-->
-    <link rel="stylesheet" href="stylesheets/style.css" />
-    <link rel="stylesheet" href="stylesheets/map.css" />
-    <!--JQuery script-->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <!-- Bootstrap-->
-      <!-- Latest compiled and minified CSS -->
-      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-      <!-- Latest compiled JavaScript -->
-      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-    <!-- Styling script-->
-    <script src="https://use.fontawesome.com/440d818026.js"></script>
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.2/dist/leaflet.draw.css" />
-    <!--EasyButton js -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
-    <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
-    <script src="https://unpkg.com/leaflet-draw@1.0.2/dist/leaflet.draw.js"></script>
-    <!-- noUIslider -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/8.5.1/nouislider.min.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/8.5.1/nouislider.min.js"></script>
+    <head>
+        <title><%= title %></title>
+        <!--Leflet-->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
+        <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin=""></script>
+        <!--Custom styling-->
+        <link rel="stylesheet" href="stylesheets/style.css" />
+        <link rel="stylesheet" href="stylesheets/map.css" />
+        <!--JQuery script-->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <!-- Bootstrap-->
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <!-- Latest compiled JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+        <!-- Styling script-->
+        <script src="https://use.fontawesome.com/440d818026.js"></script>
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.2/dist/leaflet.draw.css" />
+        <!--EasyButton js -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
+        <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
+        <script src="https://unpkg.com/leaflet-draw@1.0.2/dist/leaflet.draw.js"></script>
+        <!-- noUIslider -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/8.5.1/nouislider.min.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/8.5.1/nouislider.min.js"></script>
 
-  </head>
-  <body>
-    <div id=map-container class="map-container">
-      <div id="mapid" class="map">
-      <!-- Search bar -->
-        <div id="search-container">
-          <input type="text" id="searchbar">
-            <div id="suggestion-field"></div>
+    </head>
+    <body>
+        <div id=map-container class="map-container">
+            <div id="mapid" class="map">
+                <!-- Search bar -->
+                <div id="search-container">
+                    <input type="text" id="searchbar">
+                    <div id="suggestion-field"></div>
+                </div>
+
+                <!-- Slider -->
+
+                <div id="slider" class="sliderclass"></div>
+                <div id ="event-start"></div>
+                <div id ="event-end"></div>
+
+
+
+
+                <!-- Station field to the right and button -->
+                <div id="obj-list" class="info"></div>
+                <div class="button-container">
+                    <button class="button-two" onclick="openewgraphtab()">Grafer</button> 
+                    <button class="button-two" id="obj-button" onclick="updateStationField()">Visa valda objekt</button>
+                    <button class="button-two" onclick="removeAllObj()">Ta bort alla valda objekt</button>
+                </div>
+            </div>
         </div>
-          
-          <!-- Slider -->
-          
-          <div id="slider" class="sliderclass"></div>
-          <div id ="event-start"></div>
-          <div id ="event-end"></div>
-          
-          
-  
 
-      <!-- Station field to the right and button -->
-      <div id="obj-list" class="info"></div>
-      <div class="button-container">
-          <button class="button-two" onclick="openewgraphtab()">Grafer</button> 
-          <button class="button-two" id="obj-button" onclick="updateStationField()">Visa valda objekt</button>
-          <button class="button-two" onclick="removeAllObj()">Ta bort alla valda objekt</button>
-      </div>
-    </div>
-  </div>
-      
-    
-      
-      
-  <!-- Modal -->
-  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Upload new friction data</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <script type="text/javascript">
-            $(function () {
-              $("#upload").bind("click", function () {
-                var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.csv)$/;
-                if (regex.test($("#fileUpload").val().toLowerCase())) {
-                  $.ajax({
-                    // Your server script to process the upload
-                    url: '/api/uploadFrictionData',
-                    type: 'POST',
 
-                    // Form data
-                    data: new FormData($('form')[0]),
 
-                    // Tell jQuery not to process data or worry about content-type
-                    // You *must* include these options!
-                    cache: false,
-                    contentType: false,
-                    processData: false,
 
-                    // Custom XMLHttpRequest
-                    xhr: function () {
-                      var myXhr = $.ajaxSettings.xhr();
-                      if (myXhr.upload) {
-                        // For handling the progress of the upload
-                        myXhr.upload.addEventListener('progress', function (e) {
-                          if (e.lengthComputable) {
-                            $('progress').attr({
-                              value: e.loaded,
-                              max: e.total,
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Upload new friction data</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <script type="text/javascript">
+                            $(function () {
+                                $("#upload").bind("click", function () {
+                                    var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.csv)$/;
+                                    if (regex.test($("#fileUpload").val().toLowerCase())) {
+                                        $.ajax({
+                                            // Your server script to process the upload
+                                            url: '/api/uploadFrictionData',
+                                            type: 'POST',
+
+                                            // Form data
+                                            data: new FormData($('form')[0]),
+
+                                            // Tell jQuery not to process data or worry about content-type
+                                            // You *must* include these options!
+                                            cache: false,
+                                            contentType: false,
+                                            processData: false,
+
+                                            // Custom XMLHttpRequest
+                                            xhr: function () {
+                                                var myXhr = $.ajaxSettings.xhr();
+                                                if (myXhr.upload) {
+                                                    // For handling the progress of the upload
+                                                    myXhr.upload.addEventListener('progress', function (e) {
+                                                        if (e.lengthComputable) {
+                                                            $('progress').attr({
+                                                                value: e.loaded,
+                                                                max: e.total,
+                                                            });
+                                                        }
+                                                    }, false);
+                                                }
+                                                return myXhr;
+                                            }
+                                        });
+                                    } else {
+                                        alert("Filen kunde inte tolkas som en lämplig .csv fil.");
+                                    }
+                                });
                             });
-                          }
-                        }, false);
-                      }
-                      return myXhr;
-                    }
-                  });
+                        </script>
+                        <div>
+                            Ladda upp ny friktionsdata genom att välja en .csv fil från disk och vänta tills att uppladdningen är klar. Efter att uppladdningen är gjord från användare till server måste även servern ladda upp friktionsdatan till databasen, detta kan ta några minuter.
+                        </div>
+                        <hr>
+                        <form enctype="multipart/form-data">
+                            <input name="file" type="file" id="fileUpload" style="margin:5px">
+                            <input type="button" value="Upload" id="upload" style="margin:5px"/>
+                        </form>
+                        <progress></progress>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="infoLabel">Informationsmeny</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div>
+                            test.
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!--Map scripts-->
+        <script src="javascripts/map/countyData.js"></script>
+        <script src="javascripts/map/countyNames.js"></script>
+        <script src="javascripts/map/stations.js"></script>
+        <script src="javascripts/graph/getWeatherData.js"></script>
+        <script src="javascripts/map/weatherData.js"></script>
+        <script src="javascripts/map/boundaryCanvas.js"></script>
+        <script src="javascripts/map/markers.js"></script>
+        <script src="javascripts/map/map.js"></script>
+        <script src="javascripts/map/drawTools.js"></script>
+        <script src="javascripts/map/chosenStationField.js"></script>
+        <script src="javascripts/map/popup.js"></script>
+        <script src="javascripts/map/searchStation.js"></script>
+        <script src="javascripts/map/mapTileLayer.js"></script>
+        <script src="javascripts/map/frictionData.js"></script>
+        <script src="javascripts/map/chosenFrictionField.js"></script>
+        <script src="javascripts/map/friction.js"></script>
+        <script src="javascripts/graph/getFrictionData.js"></script>
+        <script src="javascripts/map/cameraData.js"></script>
+
+        <script>
+            // async function testDBConnection() {
+            //       await $.getJSON("/api/testDbConnection", function(data) {
+            //       console.log(data);
+            //       });
+            //     }
+            async function main (){
+                await getCameraData();
+                await getLatestAvgCountyWeatherData();
+                await drawMap();
+                await getStations();
+                await getAllLatestWeatherData();
+                await createLayers(stationsData,cameraArrayData);
+                await getDistinctReporterorgFriction();
+
+                // await getAllFrictionData();
+                // await createFrictionLayer(frictionData);
+
+                // await testDBConnection();
+                //test = ['4005047', '2019-02-01 00:00:10', '2019-02-01 00:30:01', '576,703,127,523', '121,210,512,813', '-1', '1', '34', '623,529', '5', '52', 'RoadCloud', NULL];
+                //await uploadFrictionData(test);
+
+            }
+            main();
+
+
+
+
+            function openewgraphtab(){
+                var w = window.open("/graph");
+            }
+
+            /* Funktion för att toggla sliders */    
+            function sliderToggle(){
+                var slider = document.getElementById("slider");
+                var tooltip1 = document.getElementById("event-start");
+                var tooltip2 = document.getElementById("event-end");
+                if (slider.style.display === "none" || slider.style.display === "") {
+                    slider.style.display = "block";
+                    tooltip1.style.display = "block";
+                    tooltip2.style.display = "block";
                 } else {
-                    alert("Filen kunde inte tolkas som en lämplig .csv fil.");
+                    slider.style.display = "none";
+                    tooltip1.style.display = "none";
+                    tooltip2.style.display = "none";
+                }    
+            }
+            /* Query som hämtar friktionsdata */
+            async function searchButtonQuery(){
+                let frictionOrWeatherStation = document.getElementById('frictionOrWeatherStation').value
+                const radius = document.getElementById('radius').value;
+                let timeAggregation = '1';
+                // Translate timeAggregation value to a numeric hourly value
+                switch (document.getElementById('timeAggregation').value) {
+                    case 'Timme':
+                        timeAggregation = 1;
+                        break;
+                    case 'Dag':
+                        timeAggregation = 24;
+                        break;
+                    case 'Vecka':
+                        timeAggregation = 24*7;
+                        break;
+                    case 'Månad':
+                        timeAggregation = 24*7*4;
+                        break;
                 }
-            });
-          });
-          </script>
-          <div>
-            Ladda upp ny friktionsdata genom att välja en .csv fil från disk och vänta tills att uppladdningen är klar. Efter att uppladdningen är gjord från användare till server måste även servern ladda upp friktionsdatan till databasen, detta kan ta några minuter.
-          </div>
-          <hr>
-          <form enctype="multipart/form-data">
-            <input name="file" type="file" id="fileUpload" style="margin:5px">
-            <input type="button" value="Upload" id="upload" style="margin:5px"/>
-          </form>
-          <progress></progress>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-      
+                let dates = getDates() ;
 
-    <!--Map scripts-->
-    <script src="javascripts/map/countyData.js"></script>
-    <script src="javascripts/map/countyNames.js"></script>
-    <script src="javascripts/map/stations.js"></script>
-    <script src="javascripts/graph/getWeatherData.js"></script>
-    <script src="javascripts/map/weatherData.js"></script>
-    <script src="javascripts/map/boundaryCanvas.js"></script>
-    <script src="javascripts/map/markers.js"></script>
-    <script src="javascripts/map/map.js"></script>
-    <script src="javascripts/map/drawTools.js"></script>
-    <script src="javascripts/map/chosenStationField.js"></script>
-    <script src="javascripts/map/popup.js"></script>
-    <script src="javascripts/map/searchStation.js"></script>
-    <script src="javascripts/map/mapTileLayer.js"></script>
-    <script src="javascripts/map/frictionData.js"></script>
-    <script src="javascripts/map/chosenFrictionField.js"></script>
-    <script src="javascripts/map/friction.js"></script>
-    <script src="javascripts/graph/getFrictionData.js"></script>
-    <script src="javascripts/map/cameraData.js"></script>
+                await getFrictionData(frictionOrWeatherStation);
+                //getAggregatedFrictionData(radius, timeAggregation, dates[0], dates[1], frictionOrWeatherStation);
 
-    <script>
-      // async function testDBConnection() {
-      //       await $.getJSON("/api/testDbConnection", function(data) {
-      //       console.log(data);
-      //       });
-      //     }
-      async function main (){
-        await getCameraData();
-        await getLatestAvgCountyWeatherData();
-        await drawMap();
-        await getStations();
-        await getAllLatestWeatherData();
-        await createLayers(stationsData,cameraArrayData);
-        await getDistinctReporterorgFriction();
 
-        // await getAllFrictionData();
-        // await createFrictionLayer(frictionData);
+            }
+            /* Kollar så att formuläret bara har tal mellan 0-1 */ 
+            function checkFormLength(input){
+                if (input.value > 1.0 || input.value < 0.0) {
+                    input.value = '1'; // emptying the input box      
+                }
 
-        // await testDBConnection();
-        //test = ['4005047', '2019-02-01 00:00:10', '2019-02-01 00:30:01', '576,703,127,523', '121,210,512,813', '-1', '1', '34', '623,529', '5', '52', 'RoadCloud', NULL];
-        //await uploadFrictionData(test);
 
-      }
-      main();
-     
+            }
 
-      
 
-      function openewgraphtab(){
-        var w = window.open("/graph");
-      }
-        
-     /* Funktion för att toggla sliders */    
-      function sliderToggle(){
-          var slider = document.getElementById("slider");
-          var tooltip1 = document.getElementById("event-start");
-          var tooltip2 = document.getElementById("event-end");
-            if (slider.style.display === "none" || slider.style.display === "") {
-                slider.style.display = "block";
-                tooltip1.style.display = "block";
-                tooltip2.style.display = "block";
-            } else {
-                slider.style.display = "none";
-                tooltip1.style.display = "none";
-                tooltip2.style.display = "none";
-            }    
-      }
-    </script>
-      
-  </body>
+
+
+        </script>
+
+    </body>
 </html>
