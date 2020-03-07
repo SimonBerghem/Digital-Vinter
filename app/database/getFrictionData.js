@@ -57,9 +57,6 @@ module.exports = {
 
     getAggregatedFrictionData : function(req, res, next, radius, timeAggregation, startTime, endTime, reporterOrganization, mapBounds, maxFriction){
        
-        // ssh to database server and then connect to db
-        // mysqlssh.connect(auth.ssh, auth.database).then(client => {
-        
         authorization.getConnection(function(err, conn){
             if (err) throw err
             const { northEastLat, northEastLong, southWestLat, southWestLong } = mapBounds

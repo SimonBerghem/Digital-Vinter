@@ -22,7 +22,7 @@ async function getDistinctReporterorgFriction() {
     });    
 }
 
-async function getAggregatedFrictionData(radius, timeAggregation, startTime, endTime, reporterOrganization, mapBounds) {
+async function getAggregatedFrictionData(radius, timeAggregation, startTime, endTime, reporterOrganization, mapBounds, maxFriction) {
     await $.getJSON("/api/getAggregatedFrictionData", {radius, timeAggregation, startTime, endTime, reporterOrganization, mapBounds, maxFriction}, function(data) {
         aggregatedFrictionData = data;
     });

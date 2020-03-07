@@ -216,6 +216,7 @@
             }
             /* Query som hämtar friktionsdata */
             async function searchButtonQuery(){
+                const mapBounds = { northEastLat: map.getBounds()._northEast.lat, northEastLong:map.getBounds()._northEast.lng, southWestLat:map.getBounds()._southWest.lat, southWestLong:map.getBounds()._southWest.lng}
                 let frictionOrWeatherStation = document.getElementById('frictionOrWeatherStation').value
                 const radius = document.getElementById('radius').value;
                 let timeAggregation = '1';
@@ -238,7 +239,7 @@
                 let dates = getDates() ;
 
                 //await getFrictionData(frictionOrWeatherStation);
-                getAggregatedFrictionData(radius, timeAggregation, dates[0], dates[1], frictionOrWeatherStation, maxFriction);
+                getAggregatedFrictionData(radius, timeAggregation, dates[0], dates[1], frictionOrWeatherStation, mapBounds, maxFriction);
             }
             /* Kollar så att formuläret bara har tal mellan 0-1 */ 
             function checkFormLength(input){
