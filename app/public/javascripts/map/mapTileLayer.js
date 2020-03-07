@@ -349,7 +349,7 @@ function addtoMAPtoggle(data){
 
     /* Välj högsta friktionsvärdet */ 
     const frictionValueForm = L.control({position: 'topleft'});
-    let frictionValueFormHTML = '<p class="selectparagraph">Välj högsta friktionsvärdet</p><form> <input type="number" value="1.00" step="0.01" min="0.0" max ="1.0" oninput="checkFormLength(this)"> </form>';
+    let frictionValueFormHTML = '<p class="selectparagraph">Välj högsta friktionsvärdet</p><form> <input id="maxFrictionForm" type="number" value="1.00" step="0.01" min="0.0" max ="1.0" oninput="checkFormLength(this)"> </form>';
 
     frictionValueForm.onAdd = function (map) {
         var div = L.DomUtil.create('div');
@@ -371,7 +371,7 @@ function addtoMAPtoggle(data){
     /* Utför friktionsqueryn */
     sliderButton.addTo(map)
     const searchButton = L.control({position: 'topleft'})
-    let searchButtonHTML= '<button id="searchButton" onclick="searchButtonQuery()">Sök</button>'
+    let searchButtonHTML= '<button id="searchButton" disabled=true onclick="searchButtonQuery()">Sök</button>'
     searchButton.onAdd = () => {
         var div = L.DomUtil.create('div')
         div.innerHTML = searchButtonHTML
@@ -390,6 +390,7 @@ function addtoMAPtoggle(data){
 
         let frictionOrWeatherStation = document.getElementById('frictionOrWeatherStation').value
         if(frictionOrWeatherStation=="WeatherStationData"){
+            document.getElementById('searchButton').disabled = true
             geojson.eachLayer(function (layer) {    
                 layer.setStyle({fillOpacity : 0.7 }) 
                 noColor = false;
@@ -399,6 +400,8 @@ function addtoMAPtoggle(data){
             $( "#search-container" ).show();
             circleGroup = [];
             createLayers(stationsData,cameraArrayData);
+        } else {
+            document.getElementById('searchButton').disabled = false
         }
     })
 }

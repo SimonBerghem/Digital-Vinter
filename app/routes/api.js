@@ -67,7 +67,8 @@ router.get('/getAggregatedFrictionData', function(req, res, next) {
     const startTime = req["query"]["startTime"];
     const endTime = req["query"]["endTime"];
     const reporterOrganization = req["query"]["reporterOrganization"]
-    friction.getAggregatedFrictionData(req, res, next, radius, timeAggregation, startTime, endTime, reporterOrganization);
+    const maxFriction = req["query"]["maxFriction"]
+    friction.getAggregatedFrictionData(req, res, next, radius, timeAggregation, startTime, endTime, reporterOrganization, maxFriction);
 });
 
 /* GET ALL FROM FRICTION DATA */

@@ -195,9 +195,6 @@
             }
             main();
 
-
-
-
             function openewgraphtab(){
                 var w = window.open("/graph");
             }
@@ -222,6 +219,7 @@
                 let frictionOrWeatherStation = document.getElementById('frictionOrWeatherStation').value
                 const radius = document.getElementById('radius').value;
                 let timeAggregation = '1';
+                let maxFriction = document.getElementById('maxFrictionForm').value
                 // Translate timeAggregation value to a numeric hourly value
                 switch (document.getElementById('timeAggregation').value) {
                     case 'Timme':
@@ -239,24 +237,15 @@
                 }
                 let dates = getDates() ;
 
-                await getFrictionData(frictionOrWeatherStation);
-                //getAggregatedFrictionData(radius, timeAggregation, dates[0], dates[1], frictionOrWeatherStation);
-
-
+                //await getFrictionData(frictionOrWeatherStation);
+                getAggregatedFrictionData(radius, timeAggregation, dates[0], dates[1], frictionOrWeatherStation, maxFriction);
             }
             /* Kollar så att formuläret bara har tal mellan 0-1 */ 
             function checkFormLength(input){
                 if (input.value > 1.0 || input.value < 0.0) {
                     input.value = '1'; // emptying the input box      
                 }
-
-
             }
-
-
-
-
         </script>
-
     </body>
 </html>
