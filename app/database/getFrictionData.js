@@ -82,14 +82,9 @@ module.exports = {
                 `
             conn.query(sql, [radius, timeAggregation, startTime, endTime, reporterOrganization, southWestLat, northEastLat, southWestLong, northEastLong, maxFriction], function (err, results) {
                 console.log(results.length)
-                if(results.length > 20000) {
-                    res.send([])
-                    conn.release();
-                } else {
                 
                 res.send(results);
                 conn.release();
-                }
                 if (err) throw err
             });
 
