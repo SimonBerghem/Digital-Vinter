@@ -23,7 +23,7 @@ async function getDistinctReporterorgFriction() {
 }
 
 async function getAggregatedFrictionData(radius, timeAggregation, startTime, endTime, reporterOrganization, mapBounds) {
-    await $.getJSON("/api/getAggregatedFrictionData", {radius, timeAggregation, startTime, endTime, reporterOrganization, mapBounds}, function(data) {
+    await $.getJSON("/api/getAggregatedFrictionData", {radius, timeAggregation, startTime, endTime, reporterOrganization, mapBounds, maxFriction}, function(data) {
         aggregatedFrictionData = data;
     });
     await drawAggregatedFriction(aggregatedFrictionData)
