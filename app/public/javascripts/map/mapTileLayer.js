@@ -387,7 +387,25 @@ function addtoMAPtoggle(data){
 
 
     $('select').change(async function() {       
-
+        const mapBounds = { northEastLat: map.getBounds()._northEast.lat, northEastLong:map.getBounds()._northEast.lng, southWestLat:map.getBounds()._southWest.lat, southWestLong:map.getBounds()._southWest.lng}
+        const radius = document.getElementById('radius').value
+        let timeAggregation = '1'
+        // Translate timeAggregation value to a numeric hourly value
+        switch (document.getElementById('timeAggregation').value) {
+            case 'Timme':
+                timeAggregation = 1
+                break
+            case 'Dag':
+                timeAggregation = 24
+                break
+            case 'Vecka':
+                timeAggregation = 24*7
+                break
+            case 'Månad':
+                timeAggregation = 24*7*4
+                break
+        }
+        let dates = getDates() 
         let frictionOrWeatherStation = document.getElementById('frictionOrWeatherStation').value
         if(frictionOrWeatherStation=="WeatherStationData"){
             document.getElementById('searchButton').disabled = true
@@ -396,7 +414,6 @@ function addtoMAPtoggle(data){
                 noColor = false;
             });
             info.addTo(map);
-            //temperatureScale.addTo(map);
             $( "#search-container" ).show();
             circleGroup = [];
             createLayers(stationsData,cameraArrayData);
