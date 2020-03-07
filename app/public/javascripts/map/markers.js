@@ -146,7 +146,6 @@ function createAggregatedFrictionLayer(aggregatedFrictionData) {
             else {
               c += 'green';
             }
-            console.log(c)
            
             return new L.DivIcon({ html: '<div><span>' + childCount + '</span></div>', 
              className: "marker-cluster" + " " + c, iconSize: new L.Point(40, 40) });
