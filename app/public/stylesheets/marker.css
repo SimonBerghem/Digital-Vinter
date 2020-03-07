@@ -19,18 +19,6 @@
   background-color: rgba(255, 0, 0, 0.6);
   }
   
-  .circle {
-    width: 500px;
-    height: 500px;
-    border-radius: 50%;
-    font-size: 50px;
-    color: #fff;
-    line-height: 500px;
-    text-align: center;
-    background: #000
-  }
-
-
 .marker-cluster {
 	background-clip: padding-box;
 	border-radius: 50%;
