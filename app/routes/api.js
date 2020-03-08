@@ -11,9 +11,21 @@ var province = require('../database/getProvinceData');
 var friction = require('../database/getFrictionData');
 var camera = require('../database/getCameraData');
 var uploadFrictionData = require('../database/uploadFrictionData');
+var accident = require('../database/getAccidentData');
 
 const upload = multer({dest:'uploads/'});
 const unlinkAsync = promisify(fs.unlink)
+
+/*
+
+GEt Accident Data
+ */
+
+router.get('/getAccidentData', function(req, res, next){
+    datumStart = req["query"]["startTime"];
+    datumEnd = req["query"]["endTime"];
+    accident.getAccidentData(req, res, next);
+});
 
 /* GET dATA CAMERA_DATA */
 router.get('/getCameraData', function(req, res, next) {

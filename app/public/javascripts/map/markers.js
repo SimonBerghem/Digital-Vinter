@@ -70,8 +70,12 @@ function removeMarkerOnZoom(group){
  * Should contain layergroups of markers.
  */
 
+
+
+
 var layerGroups = [];
 var circleGroup = [];
+var accidentGroup = [];
 let frictionCanvas = L.canvas({ padding: 0.5, pane: "circlemarkers", });
 //let frictionCanvas = new L.layerGroup();
 
@@ -118,6 +122,40 @@ function createFrictionLayer(filteredfrictionData) {
     //temperatureScale.remove(map);
     $( "#search-container" ).hide();
 }
+
+
+function drawAccidentData(accidentData){
+    accidentGroup = [];
+
+    frictionCanvas = L.canvas({paddin: 0.5, pane: "circlemarkers", });
+
+    for (var i = 0; i < accidentData ; i+=1){
+        let str = accidentData.WGS84;
+        let str1 = accidentData.WGS84;
+        var latitude = parseFloat(str.split(" ")[1].split("(")[1]);
+        var longitude = parseFloat(str1.split(" ")[2].split(")")[0]);
+        let circle = L.circleMarker([latitude, longitude],{
+        renderer: frictionCanvas,
+        color: '#AB0000'
+        });
+        circle.bindPopup(popupAccident(accidentData[i], circle));
+        circleGroup.push(circle);
+        circle.addTo(map);
+            
+    }
+    //Taget från createAggregatedFrictionLayer
+     //Det är här för att det ska ladda snyggare. Motsvarande för att sätta igång är i maptilelayers.js i början av funktionen.
+     geojson.eachLayer(function (layer) {    
+        layer.setStyle({fillOpacity :0 }) 
+        noColor = true;
+    });
+
+    info.remove(map);
+    //temperatureScale.remove(map);
+    $( "#search-container" ).hide();
+
+}
+
 
 function createAggregatedFrictionLayer(aggregatedFrictionData) {
     circleGroup = [];
