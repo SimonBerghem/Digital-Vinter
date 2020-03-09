@@ -1,22 +1,22 @@
 .marker-cluster-green {
-	background-color: rgba(159, 255, 170, 0.6);
+	background-color: rgba(0, 112, 0, 0.6);
 	}
 .marker-cluster-green div {
-  background-color: rgba(0, 255, 42, 0.6);
+  background-color: rgba(2, 201, 2, 0.6)
 	}
 
 .marker-cluster-yellow {
-	background-color: rgba(252, 230, 140, 0.6);
+	background-color: rgba(255,191,0, 0.6);
 	}
 .marker-cluster-yellow div {
-  background-color: rgba(255, 204, 0, 0.6);
+  background-color: rgba(255, 217, 102, 0.6);
 	}
 
 .marker-cluster-red {
-  background-color: rgba(242, 114, 114, 0.6);
+  background-color: rgba(204, 0, 0, 0.6);
 	}
 .marker-cluster-red div {
-  background-color: rgba(255, 0, 0, 0.6);
+  background-color: rgba(245, 57, 57, 0.6);
   }
   
 .marker-cluster {
