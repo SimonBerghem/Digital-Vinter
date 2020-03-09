@@ -77,6 +77,7 @@ var layerGroups = [];
 var circleGroup = [];
 var accidentGroup = [];
 let frictionCanvas = L.canvas({ padding: 0.5, pane: "circlemarkers", });
+let accidentCanvas = L.canvas({paddin: 0.5, pane: "circlemarkers", });
 //let frictionCanvas = new L.layerGroup();
 
 function createFrictionLayer(filteredfrictionData) {
@@ -126,21 +127,17 @@ function createFrictionLayer(filteredfrictionData) {
 
 function drawAccidentData(accidentData){
     accidentGroup = [];
-    console.log(accidentData)
-    frictionCanvas = L.canvas({paddin: 0.5, pane: "circlemarkers", });
+    accidentCanvas = L.canvas({paddin: 0.5, pane: "circlemarkers", });
     //console.log(accidentData[0])
 
     for (var i = 0; i < accidentData.length; i+=1){
         try{
-
             let str = accidentData[i].WGS84;
             let str1 = accidentData[i].WGS84;
-            console.log(str,str1)
-            var longitude = parseFloat(str.split(" ")[1].split("(")[1]);
-            var  latitude = parseFloat(str1.split(" ")[2].split(")")[0]);
-            console.log("latitude: ", latitude, "longitude: ", longitude)
+            let longitude = parseFloat(str.split(" ")[1].split("(")[1]);
+            let latitude = parseFloat(str1.split(" ")[2].split(")")[0]);
             let circle = L.circleMarker([latitude, longitude],{
-            renderer: frictionCanvas,
+            renderer: accidentCanvas,
             color: '#00FFFF'
             });
             circle.bindPopup(popupAccident(accidentData[i], circle));
@@ -149,13 +146,11 @@ function drawAccidentData(accidentData){
 
 
         }catch(error){
-            console.log("Något blev fel, segt ")
-
+            // Ignore error
         }
        
             
     }
-    console.log("SIE: ",accidentData.length)
     //Taget från createAggregatedFrictionLayer
      //Det är här för att det ska ladda snyggare. Motsvarande för att sätta igång är i maptilelayers.js i början av funktionen.
      geojson.eachLayer(function (layer) {    

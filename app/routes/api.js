@@ -25,9 +25,7 @@ router.get('/getAccidentData', function(req, res, next){
     try{
     datumStart = req["query"]["startTime"];
     datumEnd = req["query"]["endTime"];
-    console.log(datumStart)
     accident.getAccidentData(req, res, next, datumStart, datumEnd)
-    console.log("HAJ")
     } catch(error) {
         console.log(error)
     }

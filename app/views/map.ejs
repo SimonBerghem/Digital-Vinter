@@ -170,6 +170,7 @@
         <script src="javascripts/map/friction.js"></script>
         <script src="javascripts/graph/getFrictionData.js"></script>
         <script src="javascripts/map/cameraData.js"></script>
+        <script src="javascripts/map/accidentData.js"></script>
 
         <script>
             // async function testDBConnection() {
@@ -248,10 +249,17 @@
                     input.value = '1'; // emptying the input box      
                 }
             }
+
+            let toggleAccidentData = false
             function accidentToggle(){
-        let dates = getDates() 
-        getAccidentDataTime(dates[0], dates[1])
-      }
+                map.removeLayer(accidentCanvas);
+                if(toggleAccidentData === false) { 
+                    let dates = getDates() 
+                    getAccidentDataTime(dates[0], dates[1])
+                } else {
+                }
+                toggleAccidentData = !toggleAccidentData
+            }
         </script>
     </body>
     </html>

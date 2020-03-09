@@ -12,11 +12,8 @@ module.exports = {
     */
     
     getAccidentData  : function(req, res, next, datumStart, datumEnd) {
-        console.log("HALLÅ")
         authorization.getConnection(function(err, conn){
             if (err) throw err
-            console.log(datumStart)
-            console.log(datumEnd)
 
             const sql = "SELECT * FROM db.road_accident_data WHERE (IconID = 'roadAccident' AND CreationTime BETWEEN ? AND ? OR EndTime BETWEEN ? AND ? );"
             variable =[datumStart,datumEnd,datumStart,datumEnd];
