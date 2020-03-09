@@ -54,14 +54,12 @@ module.exports = {
     },
 
     // GET AGGREGATED FRICTION DATA
-    getAggregatedFrictionData : function(req, res, next, radius, timeAggregation, startTime, endTime, reporterOrganization){
+
+    getAggregatedFrictionData : function(req, res, next, radius, timeAggregation, startTime, endTime, reporterOrganization, mapBounds, maxFriction){
        
-        // ssh to database server and then connect to db
-        // mysqlssh.connect(auth.ssh, auth.database).then(client => {
-        
         authorization.getConnection(function(err, conn){
             if (err) throw err
-
+            const { northEastLat, northEastLong, southWestLat, southWestLong } = mapBounds
             const sql =`
                 SELECT
                     id,
@@ -80,9 +78,9 @@ module.exports = {
                     measureConfidenceMin,
                     nrOfAddedPoints
                 FROM aggregated_friction_data
-                WHERE radius = ? AND timeAggregation = ? AND time BETWEEN ? AND ? AND reporterOrganization = ?
+                WHERE radius = ? AND timeAggregation = ? AND time BETWEEN ? AND ? AND reporterOrganization = ? AND latitude BETWEEN ? AND ? AND longitude BETWEEN ? AND ? AND measureValueMin < ?
                 `
-            conn.query(sql, [radius, timeAggregation, startTime, endTime, reporterOrganization], function (err, results) {
+            conn.query(sql, [radius, timeAggregation, startTime, endTime, reporterOrganization, southWestLat, northEastLat, southWestLong, northEastLong, maxFriction], function (err, results) {
                 console.log(results.length)
                 if(results.length > 20000) {
                     res.send([])

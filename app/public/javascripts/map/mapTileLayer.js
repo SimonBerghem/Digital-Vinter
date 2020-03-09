@@ -306,22 +306,24 @@ const modalButton = L.easyButton('fas fa-upload', function(btn, map) {
 function addtoMAPtoggle(data){
     /* Välj WeatherStationData eller friction reporterOrganization */
     const toggleFriction = L.control({position: 'topleft'});
-    let stringreport = '<select id="frictionOrWeatherStation"><option>WeatherStationData</option>';
-        for(var i=0; i<data.length; i++){
-            stringreport += '<option>'+data[i].reporterorganization+'</option>';
-        }
-        stringreport += '</select>';
+    let stringreport = '<p class="selectparagraph">Datatyp</p><select id="frictionOrWeatherStation"><option>WeatherStationData</option>';
+    for(var i=0; i<data.length; i++){
+        stringreport += '<option>'+data[i].reporterorganization+'</option>';
+    }
+    stringreport += '</select>';
 
-        toggleFriction.onAdd = function (map) {
-            var div = L.DomUtil.create('div');
-            div.innerHTML = stringreport;
-            div.firstChild.onmousedown = div.firstChild.ondblclick = L.DomEvent.stopPropagation;
-            return div;
-        };
-        toggleFriction.addTo(map);
+    toggleFriction.onAdd = function (map) {
+        var div = L.DomUtil.create('div');
+        div.innerHTML = stringreport;
+        div.firstChild.onmousedown = div.firstChild.ondblclick = L.DomEvent.stopPropagation;
+        return div;
+    };
+    toggleFriction.addTo(map);
+
+
     /* Välj radie */ 
     const radiemeny = L.control({position: 'topleft'});
-    let radieoptions = '<p>Aggregationsradie</p><select id="radius"><option>1</option><option>10</option><option>100</option></select>';
+    let radieoptions = '<p class="selectparagraph">Aggregationsradie</p><select id="radius"><option>1</option><option>10</option><option>100</option></select>';
 
     radiemeny.onAdd = function (map) {
         var div = L.DomUtil.create('div');
@@ -331,9 +333,10 @@ function addtoMAPtoggle(data){
     };
     radiemeny.addTo(map);
 
-    /* Välj tidsaggretation */ 
+
+    /* Välj tidsaggreation */ 
     const tidsaggregationmeny = L.control({position: 'topleft'});
-    let tidoptions = '<p>Aggregationstid</p><select id="timeAggregation"><option>Timme</option><option>Dag</option><option>Vecka</option><option>Månad</option></select>';
+    let tidoptions = '<p class="selectparagraph">Aggregationstid</p><select id="timeAggregation"><option>Timme</option><option>Dag</option><option>Vecka</option><option>Månad</option></select>';
 
     tidsaggregationmeny.onAdd = function (map) {
         var div = L.DomUtil.create('div');
@@ -343,6 +346,20 @@ function addtoMAPtoggle(data){
     };
     tidsaggregationmeny.addTo(map);
 
+
+    /* Välj högsta friktionsvärdet */ 
+    const frictionValueForm = L.control({position: 'topleft'});
+    let frictionValueFormHTML = '<p class="selectparagraph">Välj högsta friktionsvärdet</p><input id="maxFrictionForm" type="number" value="1.00" step="0.01" min="0.0" max ="1.0" oninput="checkFormLength(this)">';
+
+    frictionValueForm.onAdd = function (map) {
+        var div = L.DomUtil.create('div');
+        div.innerHTML = frictionValueFormHTML;
+        div.firstChild.onmousedown = div.firstChild.ondblclick = L.DomEvent.stopPropagation;
+        return div;
+    };
+    frictionValueForm.addTo(map);
+
+    /*  Visar slidern för datum */
     const sliderButton = L.control({position: 'topleft'})
     let sliderHTML= '<button id="slidertoggle" onclick="sliderToggle()">Välj datum</button>'
     sliderButton.onAdd = () => {
@@ -350,7 +367,23 @@ function addtoMAPtoggle(data){
         div.innerHTML = sliderHTML
         return div
     }
+
+    /* Utför friktionsqueryn */
     sliderButton.addTo(map)
+    const searchButton = L.control({position: 'topleft'})
+    let searchButtonHTML= '<button id="searchButton" disabled=true onclick="searchButtonQuery()">Sök</button>'
+    searchButton.onAdd = () => {
+        var div = L.DomUtil.create('div')
+        div.innerHTML = searchButtonHTML
+        return div
+    }
+    searchButton.addTo(map)
+
+    /* Infoknapp */
+    const infoButton = L.easyButton('fas fa-info', function(btn, map) {
+        $('#infoModal').modal('show');
+    }, 'Informationsmeny').addTo(map);
+
 
     //OLYCKOR 
     const accidentButton = L.control({position: 'topleft'})
@@ -364,42 +397,23 @@ function addtoMAPtoggle(data){
 
 
     $('select').change(async function() {       
-        const radius = document.getElementById('radius').value
-        let timeAggregation = '1'
-        // Translate timeAggregation value to a numeric hourly value
-        switch (document.getElementById('timeAggregation').value) {
-            case 'Timme':
-                timeAggregation = 1
-                break
-            case 'Dag':
-                timeAggregation = 24
-                break
-            case 'Vecka':
-                timeAggregation = 24*7
-                break
-            case 'Månad':
-                timeAggregation = 24*7*4
-                break
-        }
-        let dates = getDates() 
-        
         let frictionOrWeatherStation = document.getElementById('frictionOrWeatherStation').value
         if(frictionOrWeatherStation=="WeatherStationData"){
+            document.getElementById('searchButton').disabled = true
             geojson.eachLayer(function (layer) {    
                 layer.setStyle({fillOpacity : 0.7 }) 
                 noColor = false;
             });
             info.addTo(map);
-            //temperatureScale.addTo(map);
             $( "#search-container" ).show();
             circleGroup = [];
             createLayers(stationsData,cameraArrayData);
-        } else{
-            await getFrictionData(frictionOrWeatherStation);
-            getAggregatedFrictionData(radius, timeAggregation, dates[0], dates[1], frictionOrWeatherStation)
+        } else {
+            document.getElementById('searchButton').disabled = false
         }
     })
 }
+
 
 
 
@@ -430,7 +444,7 @@ function nth(d) {
 
 // En sträng av hela datumet
 function formatDate(date) {
-    return date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate()
+    return date.getFullYear() + "-" + (date.getMonth()+1) + "-" + date.getDate()
 }
 
 

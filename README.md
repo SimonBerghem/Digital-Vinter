@@ -1,8 +1,6 @@
 # Road-Condition-Monitoring
 RCM is a tool for gathering data from [DATEX II](https://datex2.eu/) and presenting the data in a informative and user friendly way.
 
-See live [demo](http://130.240.204.191/)
-
 ## Prerequisite
 - [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [Node.js](https://nodejs.org/en/download/) and [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
@@ -18,7 +16,7 @@ git clone https://github.com/hotpucko/rcm-sommar-2019.git
 
 ### Webserver
 ```
-cd /rcm-d0020e/app/
+cd /rcm-sommar-2019/app/
 npm install
 npm start
 ```
@@ -26,7 +24,8 @@ npm start
 ### RustBackend
 
 ```
-cd /rcm-d0020e/RustBackend/
+cd /rcm-sommar-2019/backend/
+cargo update
 cargo build
 cargo run
 ```
@@ -49,12 +48,12 @@ See [Docs](https://dev.mysql.com/doc/).
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 ## Authors
-* **Gustav Hansson** - *Database, Map* - [97gushan](https://github.com/97gushan)
-* **Robert Högberg** - *Map* - [Greybert](https://github.com/Greybert)
-* **Oscar Ferm** - *Map* - [Slashy27](https://github.com/Slashy27)
-* **William Antti** - *Graph* - [wilant](https://github.com/wilant)
-* **Anton Grahn** - *Graph* - [Grumme2](https://github.com/Grumme2)
-* **Aron Strandberg** - *Scrum Master* - [dynematic](https://github.com/dynematic) 
+* **Pontus Eriksson Jirbratt** - *Graph* - [98pontan](https://github.com/98pontan)
+* **Samuel Gradén** - *Backend* - [samgra-7](https://github.com/samgra-7)
+* **Oskar Havo** - *Frontend* - [OskarHavo](https://github.com/OskarHavo)
+* **Stefan Jonsson** - *Graph* - [hotpucko](https://github.com/hotpucko)
+* **Martin Larsson** - *Fullstack* - [PMMLarsson](https://github.com/PMMLarsson)
+
 
 
 
@@ -62,4 +61,4 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 [MIT](https://choosealicense.com/licenses/mit/)
 
 ## Acknowledgments
-Continuous work of [https://github.com/Rovva/D0020E](https://github.com/Rovva/D0020E). A tool built by students at Luleå University of Technology.
+Continuous work of [https://github.com/dynematic/rcm-sommar-2019](https://github.com/dynematic/rcm-sommar-2019). A tool built by students at Luleå University of Technology.
