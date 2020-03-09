@@ -179,15 +179,10 @@ module.exports = {
                 if (err) throw err
             });
         });
-
-
-
     },
 
      // Get friction data in a certain circle, probably used when drawing a circle on map
      getFrictionDataCirc : function(req, res, next, reporter, lat, lon, radius){
-       
-
         authorization.getConnection(function(err, conn){
             if (err) throw err
             
@@ -206,9 +201,6 @@ module.exports = {
                 conn.release();
 
                 if (err) throw err
-
-
-
             });
         });
     },
@@ -247,6 +239,28 @@ module.exports = {
 
             });
          });
+    },
+    // Get friction data in a certain rectangle, probably used when drawing a rectangle on map
+    getDataDateRange : function(req, res, next){
+        return new Promise((resolve, reject) => {
+            authorization.getConnection(function(err, conn){
+                if (err) throw reject(err)
+                
+                const sql =`
+                SELECT
+                    DATE_ADD(MIN(Time), INTERVAL -1 DAY) AS startDate,
+                    DATE_ADD(MAX(Time), INTERVAL 1 DAY) AS endDate
+                FROM db.aggregated_friction_data`
+                
+                conn.query(sql, function (err, results) {
+                    // send data back to client
+                    resolve(results);
+                    conn.release();
+
+                    if (err) throw reject(err)
+                });
+            });
+        })
     },
 
 };
