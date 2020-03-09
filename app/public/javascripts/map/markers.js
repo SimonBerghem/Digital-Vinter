@@ -74,8 +74,9 @@ function removeMarkerOnZoom(group){
 
 
 var layerGroups = [];
-var circleGroup = [];
+var markerGroup = []
 var accidentGroup = [];
+
 let frictionCanvas = L.canvas({ padding: 0.5, pane: "circlemarkers", });
 let accidentCanvas = L.canvas({paddin: 0.5, pane: "circlemarkers", });
 //let frictionCanvas = new L.layerGroup();
@@ -124,6 +125,7 @@ function createFrictionLayer(filteredfrictionData) {
     $( "#search-container" ).hide();
 }
 
+let markers = L.markerClusterGroup({ chunkedLoading: true });
 
 function drawAccidentData(accidentData){
     accidentGroup = [];
@@ -171,16 +173,45 @@ function createAggregatedFrictionLayer(aggregatedFrictionData) {
     frictionCanvas = L.canvas({ padding: 0.5, pane: "circlemarkers", });
     //frictionCanvas.clearLayers();
 
-    for (var i = 0; i < aggregatedFrictionData.length; i += 1) { 
-        let circle = L.circleMarker([aggregatedFrictionData[i].latitude, aggregatedFrictionData[i].longitude], {
-        renderer: frictionCanvas,
-        color: '#9400D3'
-        });
-        circle.bindPopup(popupAggregatedFriction(aggregatedFrictionData[i], circle));
-        circleGroup.push(circle);
-        circle.addTo(map);
-        
-    }
+function createAggregatedFrictionLayer(aggregatedFrictionData) {
+    markerGroup = [];
+    map.removeLayer(markers);
+    markers = L.markerClusterGroup({ chunkedLoading: true,
+        iconCreateFunction: function (cluster) {
+            children = cluster.getAllChildMarkers()
+            childCount = cluster.getChildCount()
+            let measureValueMin = 1
+
+            children.forEach(child => {
+                if(measureValueMin > child.measureValueMin) {
+                    measureValueMin = child.measureValueMin
+                }
+            })
+
+            var c = 'marker-cluster-';
+            if (measureValueMin < 0.26) {
+              c += 'red';
+            } 
+            else if (measureValueMin < 0.36) {
+              c += 'yellow';
+            } 
+            else {
+              c += 'green';
+            }
+           
+            return new L.DivIcon({ html: '<div><span>' + childCount + '</span></div>', 
+             className: "marker-cluster" + " " + c, iconSize: new L.Point(40, 40) });
+            } });
+
+    aggregatedFrictionData.map(data => {
+        var marker = L.marker(L.latLng(data.latitude, data.longitude));
+        marker.measureValueMin = data.measureValueMin
+        marker.bindPopup(popupAggregatedFriction(data));
+        markerGroup.push(marker);
+    })
+    
+    markers.addLayers(markerGroup);
+    map.addLayer(markers);
 
 
     //Det är här för att det ska ladda snyggare. Motsvarande för att sätta igång är i maptilelayers.js i början av funktionen.

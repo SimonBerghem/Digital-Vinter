@@ -402,10 +402,6 @@ function addtoMAPtoggle(data){
         $('#infoModal').modal('show');
     }, 'Informationsmeny').addTo(map);
 
-
-
-
-
     $('select').change(async function() {       
         let frictionOrWeatherStation = document.getElementById('frictionOrWeatherStation').value
         if(frictionOrWeatherStation=="WeatherStationData"){
@@ -416,7 +412,8 @@ function addtoMAPtoggle(data){
             });
             info.addTo(map);
             $( "#search-container" ).show();
-            circleGroup = [];
+            markerGroup = [];
+            map.removeLayer(markers);
             createLayers(stationsData,cameraArrayData);
         } else {
             document.getElementById('searchButton').disabled = false

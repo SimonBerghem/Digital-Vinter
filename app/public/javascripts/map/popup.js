@@ -182,7 +182,7 @@ function popupAccident(accident, circle){
  * 
  * @param {*} friction return popup content for aggregated frictiondata circlemarkers
  */
-function popupAggregatedFriction(friction, circle){
+function popupAggregatedFriction(friction){
   const popupContent = document.createElement("table-data");
    // Tar bort oönskade element i strängen.
   const timestring = friction.time.replace("T", " / ").replace("Z", " ");
@@ -221,9 +221,9 @@ function popupAggregatedFriction(friction, circle){
    button.className = "add-button";
    button.innerText = "Lägg till";
  }
- button.addEventListener("click" , function() {
+ /* button.addEventListener("click" , function() {
        handleChosenFriction(friction, circle, this);
- });
+ }); */
  popupContent.appendChild(button);
 
  return popupContent;
