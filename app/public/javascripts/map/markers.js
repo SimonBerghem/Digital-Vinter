@@ -128,9 +128,8 @@ function createFrictionLayer(filteredfrictionData) {
 let markers = L.markerClusterGroup({ chunkedLoading: true });
 
 function drawAccidentData(accidentData){
-    accidentGroup = [];
+    circleGroup = [];
     accidentCanvas = L.canvas({paddin: 0.5, pane: "circlemarkers", });
-    //console.log(accidentData[0])
 
     for (var i = 0; i < accidentData.length; i+=1){
         try{
@@ -145,33 +144,12 @@ function drawAccidentData(accidentData){
             circle.bindPopup(popupAccident(accidentData[i], circle));
             circleGroup.push(circle);
             circle.addTo(map);
-
-
         }catch(error){
             // Ignore error
         }
-       
-            
     }
-    //Taget från createAggregatedFrictionLayer
-     //Det är här för att det ska ladda snyggare. Motsvarande för att sätta igång är i maptilelayers.js i början av funktionen.
-     geojson.eachLayer(function (layer) {    
-        layer.setStyle({fillOpacity :0 }) 
-        noColor = true;
-    });
-
-    info.remove(map);
-    //temperatureScale.remove(map);
-    $( "#search-container" ).hide();
-
 }
 
-
-function createAggregatedFrictionLayer(aggregatedFrictionData) {
-    circleGroup = [];
-    //map.removeLayer(frictionCanvas);
-    frictionCanvas = L.canvas({ padding: 0.5, pane: "circlemarkers", });
-    //frictionCanvas.clearLayers();
 
 function createAggregatedFrictionLayer(aggregatedFrictionData) {
     markerGroup = [];

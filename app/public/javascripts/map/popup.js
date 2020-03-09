@@ -141,9 +141,10 @@ function popupfriction(friction, circle){
 function popupAccident(accident, circle){
   const popupContent = document.createElement("table-data");
   var obj = {
-
-    Severity : [accident.SeverityCode,""]
-
+    StartTime : [accident.CreationTime, ""],
+    EndTime : [accident.EndTime, ""],
+    Severity : [accident.SeverityCode,""],
+    AccidentType: [accident.IconId, ""],
   };
 
   var strings = "";
@@ -157,21 +158,6 @@ function popupAccident(accident, circle){
  strings = ""    
 
  popupContent.innerHTML  = htmlvar;
-
- let button = document.createElement("button");
- button.id = accident.id;
- /*
- if(chosenFriction.includes(friction)){
-   button.className = "remove-button";
-   button.innerText = "Ta bort";
- }else{
-   button.className = "add-button";
-   button.innerText = "Lägg till";
- }*/
- button.addEventListener("click" , function() {
-       handleChosenFriction(accident, circle, this);
- });
- popupContent.appendChild(button);
 
  return popupContent;
 }
