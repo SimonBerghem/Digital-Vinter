@@ -289,3 +289,27 @@ height: 100%;
 .slidertoggle:active{
     box-shadow:inset 0 0.6em 2em -0.3em rgba(0,0,0,0.15),inset 0 0 0em 0.05em rgba(255,255,255,0.12);
 }
+
+#accidentToggle{
+    z-index: 500;
+    position: absolute;
+    font-size: 18px; 
+    background-color: #346791; 
+    color: #fff; 
+    border: 0px; 
+    border-radius: 3px; 
+    padding: 6px;
+    cursor: pointer;
+    width: 100px;
+    opacity: 0.8;
+    text-align: center;
+    text-decoration:none;
+    box-shadow:inset 0 -0.6em 1em -0.35em rgba(0,0,0,0.17),inset 0 0.6em 2em -0.3em rgba(255,255,255,0.15),inset 0 0 0em 0.05em rgba(255,255,255,0.12);
+
+}
+#accidentToggle:hover{
+    opacity: 1;
+}
+#accidentToggle:active{
+    box-shadow:inset 0 0.6em 2em -0.3em rgba(0,0,0,0.15),inset 0 0 0em 0.05em rgba(255,255,255,0.12);
+}

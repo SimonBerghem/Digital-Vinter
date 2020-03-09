@@ -159,16 +159,17 @@ function popupAccident(accident, circle){
  popupContent.innerHTML  = htmlvar;
 
  let button = document.createElement("button");
- button.id = friction.id;
+ button.id = accident.id;
+ /*
  if(chosenFriction.includes(friction)){
    button.className = "remove-button";
    button.innerText = "Ta bort";
  }else{
    button.className = "add-button";
    button.innerText = "Lägg till";
- }
+ }*/
  button.addEventListener("click" , function() {
-       handleChosenFriction(friction, circle, this);
+       handleChosenFriction(accident, circle, this);
  });
  popupContent.appendChild(button);
 

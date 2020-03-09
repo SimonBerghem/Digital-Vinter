@@ -149,6 +149,7 @@
     <script src="javascripts/map/friction.js"></script>
     <script src="javascripts/graph/getFrictionData.js"></script>
     <script src="javascripts/map/cameraData.js"></script>
+    <script src="javascripts/map/accidentData.js"></script>
 
     <script>
       // async function testDBConnection() {
@@ -196,6 +197,10 @@
                 tooltip1.style.display = "none";
                 tooltip2.style.display = "none";
             }    
+      }
+      function accidentToggle(){
+        let dates = getDates() 
+        getAccidentDataTime(dates[0], dates[1])
       }
     </script>
       

@@ -352,6 +352,17 @@ function addtoMAPtoggle(data){
     }
     sliderButton.addTo(map)
 
+    //OLYCKOR 
+    const accidentButton = L.control({position: 'topleft'})
+    let accidentHTML= '<button id="accidentToggle" onclick="accidentToggle()">Olyckor</button>'
+    accidentButton.onAdd = () => {
+        var div = L.DomUtil.create('div')
+        div.innerHTML = accidentHTML
+        return div
+    }
+    accidentButton.addTo(map)
+
+
     $('select').change(async function() {       
         const radius = document.getElementById('radius').value
         let timeAggregation = '1'
@@ -492,7 +503,6 @@ function getDates(){
     return [dateValues[0].innerHTML , dateValues[1].innerHTML];
 
 }
-
 
 
 
