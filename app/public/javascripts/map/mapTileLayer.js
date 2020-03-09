@@ -294,9 +294,23 @@ const stateChangingButton = L.easyButton({
     ]
 }).addTo(map);
 
+
+
 const modalButton = L.easyButton('fas fa-upload', function(btn, map) {
     $('#exampleModal').modal('show');
 }, 'Ladda upp ny friktionsdata').addTo(map);
+
+
+//OLYCKOR 
+const accidentButton = L.control({position: 'topleft'})
+let accidentHTML= '<button id="accidentToggle" onclick="accidentToggle()">Olyckor</button>'
+accidentButton.onAdd = () => {
+    var div = L.DomUtil.create('div')
+    div.innerHTML = accidentHTML
+    return div
+}
+accidentButton.addTo(map)
+
 
 
 /**
@@ -368,6 +382,8 @@ function addtoMAPtoggle(data){
         return div
     }
 
+
+
     /* Utför friktionsqueryn */
     sliderButton.addTo(map)
     const searchButton = L.control({position: 'topleft'})
@@ -379,12 +395,12 @@ function addtoMAPtoggle(data){
     }
     searchButton.addTo(map)
 
+
+
     /* Infoknapp */
     const infoButton = L.easyButton('fas fa-info', function(btn, map) {
         $('#infoModal').modal('show');
     }, 'Informationsmeny').addTo(map);
-
-
 
     $('select').change(async function() {       
         let frictionOrWeatherStation = document.getElementById('frictionOrWeatherStation').value
@@ -508,7 +524,6 @@ function getDates(){
     return [dateValues[0].innerHTML , dateValues[1].innerHTML];
 
 }
-
 
 
 

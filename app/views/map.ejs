@@ -152,7 +152,8 @@
 
                 </div>
             </div>
-        </div>
+        
+    </div>
 
 
         <!--Map scripts-->
@@ -252,6 +253,10 @@
                     input.value = '1'; // emptying the input box      
                 }
             }
+            function accidentToggle(){
+        let dates = getDates() 
+        getAccidentDataTime(dates[0], dates[1])
+      }
         </script>
     </body>
-</html>
+    </html>
