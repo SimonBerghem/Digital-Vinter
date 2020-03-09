@@ -451,7 +451,7 @@ function nth(d) {
 
 // En sträng av hela datumet
 function formatDate(date) {
-    return date.getFullYear() + "-" + (date.getMonth()+1) + "-" + date.getDate()
+    return date.getFullYear() + "-" + (date.getMonth()+1 < 10 ? "0" + (date.getMonth()+1) : (date.getMonth()+1)) + "-" + (date.getDate() < 10 ? "0" + date.getDate() : date.getDate())
 }
 
 
@@ -468,56 +468,53 @@ function toFormat ( v ) {
 
 /* Datum slidern  */
 var dateSlider = document.getElementById('slider');
-noUiSlider.create(dateSlider, {
-
-    behaviour: 'tap',
-    connect: true,
-    tooltips: [ true, true ],
-    format: { to: toFormat, from: Number },
-
-    range: {
-        min: timestamp('2019'),
-        max: timestamp(date)
-    },
-
-    // Steps of one week
-    step: 1 * 24 * 60 * 60 * 1000,
-
-    start: [timestamp(previousMonth), timestamp(date)],
-
-
-});
-
 var dateValues = [
     document.getElementById('event-start'),
     document.getElementById('event-end')
 ];
 
+const createSlider = (startDate, endDate) => {
+    noUiSlider.create(dateSlider, {
 
-// Tooltips på handles
-dateSlider.noUiSlider.on('update', function (values, handle) {
-    dateValues[handle].innerHTML = values[handle]; 
-});
+        behaviour: 'tap',
+        connect: true,
+        tooltips: [ true, true ],
+        format: { to: toFormat, from: Number },
+        range: {
+            min: timestamp(startDate),
+            max: timestamp(endDate)
+        },
 
-//  Fråntar kontrollen av kartan medans man drar i slidern.
-dateSlider.noUiSlider.on('start', function (values, handle) {    
-    map.dragging.disable();
-    map.touchZoom.disable();
-    map.doubleClickZoom.disable();
-    map.scrollWheelZoom.disable();
-    map.boxZoom.disable();
-    map.keyboard.disable();  
-});
+        // Steps of one week
+        step: 1 * 24 * 60 * 60 * 1000,
+        start: [timestamp(startDate), timestamp(endDate)],
+    });
 
-// Återger kontrollen efter man släppt slidern.
-dateSlider.noUiSlider.on('end', function (values, handle) {
-    map.dragging.enable();
-    map.touchZoom.enable();
-    map.doubleClickZoom.enable();
-    map.scrollWheelZoom.enable();
-    map.boxZoom.enable();
-    map.keyboard.enable();
-});
+    // Tooltips på handles
+    dateSlider.noUiSlider.on('update', function (values, handle) {
+        dateValues[handle].innerHTML = values[handle]; 
+    });
+
+    //  Fråntar kontrollen av kartan medans man drar i slidern.
+    dateSlider.noUiSlider.on('start', function (values, handle) {    
+        map.dragging.disable();
+        map.touchZoom.disable();
+        map.doubleClickZoom.disable();
+        map.scrollWheelZoom.disable();
+        map.boxZoom.disable();
+        map.keyboard.disable();  
+    });
+
+    // Återger kontrollen efter man släppt slidern.
+    dateSlider.noUiSlider.on('end', function (values, handle) {
+        map.dragging.enable();
+        map.touchZoom.enable();
+        map.doubleClickZoom.enable();
+        map.scrollWheelZoom.enable();
+        map.boxZoom.enable();
+        map.keyboard.enable();
+    });
+}
 
 // Returnerar Datumsträngen
 function getDates(){

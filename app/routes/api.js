@@ -166,6 +166,21 @@ router.get('/getAverageWeatherData', function(req, res, next) {
     weather.getAverageWeatherData(req,res,next,station_id, start_time, stop_time);
 });
 
+/* GET data date range for friction and accident data used to set boundary for slider*/
+router.get('/getDataDateRange', async (req, res, next) => {
+    frictionPromise = friction.getDataDateRange(req, res, next)
+    accidentPromise = accident.getDataDateRange(req, res, next)
+    await Promise.all([frictionPromise, accidentPromise]).then(data => {
+        const startDateFriction = data[0][0].startDate
+        const endDateFriction = data[0][0].endDate
+        const startDateAccident = new Date(data[1][0].startDate)
+        const endDateAccident = new Date(data[1][0].endDate)
+        const startDate = startDateFriction < startDateAccident ? startDateFriction : startDateAccident
+        const endDate = endDateFriction > endDateAccident ? endDateFriction : endDateAccident
+        res.send({startDate, endDate});
+    })
+})
+
 /* POST frictiondata to db. Request contains a .csv file. */
 router.post('/uploadFrictionData', upload.single('file'), async (req, res, next) => {
     await uploadFrictionData.uploadFrictionData(req.file)

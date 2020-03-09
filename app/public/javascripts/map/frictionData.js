@@ -29,4 +29,10 @@ async function getAggregatedFrictionData(radius, timeAggregation, startTime, end
     await drawAggregatedFriction(aggregatedFrictionData)
 }
 
+const getDataDateRange = async () => {
+    await $.getJSON("/api/getDataDateRange", function(data) {
+        const { startDate, endDate } = data
+        createSlider(startDate, endDate);
+    }); 
+}
 
