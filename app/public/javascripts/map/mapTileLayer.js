@@ -349,7 +349,7 @@ function addtoMAPtoggle(data){
 
     /* Välj högsta friktionsvärdet */ 
     const frictionValueForm = L.control({position: 'topleft'});
-    let frictionValueFormHTML = '<p class="selectparagraph">Välj högsta friktionsvärdet</p><form> <input id="maxFrictionForm" type="number" value="1.00" step="0.01" min="0.0" max ="1.0" oninput="checkFormLength(this)"> </form>';
+    let frictionValueFormHTML = '<p class="selectparagraph">Välj högsta friktionsvärdet</p><input id="maxFrictionForm" type="number" value="1.00" step="0.01" min="0.0" max ="1.0" oninput="checkFormLength(this)">';
 
     frictionValueForm.onAdd = function (map) {
         var div = L.DomUtil.create('div');
@@ -386,8 +386,7 @@ function addtoMAPtoggle(data){
 
 
 
-    $('select').change(async function() {
-               
+    $('select').change(async function() {       
         let frictionOrWeatherStation = document.getElementById('frictionOrWeatherStation').value
         if(frictionOrWeatherStation=="WeatherStationData"){
             document.getElementById('searchButton').disabled = true
