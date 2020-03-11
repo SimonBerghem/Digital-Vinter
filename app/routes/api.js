@@ -78,14 +78,41 @@ router.get('/getFrictionData', function(req, res, next) {
 
 /* GET FROM AGGREGATED FRICTION DATA  */
 router.get('/getAggregatedFrictionData', function(req, res, next) {
-    const radius = req["query"]["radius"];
-    const timeAggregation = req["query"]["timeAggregation"];
-    const startTime = req["query"]["startTime"];
-    const endTime = req["query"]["endTime"];
-    const reporterOrganization = req["query"]["reporterOrganization"]
-    const mapBounds = req["query"]["mapBounds"]
-    const maxFriction = req["query"]["maxFriction"]
-    friction.getAggregatedFrictionData(req, res, next, radius, timeAggregation, startTime, endTime, reporterOrganization, mapBounds, maxFriction);
+    try{
+        const radius = req["query"]["radius"];
+        const timeAggregation = req["query"]["timeAggregation"];
+        const startTime = req["query"]["startTime"];
+        const endTime = req["query"]["endTime"];
+        const reporterOrganization = req["query"]["reporterOrganization"]
+        const mapBounds = req["query"]["mapBounds"]
+        const maxFriction = req["query"]["maxFriction"]
+        const autoAggregation = req["query"]["autoAggregation"]
+        
+        if(autoAggregation === "true") {
+            // Auto aggregate
+            friction.autoAggregate(res, startTime, endTime, reporterOrganization, mapBounds, maxFriction)
+        } else {
+            if(radius === "No Aggregation") {
+                friction.getSpecificFrictionData(startTime, endTime, reporterOrganization, mapBounds, maxFriction).then(result => {
+                    if(result.length > 50000) {
+                        res.send({ success:false, autoAggregation:false })
+                    } else {
+                        res.send({ radius:'No Aggregation', timeAggregation:'No Aggregation', result,  success: true, autoAggregation:false })
+                    }
+                })
+            } else {
+                friction.getAggregatedFrictionData(radius, timeAggregation, startTime, endTime, reporterOrganization, mapBounds, maxFriction).then(result => {
+                    if(result.length > 50000) {
+                        res.send({ success:false, autoAggregation:false })
+                    } else {
+                        res.send({ result, success:true, autoAggregation:false })
+                    }
+                })
+            }
+        }
+    } catch(error) {
+        console.log(error)
+    }
 });
 
 /* GET ALL FROM FRICTION DATA */

@@ -151,7 +151,7 @@ function drawAccidentData(accidentData){
 }
 
 
-function createAggregatedFrictionLayer(aggregatedFrictionData) {
+function createAggregatedFrictionLayer(aggregatedFrictionData, notAggregated) {
     markerGroup = [];
     map.removeLayer(markers);
     markers = L.markerClusterGroup({ chunkedLoading: true,
@@ -159,12 +159,22 @@ function createAggregatedFrictionLayer(aggregatedFrictionData) {
             children = cluster.getAllChildMarkers()
             childCount = cluster.getChildCount()
             let measureValueMin = 1
-
-            children.forEach(child => {
-                if(measureValueMin > child.measureValueMin) {
-                    measureValueMin = child.measureValueMin
-                }
-            })
+            
+            // Separate logic depending on if we want to display aggregated friction data or not
+            if(notAggregated) {
+                children.forEach(child => {
+                    if(measureValueMin > child.measureValue) {
+                        measureValueMin = child.measureValue
+                    }
+                })
+            } else {
+                children.forEach(child => {
+                    if(measureValueMin > child.measureValueMin) {
+                        measureValueMin = child.measureValueMin
+                    }
+                })
+            }
+            
 
             var c = 'marker-cluster-';
             if (measureValueMin < 0.26) {
@@ -182,9 +192,16 @@ function createAggregatedFrictionLayer(aggregatedFrictionData) {
             } });
 
     aggregatedFrictionData.map(data => {
-        var marker = L.marker(L.latLng(data.latitude, data.longitude));
-        marker.measureValueMin = data.measureValueMin
-        marker.bindPopup(popupAggregatedFriction(data));
+        let marker
+        // Separate logic depending on if we want to display aggregated friction data or not
+        if(notAggregated) {
+            marker = L.marker(L.latLng(data.Latitude, data.Longitude));
+            marker.measureValue = data.MeasureValue
+        } else {
+            marker = L.marker(L.latLng(data.latitude, data.longitude));
+            marker.measureValueMin = data.measureValueMin
+        }
+        marker.bindPopup(popupAggregatedFriction(data, notAggregated));
         markerGroup.push(marker);
     })
     
