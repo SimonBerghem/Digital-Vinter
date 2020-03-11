@@ -118,13 +118,13 @@ function drawFriction(filteredfrictionData) {
     createFrictionLayer(filteredfrictionData);
 }
 
-function drawAggregatedFriction(aggregatedFrictionData) {
+function drawAggregatedFriction(aggregatedFrictionData, notAggregated) {
     for (let i = 0; i < layerGroups.length; i++) {
         map.removeLayer(layerGroups[i]);
 
     }
     layerGroups = [];
-    createAggregatedFrictionLayer(aggregatedFrictionData);
+    createAggregatedFrictionLayer(aggregatedFrictionData, notAggregated);
 }
 
 /**
@@ -334,10 +334,19 @@ function addtoMAPtoggle(data){
     };
     toggleFriction.addTo(map);
 
+    /* Auto choose aggregation options checkbox */
+    const autoCheckbox = L.control({position: 'topleft'});
+    let autoCheckboxHTML = '<p class="selectparagraph">Auto välj aggregering</p><input type="checkbox" onClick="enableAggregationOptions()" id="autoChooseAggregation" name="Auto choose aggregation" value="autoChooseAgg" checked>'
+    autoCheckbox.onAdd = (map) => {
+        var div = L.DomUtil.create('div')
+        div.innerHTML = autoCheckboxHTML
+        return div
+    }
+    autoCheckbox.addTo(map)
 
     /* Välj radie */ 
     const radiemeny = L.control({position: 'topleft'});
-    let radieoptions = '<p class="selectparagraph">Aggregationsradie</p><select id="radius"><option>1</option><option>10</option><option>100</option></select>';
+    let radieoptions = '<p class="selectparagraph">Aggregationsradie</p><select id="radius" disabled=true><option>1</option><option>10</option><option selected="selected">100</option><option>No Aggregation</option></select> km';
 
     radiemeny.onAdd = function (map) {
         var div = L.DomUtil.create('div');
@@ -350,7 +359,7 @@ function addtoMAPtoggle(data){
 
     /* Välj tidsaggreation */ 
     const tidsaggregationmeny = L.control({position: 'topleft'});
-    let tidoptions = '<p class="selectparagraph">Aggregationstid</p><select id="timeAggregation"><option>Timme</option><option>Dag</option><option>Vecka</option><option>Månad</option></select>';
+    let tidoptions = '<p class="selectparagraph">Aggregationstid</p><select id="timeAggregation" disabled=true><option>Timme</option><option>Dag</option><option>Vecka</option><option selected="selected">Månad</option><option>No Aggregation</option></select>';
 
     tidsaggregationmeny.onAdd = function (map) {
         var div = L.DomUtil.create('div');

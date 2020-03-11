@@ -267,25 +267,25 @@ const aggregateData = (data, radiusInKm, timeAggregation) => {
       // These numbers need to be updated by going through the grouping
       groupObject.NumberOfMeasurements = 0
       groupObject.MeasureValueMedian = 0
-      groupObject.MeasureValueMax = data[0].MeasureValue
-      groupObject.MeasureValueMin = data[0].MeasureValue
+      groupObject.MeasureValueMax = parseFloat(data[0].MeasureValue)
+      groupObject.MeasureValueMin = parseFloat(data[0].MeasureValue)
       groupObject.MeasureConfidenceMedian = 0
-      groupObject.MeasureConfidenceMax = data[0].MeasureValue
-      groupObject.MeasureConfidenceMin = data[0].MeasureValue
+      groupObject.MeasureConfidenceMax = parseFloat(data[0].MeasureValue)
+      groupObject.MeasureConfidenceMin = parseFloat(data[0].MeasureValue)
       groupObject.NrOfAddedDataPoints = 0
 
       data.forEach((row, index)=> {
         if(parseFloat(row.Latitude) <= maxLat && parseFloat(row.Latitude) >= minLat && parseFloat(row.Longitude) < maxLong && parseFloat(row.Longitude) > minLong) {
           groupObject.NumberOfMeasurements = groupObject.NumberOfMeasurements + parseFloat(row.NumberOfMeasurements)
           groupObject.MeasureValueMedian = groupObject.MeasureValueMedian + parseFloat(row.MeasureValue)
-          if(row.MeasureValue > groupObject.MeasureValueMax) {
+          if(parseFloat(row.MeasureValue) > groupObject.MeasureValueMax) {
             groupObject.MeasureValueMax = parseFloat(row.MeasureValue)
           }
-          if(row.MeasureValue < groupObject.MeasureValueMin) {
+          if(parseFloat(row.MeasureValue) < groupObject.MeasureValueMin) {
             groupObject.MeasureValueMin = parseFloat(row.MeasureValue)
           }
           groupObject.MeasureConfidenceMedian = groupObject.MeasureConfidenceMedian + parseFloat(row.MeasureConfidence)
-          if(row.MeasureConfidence > groupObject.MeasureConfidenceMax) {
+          if(parseFloat(row.MeasureConfidence) > groupObject.MeasureConfidenceMax) {
             groupObject.MeasureConfidenceMax = parseFloat(row.MeasureConfidence)
           }
           if(row.MeasureConfidence < groupObject.MeasureConfidenceMin) {
@@ -365,13 +365,13 @@ const aggregateAggregation = (data, radiusInKm) => {
       groupObject.Longitude = data[0][4]
       groupObject.Latitude = data[0][5]
       // These numbers need to be updated by going through the grouping
-      groupObject.NumberOfMeasurements = data[0][6]
+      groupObject.NumberOfMeasurements = parseFloat(data[0][6])
       groupObject.MeasureValueMedian = 0
-      groupObject.MeasureValueMax = data[0][8]
-      groupObject.MeasureValueMin = data[0][9]
+      groupObject.MeasureValueMax = parseFloat(data[0][8])
+      groupObject.MeasureValueMin = parseFloat(data[0][9])
       groupObject.MeasureConfidenceMedian = 0
-      groupObject.MeasureConfidenceMax = data[0][11]
-      groupObject.MeasureConfidenceMin = data[0][12]
+      groupObject.MeasureConfidenceMax = parseFloat(data[0][11])
+      groupObject.MeasureConfidenceMin = parseFloat(data[0][12])
       groupObject.NrOfAddedDataPoints = 0
       groupObject.NrOfAggregationsAdded = 0
           /*

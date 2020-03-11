@@ -119,6 +119,8 @@
                         </script>
                         <div>
                             Ladda upp ny friktionsdata genom att välja en .csv fil från disk och vänta tills att uppladdningen är klar. Efter att uppladdningen är gjord från användare till server måste även servern ladda upp friktionsdatan till databasen, detta kan ta några minuter.
+                            <br><br>
+                            Efter att filen laddats upp gör servern aggregering av datapunkter. Detta tar tid extra tid.
                         </div>
                         <hr>
                         <form enctype="multipart/form-data">
@@ -138,14 +140,33 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="infoLabel">Informationsmeny</h5>
+                        <h5 class="modal-title" id="infoLabel">Information om kartanvändning för friktionsdata</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
                         <div>
-                            test.
+                            Friktionsdatan innehåller ett stort antal mätvärden. Att rendera ett väldigt stort antal punkter i webbläsaren
+                             är inte möjligt utan att krascha webbsidan.
+                            <br><br>
+                            För att lösa detta används tre metoder:
+                            <ul>
+                                <li>Aggregering - När ny friktionsdata laddas upp bearbetas den och punkter som är nära varandra i tid och
+                                     distans läggs ihop till större punkter. Detta betyder att man vid större aggregeringar tappar precision
+                                      men rejält reducerar antalet datapunkter.</li>
+                                <li>Filtrering - Via val så som max friktion, datum och vart på kartan man kollar kan man bestämma vilka
+                                     punkter man vill se.</li>
+                                <li>Markerclusters - Punkter som är nära varandra på kartan läggs ihop med hjälp av 'markerclusters' en typ
+                                     av leaflet marker.</li>
+                            </ul>
+                            Då det kan vara otympligt för en användare att själv välja aggregeringsparameterar så har det implementerats auto
+                             val. Detta gör att webbservern kollar på olika resultat och väljer en aggregation som
+                              är lämpligast.
+                              <br><br>
+                            Detta gör att man snabbt kan få översikt över datan och sedan filterar genom att zooma in, välja datum eller max
+                             friktion och söka igen för att få en mer detaljerad bild av datan. OBS då sökningen endast tar hänsyn till vad
+                              användaren kan se på kartan så är det så att om man zoomat in och sökt så måste man söka igen för att se punkter utanför den förra sökningen.
                         </div>
 
                     </div>
@@ -222,6 +243,13 @@
                     tooltip2.style.display = "none";
                 }    
             }
+
+            /* Funktion för att toggla disable av eget val av aggregated friction data" */
+            enableAggregationOptions = () => {
+                document.getElementById('radius').disabled = !document.getElementById('radius').disabled
+                document.getElementById('timeAggregation').disabled = !document.getElementById('timeAggregation').disabled
+            }
+
             /* Query som hämtar friktionsdata */
             async function searchButtonQuery(){
                 const mapBounds = { northEastLat: map.getBounds()._northEast.lat, northEastLong:map.getBounds()._northEast.lng, southWestLat:map.getBounds()._southWest.lat, southWestLong:map.getBounds()._southWest.lng}
@@ -229,6 +257,10 @@
                 const radius = document.getElementById('radius').value;
                 let timeAggregation = '1';
                 let maxFriction = document.getElementById('maxFrictionForm').value
+                if(maxFriction === "") {
+                    maxFriction = '1'
+                    document.getElementById('maxFrictionForm').value = maxFriction
+                }
                 // Translate timeAggregation value to a numeric hourly value
                 switch (document.getElementById('timeAggregation').value) {
                     case 'Timme':
@@ -243,11 +275,15 @@
                     case 'Månad':
                         timeAggregation = 24*7*4;
                         break;
+                    case 'No Aggregation':
+                        timeAggregation = 'No Aggregation';
+                        break;
                 }
-                let dates = getDates() ;
+                let dates = getDates();
+                let autoAggregation = document.getElementById('autoChooseAggregation').checked
 
                 //await getFrictionData(frictionOrWeatherStation);
-                getAggregatedFrictionData(radius, timeAggregation, dates[0], dates[1], frictionOrWeatherStation, mapBounds, maxFriction);
+                getAggregatedFrictionData(radius, timeAggregation, dates[0], dates[1], frictionOrWeatherStation, mapBounds, maxFriction, autoAggregation);
             }
             /* Kollar så att formuläret bara har tal mellan 0-1 */ 
             function checkFormLength(input){

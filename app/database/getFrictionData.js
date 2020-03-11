@@ -44,7 +44,6 @@ module.exports = {
                     GROUP BY latitude, longitude
                 ) tm ON t.latitude = tm.latitude and t.longitude = tm.longitude and t.id = tm.MaxID;`
             conn.query(sql, [reporter], function (err, results) {
-                console.log(results.length)
                 res.send(results);
                 conn.release();
                 if (err) throw err
@@ -55,41 +54,151 @@ module.exports = {
 
     // GET AGGREGATED FRICTION DATA
 
-    getAggregatedFrictionData : function(req, res, next, radius, timeAggregation, startTime, endTime, reporterOrganization, mapBounds, maxFriction){
-       
-        authorization.getConnection(function(err, conn){
-            if (err) throw err
-            const { northEastLat, northEastLong, southWestLat, southWestLong } = mapBounds
-            const sql =`
-                SELECT
-                    id,
-                    time,
-                    timeAggregation,
-                    radius,
-                    reporterOrganization,
-                    longitude,
-                    latitude,
-                    numberOfMeasurements,
-                    measureValueMedian,
-                    measureValueMax,
-                    measureValueMin,
-                    measureConfidenceMedian,
-                    measureConfidenceMax,
-                    measureConfidenceMin,
-                    nrOfAddedPoints
-                FROM aggregated_friction_data
-                WHERE radius = ? AND timeAggregation = ? AND time BETWEEN ? AND ? AND reporterOrganization = ? AND latitude BETWEEN ? AND ? AND longitude BETWEEN ? AND ? AND measureValueMin < ?
-                `
-            conn.query(sql, [radius, timeAggregation, startTime, endTime, reporterOrganization, southWestLat, northEastLat, southWestLong, northEastLong, maxFriction], function (err, results) {
-                console.log(results.length)
-                
-                res.send(results);
-                conn.release();
+    getAggregatedFrictionData : function(radius, timeAggregation, startTime, endTime, reporterOrganization, mapBounds, maxFriction){
+       return new Promise((resolve, reject) => {
+           authorization.getConnection(function(err, conn){
                 if (err) throw err
-            });
-
-        });
+                const { northEastLat, northEastLong, southWestLat, southWestLong } = mapBounds
+                const sql =`
+                    SELECT
+                        id,
+                        time,
+                        timeAggregation,
+                        radius,
+                        reporterOrganization,
+                        longitude,
+                        latitude,
+                        numberOfMeasurements,
+                        measureValueMedian,
+                        measureValueMax,
+                        measureValueMin,
+                        measureConfidenceMedian,
+                        measureConfidenceMax,
+                        measureConfidenceMin,
+                        nrOfAddedPoints
+                    FROM aggregated_friction_data
+                    WHERE radius = ? AND timeAggregation = ? AND time BETWEEN ? AND ? AND reporterOrganization = ? AND latitude BETWEEN ? AND ? AND longitude BETWEEN ? AND ? AND measureValueMin < ?
+                    `
+                conn.query(sql, [radius, timeAggregation, startTime, endTime, reporterOrganization, southWestLat, northEastLat, southWestLong, northEastLong, maxFriction], function (err, results) {
+                    resolve(results);
+                    conn.release();
+                    if (err) throw reject(err)
+                });
+            })
+        ;})
     },
+
+    // FIND GOOD AGGREGATION
+    autoAggregate : function (res, startTime, endTime, reporterOrganization, mapBounds, maxFriction){
+        try{
+            let promiseArray = new Array()
+            // Query for raw data size
+            promiseArray.push(this.getCountFriction(startTime, endTime, reporterOrganization, mapBounds, maxFriction))
+            // Query for aggregation datasize
+            const radius = [1, 10, 100]
+            const timeAggregation  = [1, 24, 24*7, 24*7*4]
+            radius.forEach(radius => {
+                timeAggregation.forEach(timeAggregation => {
+                    promiseArray.push(this.getCountAggregatedFriction(radius, timeAggregation, startTime, endTime, reporterOrganization, mapBounds, maxFriction))
+                })
+            })
+            Promise.all(promiseArray).then(data => {
+                let potentialQueries = new Array
+                // Check if raw data can be displayed
+                const rawData = data.filter(result => {
+                    return result.radius === "No Aggregation"
+                })
+                if(rawData[0].results[0].size < 50000) {
+                    this.getSpecificFrictionData(startTime, endTime, reporterOrganization, mapBounds, maxFriction).then(result => {
+                        res.send({ radius:'No Aggregation', timeAggregation:'No Aggregation', result,  success: true, autoAggregation:true })
+                    })
+                } else {
+                    data.forEach(query => {
+                        if(query.results[0].size < 20000) {
+                            potentialQueries.push(query)
+                        }
+                    })
+                    // Test case for when no aggregation works on data
+                    //potentialQueries = []
+                    if(potentialQueries.length === 0) {
+                        res.send({ success:false })
+                    }
+                    // Sort so that the query with the most elements but less < 30000 are on top.
+                    potentialQueries.sort((a, b) => b.results[0].size - a.results[0].size)
+                    const chosenRadius = potentialQueries[0].radius
+                    const chosenTimeAggregation = potentialQueries[0].timeAggregation
+                    this.getAggregatedFrictionData(chosenRadius, chosenTimeAggregation, startTime, endTime, reporterOrganization, mapBounds, maxFriction).then(result => {
+                        res.send({ radius:chosenRadius, timeAggregation:chosenTimeAggregation, result, success:true, autoAggregation:true })
+                    })
+                }
+            })
+        } catch(error) {
+            throw(error)
+        }
+    },
+
+    // GET COUNT(*) OF ELEMENTS IN A AGGREGATED FRICTION TABLE
+
+    getCountAggregatedFriction : function(radius, timeAggregation, startTime, endTime, reporterOrganization, mapBounds, maxFriction){
+        return new Promise((resolve, reject) => {
+            authorization.getConnection(function(err, conn){
+                 if (err) throw err
+                 const { northEastLat, northEastLong, southWestLat, southWestLong } = mapBounds
+                 const sql =`
+                     SELECT
+                         COUNT(*) AS size
+                     FROM aggregated_friction_data
+                     WHERE radius = ? AND timeAggregation = ? AND time BETWEEN ? AND ? AND reporterOrganization = ? AND latitude BETWEEN ? AND ? AND longitude BETWEEN ? AND ? AND measureValueMin < ?
+                     `
+                 conn.query(sql, [radius, timeAggregation, startTime, endTime, reporterOrganization, southWestLat, northEastLat, southWestLong, northEastLong, maxFriction], function (err, results) {
+                     resolve({ results, radius, timeAggregation });
+                     conn.release();
+                     if (err) throw reject(err)
+                 });
+             })
+         ;})
+     },
+     
+     // GET COUNT(*) OF ELEMENTS IN FRICTION TABLE
+     getCountFriction : function(startTime, endTime, reporterOrganization, mapBounds, maxFriction){
+        return new Promise((resolve, reject) => {
+            authorization.getConnection(function(err, conn){
+                 if (err) throw err
+                 const { northEastLat, northEastLong, southWestLat, southWestLong } = mapBounds
+                 const sql =`
+                     SELECT
+                         COUNT(*) AS size
+                     FROM friction_data
+                     WHERE observationTimeUTC BETWEEN ? AND ? AND reporterOrganization = ? AND latitude BETWEEN ? AND ? AND longitude BETWEEN ? AND ? AND measureValue < ?
+                     `
+                 conn.query(sql, [startTime.toString(), endTime.toString(), reporterOrganization.toString(), southWestLat, northEastLat, southWestLong, northEastLong, maxFriction], function (err, results) {
+                     resolve({ results, radius:'No Aggregation', timeAggregation:'No Aggregation' });
+                     conn.release();
+                     if (err) throw reject(err)
+                 });
+             })
+         ;})
+     },
+     // GET SPECIFIC FRICTION DATA
+     getSpecificFrictionData : function(startTime, endTime, reporterOrganization, mapBounds, maxFriction){
+        return new Promise((resolve, reject) => {
+            authorization.getConnection(function(err, conn){
+                 if (err) throw err
+                 const { northEastLat, northEastLong, southWestLat, southWestLong } = mapBounds
+                 const sql =`
+                     SELECT
+                         *
+                     FROM friction_data
+                     WHERE observationTimeUTC BETWEEN ? AND ? AND reporterOrganization = ? AND latitude BETWEEN ? AND ? AND longitude BETWEEN ? AND ? AND measureValue < ?
+                     `
+                 conn.query(sql, [startTime, endTime, reporterOrganization, southWestLat, northEastLat, southWestLong, northEastLong, maxFriction], function (err, results) {
+                     resolve(results);
+                     conn.release();
+                     if (err) throw reject(err)
+                 });
+             })
+         ;})
+     },
 
     // GET REPORTER ORGANIZATIONS
     getDistinctReporterorgFriction : function(req, res, next){
