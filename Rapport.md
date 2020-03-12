@@ -93,6 +93,9 @@ Fixa bugs
 
 ## 3.3.3 Reflektioner, planering, genomförande och tidsuppföljning
 
+### 4.2.1 Teststrategi
+Vi har varit ansvariga för att utföra relevant testning på våra egna funktioner på vår branch. Sen har vi haft som system att vi laddar upp branchen och då den är färdigutvecklad så gör man en Pull Request där då de andra medlemmarna i gruppen testar funktionen och sedan mergar in den i master branchen. Inför demon som utförts på möten samt seminarier så har vi sett till att vi har en stabil version där alla funktioner fungerar på allas datorer.
+
 ### 4.2.2 Regressionsrisker
 En regression är då en av systemets funktioner upphör att fungera i samband med att kod i systemet ändrats. Det finns tre huvudsakliga typer av regression som är aktuella för projektet.
 
@@ -191,14 +194,99 @@ Det finns en stor mängd data som projektet hanterar där majoriteten inte är k
 
 I testning av projektet har inte någon etik fråga lyfts då detta projekt inte behöver någon testning med personer eller personlig data. Projektgruppen har tänkt på etiken kring det vi har arbetat med men har inte kunnat hitta någon etisk problematik. 
 
-### 4.4 Fortsättning
+### 4.4. Fortsättning
+Kompetensen och kunskapen som krävs för att vidare utveckla detta projekt finns sammanfattat i punkt **7) Instruktioner**.
+Några potentiella utökningar kan vara följande:
+<br />
+**Kortsiktiga mål**
+* Live uppdatering och utritning <br />
+I framtiden så vore det bra om hemsidan hämtar ner den senaste datan under körning och ritar ut den utan att man är tvungen att uppdatera hemsidan.
+* Ny trafikdata <br />
+På ett liknande sätt som vi i sista sprinten infört olycksstatistik så finns även en mängd annan intressant data att hämta. Allt ifrån hur trafikflödet ser ut till detaljer som till exempel vad den största stenstorleken i asfalten är på en given väg.
+* Fler aggregation/filtreringsalternativ <br />
+Vi har i nuläget en väldigt omfattande lösning med många olika alternativ för filtreringen. Till exempel att man kanske vill se alla punkter inom 1 km av alla olyckor. Det kan ge insikt för hur vägunderlaget är vid just de olycksdrabbade platserna.
+
+**Långsiktiga mål**
+
+* Vägsystem  <br />
+Istället för att rita ut friktionsdatan som punkter så skulle det vara möjligt att rita ut Sveriges vägnät och att istället färgkoda vägarna efter friktionsvärdet.
+
+* Nya länder och regioner <br />
+Ett väldigt långsiktigt mål kan vara att lägga till fler länder och regioner. Till exempel om Norska vegvesnet hade velat använda vår tjänst så hade vi kunnat göra en lösning med den norska kartan med deras data.
+<br />
+<br />
+
+
 
 # 5. Slutsats
 
 # 6. Referenser
 
 # 7. Annex A - Instruktioner
+ # Road-Condition-Monitoring
+RCM is a tool for gathering data from [DATEX II](https://datex2.eu/) and presenting the data in a informative and user friendly way.
 
+## Prerequisite
+- [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+- [Node.js](https://nodejs.org/en/download/) and [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
+- [MySQL](https://www.tutorialspoint.com/mysql/mysql-installation.htm)
+- Either [OpenJDK](https://openjdk.java.net/install/) or [Rust](https://www.rust-lang.org/tools/install)
+
+## Installation
+
+
+```
+git clone https://github.com/hotpucko/rcm-sommar-2019.git
+```
+
+### Webserver
+```
+cd /rcm-sommar-2019/app/
+npm install
+npm start
+```
+
+### RustBackend
+
+```
+cd /rcm-sommar-2019/backend/
+cargo update
+cargo build
+cargo run
+```
+
+### Database
+
+See [Docs](https://dev.mysql.com/doc/).
+
+
+## Built With
+* [Leaflet](https://leafletjs.com/) - A JavaScript library for interactive maps
+* [OpenStreetMap](https://www.openstreetmap.org/#map=5/62.994/17.637) -  Free wiki world map
+* [MapBox](https://www.mapbox.com/) - An open source mapping platform for custom designed maps
+* [Chart.js](https://www.chartjs.org/) - Flexible JavaScript charting
+* [Boundary-Canvas](https://github.com/aparshin/leaflet-boundary-canvas/) - A plugin for Leaflet mapping library to draw tiled raster layers with arbitrary boundary
+* [GeoData](http://kodapan.se/geodata/data/2015-06-26/laen-kustlinjer.geo.json) - Data for county boundaries in Sweden
+
+## Contributing
+
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+## Authors
+* **Pontus Eriksson Jirbratt** - *Graph* - [98pontan](https://github.com/98pontan)
+* **Samuel Gradén** - *Backend* - [samgra-7](https://github.com/samgra-7)
+* **Oskar Havo** - *Frontend* - [OskarHavo](https://github.com/OskarHavo)
+* **Stefan Jonsson** - *Graph* - [hotpucko](https://github.com/hotpucko)
+* **Martin Larsson** - *Fullstack* - [PMMLarsson](https://github.com/PMMLarsson)
+
+
+
+
+## License
+[MIT](https://choosealicense.com/licenses/mit/)
+
+## Acknowledgments
+Continuous work of [https://github.com/dynematic/rcm-sommar-2019](https://github.com/dynematic/rcm-sommar-2019). A tool built by students at Luleå University of Technology.
 
 # Appendix
 
