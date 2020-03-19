@@ -226,10 +226,10 @@ const fetchReporterOrg =  () => {
 }
 
 // Divide and conquer method for aggregating the data
-const aggregateData = (data, radiusInKm, timeAggregation) => {
+const aggregateData = (data, distanceInKm, timeAggregation) => {
   if(data.length > 500) {
-    const firstHalf = aggregateData(data.splice(data.length/2), radiusInKm, timeAggregation)
-    const secondHalf = aggregateData(data, radiusInKm, timeAggregation)
+    const firstHalf = aggregateData(data.splice(data.length/2), distanceInKm, timeAggregation)
+    const secondHalf = aggregateData(data, distanceInKm, timeAggregation)
     return firstHalf.concat(secondHalf)
   } else {
     // Catch the case when there is a day in which there is no data
@@ -248,8 +248,8 @@ const aggregateData = (data, radiusInKm, timeAggregation) => {
       const lat = parseFloat(data[0].Latitude)
       const long = parseFloat(data[0].Longitude)
       const kmInLongitudeDegree = 111.320 * Math.cos( lat / 180.0 * Math.PI)
-      const deltaLat = radiusInKm / 111.1;
-      const deltaLong = radiusInKm / kmInLongitudeDegree;
+      const deltaLat = distanceInKm / 111.1;
+      const deltaLong = distanceInKm / kmInLongitudeDegree;
       
       const minLat = lat - deltaLat;  
       const maxLat = lat + deltaLat;
@@ -260,7 +260,7 @@ const aggregateData = (data, radiusInKm, timeAggregation) => {
       let groupObject = new Object
       groupObject.Time = data[0].ObservationTimeUTC
       groupObject.TimeAggregation = timeAggregation
-      groupObject.Radius = radiusInKm
+      groupObject.Distance = distanceInKm
       groupObject.ReporterOrganization = data[0].ReporterOrganization
       groupObject.Longitude = data[0].Longitude
       groupObject.Latitude = data[0].Latitude
@@ -303,7 +303,7 @@ const aggregateData = (data, radiusInKm, timeAggregation) => {
       const {
         Time,
         TimeAggregation,
-        Radius,
+        Distance,
         ReporterOrganization,
         Longitude,
         Latitude,
@@ -318,7 +318,7 @@ const aggregateData = (data, radiusInKm, timeAggregation) => {
 
         result.push([Time,
           TimeAggregation,
-          Radius,
+          Distance,
           ReporterOrganization,
           Longitude,
           Latitude,
@@ -335,7 +335,7 @@ const aggregateData = (data, radiusInKm, timeAggregation) => {
   }
 }
 
-const aggregateAggregation = (data, radiusInKm) => {
+const aggregateAggregation = (data, distanceInKm) => {
   const result = new Array
     // Loop through the data - Remove the points which are added to a group. Continue until all points
     // are added in groups. Each iteration will create 1 group.
@@ -347,8 +347,8 @@ const aggregateAggregation = (data, radiusInKm) => {
       const lat = parseFloat(data[0][5])
       const long = parseFloat(data[0][4])
       const kmInLongitudeDegree = 111.320 * Math.cos( lat / 180.0 * Math.PI)
-      const deltaLat = radiusInKm / 111.1;
-      const deltaLong = radiusInKm / kmInLongitudeDegree;
+      const deltaLat = distanceInKm / 111.1;
+      const deltaLong = distanceInKm / kmInLongitudeDegree;
       
       const minLat = lat - deltaLat;  
       const maxLat = lat + deltaLat;
@@ -360,7 +360,7 @@ const aggregateAggregation = (data, radiusInKm) => {
       let groupObject = new Object
       groupObject.Time = data[0][0]
       groupObject.TimeAggregation = data[0][1]
-      groupObject.Radius = radiusInKm
+      groupObject.Distance = distanceInKm
       groupObject.ReporterOrganization = data[0][3]
       groupObject.Longitude = data[0][4]
       groupObject.Latitude = data[0][5]
@@ -377,7 +377,7 @@ const aggregateAggregation = (data, radiusInKm) => {
           /*
           [0]   Time,
           [1]   TimeAggregation,
-          [2]   Radius,
+          [2]   Distance,
           [3]   ReporterOrganization,
           [4]   Longitude,
           [5]   Latitude,
@@ -420,7 +420,7 @@ const aggregateAggregation = (data, radiusInKm) => {
       const {
         Time,
         TimeAggregation,
-        Radius,
+        Distance,
         ReporterOrganization,
         Longitude,
         Latitude,
@@ -435,7 +435,7 @@ const aggregateAggregation = (data, radiusInKm) => {
 
         result.push([Time,
           TimeAggregation,
-          Radius,
+          Distance,
           ReporterOrganization,
           Longitude,
           Latitude,
@@ -463,7 +463,7 @@ const uploadAggregatedFrictionData = (data, timeAggregation) => {
       INSERT INTO db.aggregated_friction_data (
         Time,
         TimeAggregation,
-        Radius,
+        Distance,
         ReporterOrganization,
         Longitude,
         Latitude,

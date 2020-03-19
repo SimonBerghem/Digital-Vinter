@@ -187,7 +187,7 @@ function popupAggregatedFriction(friction, notAggregated){
     // Tar bort oönskade element i strängen.
     timestring = friction.time.replace("T", " / ").replace("Z", " ");
     obj = {
-      AggregationsRadie : [friction.radius, ""],
+      AggregationsRadie : [friction.distance, ""],
       AggregationsTid : [TIMEAGGREGATIONENUM[friction.timeAggregation], ""],
       MätvärdeMedian  : [friction.measureValueMedian,""],
       MätvärdeMax  : [friction.measureValueMax,""],

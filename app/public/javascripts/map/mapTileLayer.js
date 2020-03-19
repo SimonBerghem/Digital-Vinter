@@ -346,7 +346,7 @@ function addtoMAPtoggle(data){
 
     /* Välj radie */ 
     const radiemeny = L.control({position: 'topleft'});
-    let radieoptions = '<p class="selectparagraph">Aggregationsradie</p><select id="radius" disabled=true><option>1</option><option>10</option><option selected="selected">100</option><option>No Aggregation</option></select> km';
+    let radieoptions = '<p class="selectparagraph">Aggregationsdistans</p><select id="distance" disabled=true><option>1</option><option>10</option><option selected="selected">100</option><option>No Aggregation</option></select> km';
 
     radiemeny.onAdd = function (map) {
         var div = L.DomUtil.create('div');
