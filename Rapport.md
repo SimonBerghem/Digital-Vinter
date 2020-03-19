@@ -15,9 +15,6 @@ Uppgiften i detta projekt består av att vidareutveckla projektet “Road condit
 ## 1.4 Avgränsning
 Projektgruppen kommer inte göra några flera moduler då dem är redan färdiga. Det är ej tänkt att göra några större ändringar i backend och databasen. Istället så skall fokuset ligga på att utveckla funktionalitet samt att förfina existerande funktioner såsom filtreringen av friktionsdata.
 
-<br/><br/>
-<br/><br/>
-
 # 2 Systemdesign
 Figuren nedan är ett modul-diagram över nuvarande lösning. Då uppgiften är att förbättra/bygga på denna lösning så kommer den ha samma struktur fast med några ändrade detaljer. Diagrammet beskriver hur en backend kommunicerar med trafikverkets API Datex II och fyller i en databas. APIet är skrivet i programmeringsspråket Rust. Frontend vilket är skrivet i JavaScript kommunicerar med databasen och använder sig av paket som OpenStreetMap för att visa en karta över Sverige. Strukturen på systemet ska reflektera dataflödet.
 
@@ -57,11 +54,12 @@ Stefan har under projektets gång varit fullstack utvecklare med ansvar på graf
 
 ## 3.2 Projektgenomförande
 Våra roller i projektet:
-Pontus Eriksson Jirbratt - Graph/Kommunikation 
-Samuel Gradén - Backend/SCRUM-Master 
-Oskar Havo - Frontend 
-Stefan Jonsson - Graph 
-Martin Larsson - Fullstack/Git
+* Pontus Eriksson Jirbratt - Graph/Kommunikation 
+* Samuel Gradén - Backend/SCRUM-Master 
+* Oskar Havo - Frontend 
+* Stefan Jonsson - Graph 
+* Martin Larsson - Fullstack/Git
+
 Förklaring, se: 3.1.1.namn.
 
 I början av varje sprint har projektgruppen suttit tillsammans i grupp och skrivit ihop stories och medföljande tasks efter vad produktägare Sofia Sollén (expert) har begärt. Därefter har vi delegerat ut dem efter intresse så att alla känt sig nöjda. Då vi är ett udda antal i gruppen så delade vi upp oss 2-2-1 då vi hade två stora stories och en mindre. Detta har lett till en ökad flexibilitet då vi har haft möjligheten att omfördela arbetsuppgifter efter behov.  Eventuellt kan det vara bra att dela upp gruppen i 2 och 3 istället för att öka robustheten i projektet ifall någon skulle bli sjuk eller dylikt.
@@ -72,7 +70,7 @@ Omfattningen på projektet har varit liten eftersom att det inte behövdes genom
 
 Slutprodukten presenteras som en karta som kan visualiserar stora mängder data som är kopplat till plats för att underlätta översikt, analys och att finna korrelation. I fallet som vi har jobbat på under detta projekt så har det varit RCM i fokus. Om man har en annan typ av data som är kopplat till plats så är det lätt att lägga in sådan data och även visualisera den.
 
-3.2.3.Samuel
+#### 3.2.3.Samuel
 Under Sprint 2 ansvarade Samuel för Storien “Visualisera Olycksdata”. Storien var uppdelad i 3 Tasks, i detta stycke kommer varje task att presenteras och diskuteras. Det som inte togs med i tidsestimeringen var konstruering av XML-Parser och databas insättning. Med eftertanke så bör detta har visats som två tasks i storien. Detta tog 8h respektive 9h.
  
 **Task 1** som utgick från att data skulle hämtas och hanteras på samma sätt som hämtning för stationsdata. En stor del av tiden gick till att försöka skriva om tidigare kod som var för stations data för att hämta olycksstatistik. Detta visade sig vara onödigt arbete för att olycksstatistik inte sparades på samma sätt som stationsdata. Istället behövdes en post request konstrueras istället för en get som tidigare används. Dokumenteringen för Trafikverkets API var bra och det var enkelt att förstå hur post requesten skulle konstrueras. Konstrueringen av post requesten gjordes i programmet Postman[^2]. Tidsåtgång: 4h. 
@@ -239,8 +237,8 @@ Funktionaliteten som behövdes togs reda på genom intervju med områdes-experte
 Det framgick att det behövs funktionalitet för att ladda upp friktionsdata genom .csv filer och att punkter på kartan ska kunna urskiljas beroende på vilket friktionsvärde de innehåller. Under arbetet uppmärksammades det att den stora mängden friktionsdata som blir uppladdad omöjligt kan renderas i en webbläsare punkt för punkt. Därför blev nästa uppgift att möjliggöra detta. Tre tekniker för att reducera antalet punkter implementerades. Filtrering, aggregering och en speciell typ av marker ‘markercluster’ från Leaflet. Lösningarna tillsammans gör att en användare kan navigera det stora datamängden utan att webbläsaren tar för evigt att svara. 
 Utöver detta utvecklades det även visualisering av olycksdata från Trafikverkets API. Databasen för friktionsdata gjordes robust genom att ha en konversation om vilka kolumner som ska finnas med i .csv filerna. Samt se till att tillägg av nya kolumner inte tar sönder nuvarande lösning.
 
-##4.2 Testning
-###4.2.1 Teststrategi
+## 4.2 Testning
+### 4.2.1 Teststrategi
 Vi har varit ansvariga för att utföra relevant testning på våra egna funktioner på vår branch. Sen har vi haft som system att vi laddar upp branchen och då den är färdigutvecklad så gör man en Pull Request där då de andra medlemmarna i gruppen testar funktionen och sedan mergar in den i master branchen. Inför demon som utförts på möten samt seminarier så har vi sett till att vi har en stabil version där alla funktioner fungerar på allas datorer.
 
 
@@ -343,21 +341,14 @@ Det finns en stor mängd data som projektet hanterar där majoriteten inte är k
 I testning av projektet har inte någon etisk fråga lyfts då detta projekt inte behöver någon testning med personer eller personlig data. Projektgruppen har tänkt på etiken kring det vi har arbetat med men har inte kunnat hitta någon etisk problematik. 
 
 ### 4.4 Fortsättning
-Kompetensen och kunskapen som krävs för att vidareutveckla detta projekt finns sammanfattat i punkt 7) Instruktioner. Några potentiella utökningar kan vara följande:
-<br>
-<br>
-
+Kompetensen och kunskapen som krävs för att vidareutveckla detta projekt finns sammanfattat i 7) Instruktioner. Några potentiella utökningar kan vara följande:
 **Kortsiktiga mål**
-
 * Säkerhet - Ifall projektet ska deployas så bör sessions implementeras som håller reda på vilka som är inloggade.
 * Live uppdatering och utritning - I framtiden så vore det bra om hemsidan hämtar ner den senaste datan under körning och ritar ut den utan att man är tvungen att uppdatera hemsidan.
 * Ny trafikdata - På ett liknande sätt som vi i sista sprinten infört olycksstatistik så finns även en mängd annan intressant data att hämta. Allt ifrån hur trafikflödet ser ut till detaljer som till exempel vad den största stenstorleken i asfalten är på en given väg.
 * Fler aggregation/filtreringsalternativ - Vi har i nuläget en väldigt omfattande lösning med många olika alternativ för filtreringen. Till exempel att man kanske vill se alla punkter inom 1 km av alla olyckor. Det kan ge insikt för hur vägunderlaget är vid just de olycksdrabbade platserna.
-<br>
-<br>
 
 **Långsiktiga mål**
-
 * Vägsystem - Istället för att rita ut friktionsdatan som punkter så skulle det vara möjligt att rita ut Sveriges vägnät och att istället färgkoda vägarna efter friktionsvärdet.
 * Nya länder och regioner - Ett väldigt långsiktigt mål kan vara att lägga till fler länder och regioner. Till exempel om Norska vegvesnet hade velat använda vår tjänst så hade vi kunnat göra en lösning med den norska kartan med deras data.
 
@@ -374,16 +365,79 @@ Under andra sprinten begärde projektägaren att kunna visualisera olycksdata ti
 .
 
 # 6. Referenser
-RUST
-För att skapa HTTP request med rust så användes reqwest: https://docs.rs/reqwest/0.10.4/reqwest/
-För att Parsa XML i Rust användes xmlparser
-https://docs.rs/xmlparser/0.13.1/xmlparser/
-För att göra SQL- Quries i Node användes följande i lösningen.
-https://codeforgeek.com/nodejs-mysql-tutorial/
-[^2]: Postman: https://www.postman.com/
+***RUST**
+* För att skapa HTTP request med rust så användes reqwest: https://docs.rs/reqwest/0.10.4/reqwest/
+* För att Parsa XML i Rust användes xmlparser https://docs.rs/xmlparser/0.13.1/xmlparser/
+* För att göra SQL- Quries i Node användes följande i lösningen. https://codeforgeek.com/nodejs-mysql-tutorial/
+* Postman: https://www.postman.com/
 
 # 7. Annex A - Instruktioner
-Finns i markdown
+**Project README**
+# Road-Condition-Monitoring
+RCM is a tool for gathering data from [DATEX II](https://datex2.eu/) and presenting the data in a informative and user friendly way.
+
+## Prerequisite
+- [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+- [Node.js](https://nodejs.org/en/download/) and [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
+- [MySQL](https://www.tutorialspoint.com/mysql/mysql-installation.htm)
+- Either [OpenJDK](https://openjdk.java.net/install/) or [Rust](https://www.rust-lang.org/tools/install)
+
+## Installation
+
+
+```
+git clone https://github.com/hotpucko/rcm-sommar-2019.git
+```
+
+### Webserver
+```
+cd /rcm-sommar-2019/app/
+npm install
+npm start
+```
+
+### RustBackend
+
+```
+cd /rcm-sommar-2019/backend/
+cargo update
+cargo build
+cargo run
+```
+
+### Database
+
+See [Docs](https://dev.mysql.com/doc/).
+
+
+## Built With
+* [Leaflet](https://leafletjs.com/) - A JavaScript library for interactive maps
+* [OpenStreetMap](https://www.openstreetmap.org/#map=5/62.994/17.637) -  Free wiki world map
+* [MapBox](https://www.mapbox.com/) - An open source mapping platform for custom designed maps
+* [Chart.js](https://www.chartjs.org/) - Flexible JavaScript charting
+* [Boundary-Canvas](https://github.com/aparshin/leaflet-boundary-canvas/) - A plugin for Leaflet mapping library to draw tiled raster layers with arbitrary boundary
+* [GeoData](http://kodapan.se/geodata/data/2015-06-26/laen-kustlinjer.geo.json) - Data for county boundaries in Sweden
+
+## Contributing
+
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+## Authors
+* **Pontus Eriksson Jirbratt** - *Graph* - [98pontan](https://github.com/98pontan)
+* **Samuel Gradén** - *Backend* - [samgra-7](https://github.com/samgra-7)
+* **Oskar Havo** - *Frontend* - [OskarHavo](https://github.com/OskarHavo)
+* **Stefan Jonsson** - *Graph* - [hotpucko](https://github.com/hotpucko)
+* **Martin Larsson** - *Fullstack* - [PMMLarsson](https://github.com/PMMLarsson)
+
+
+
+
+## License
+[MIT](https://choosealicense.com/licenses/mit/)
+
+## Acknowledgments
+Continuous work of [https://github.com/dynematic/rcm-sommar-2019](https://github.com/dynematic/rcm-sommar-2019). A tool built by students at Luleå University of Technology.
+
 
 # Appendix
 
