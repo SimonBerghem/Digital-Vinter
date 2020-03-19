@@ -344,22 +344,22 @@ I testning av projektet har inte någon etisk fråga lyfts då detta projekt int
 
 ### 4.4 Fortsättning
 Kompetensen och kunskapen som krävs för att vidareutveckla detta projekt finns sammanfattat i punkt 7) Instruktioner. Några potentiella utökningar kan vara följande:
-Kortsiktiga mål
-Säkerhet
-Ifall projektet ska deployas så bör sessions implementeras som håller reda på vilka som är inloggade.
-Live uppdatering och utritning
- I framtiden så vore det bra om hemsidan hämtar ner den senaste datan under körning och ritar ut den utan att man är tvungen att uppdatera hemsidan.
-Ny trafikdata
- På ett liknande sätt som vi i sista sprinten infört olycksstatistik så finns även en mängd annan intressant data att hämta. Allt ifrån hur trafikflödet ser ut till detaljer som till exempel vad den största stenstorleken i asfalten är på en given väg.
-Fler aggregation/filtreringsalternativ
- Vi har i nuläget en väldigt omfattande lösning med många olika alternativ för filtreringen. Till exempel att man kanske vill se alla punkter inom 1 km av alla olyckor. Det kan ge insikt för hur vägunderlaget är vid just de olycksdrabbade platserna.
-Långsiktiga mål
-Vägsystem
- Istället för att rita ut friktionsdatan som punkter så skulle det vara möjligt att rita ut Sveriges vägnät och att istället färgkoda vägarna efter friktionsvärdet.
+<br>
+<br>
 
+**Kortsiktiga mål**
 
-Nya länder och regioner
- Ett väldigt långsiktigt mål kan vara att lägga till fler länder och regioner. Till exempel om Norska vegvesnet hade velat använda vår tjänst så hade vi kunnat göra en lösning med den norska kartan med deras data.
+* Säkerhet - Ifall projektet ska deployas så bör sessions implementeras som håller reda på vilka som är inloggade.
+* Live uppdatering och utritning - I framtiden så vore det bra om hemsidan hämtar ner den senaste datan under körning och ritar ut den utan att man är tvungen att uppdatera hemsidan.
+* Ny trafikdata - På ett liknande sätt som vi i sista sprinten infört olycksstatistik så finns även en mängd annan intressant data att hämta. Allt ifrån hur trafikflödet ser ut till detaljer som till exempel vad den största stenstorleken i asfalten är på en given väg.
+* Fler aggregation/filtreringsalternativ - Vi har i nuläget en väldigt omfattande lösning med många olika alternativ för filtreringen. Till exempel att man kanske vill se alla punkter inom 1 km av alla olyckor. Det kan ge insikt för hur vägunderlaget är vid just de olycksdrabbade platserna.
+<br>
+<br>
+
+**Långsiktiga mål**
+
+* Vägsystem - Istället för att rita ut friktionsdatan som punkter så skulle det vara möjligt att rita ut Sveriges vägnät och att istället färgkoda vägarna efter friktionsvärdet.
+* Nya länder och regioner - Ett väldigt långsiktigt mål kan vara att lägga till fler länder och regioner. Till exempel om Norska vegvesnet hade velat använda vår tjänst så hade vi kunnat göra en lösning med den norska kartan med deras data.
 
 
 
