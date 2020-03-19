@@ -118,9 +118,9 @@
                             });
                         </script>
                         <div>
-                            Ladda upp ny friktionsdata genom att välja en .csv fil från disk och vänta tills att uppladdningen är klar. Efter att uppladdningen är gjord från användare till server måste även servern ladda upp friktionsdatan till databasen, detta kan ta några minuter.
+                            Ladda upp ny friktionsdata genom att välja en .csv fil från disk och vänta tills att uppladdningen är klar. Efter att uppladdningen är gjord från användare till server måste även servern ladda upp friktionsdatan till databasen.
                             <br><br>
-                            Efter att filen laddats upp gör servern aggregering av datapunkter. Detta tar tid extra tid.
+                            Efter att filen laddats upp gör servern aggregering av datapunkter. Tillsammans tar dessa två sakerna tid att genomföra.
                         </div>
                         <hr>
                         <form enctype="multipart/form-data">
@@ -248,7 +248,7 @@
 
             /* Funktion för att toggla disable av eget val av aggregated friction data" */
             enableAggregationOptions = () => {
-                document.getElementById('radius').disabled = !document.getElementById('radius').disabled
+                document.getElementById('distance').disabled = !document.getElementById('distance').disabled
                 document.getElementById('timeAggregation').disabled = !document.getElementById('timeAggregation').disabled
             }
 
@@ -256,7 +256,7 @@
             async function searchButtonQuery(){
                 const mapBounds = { northEastLat: map.getBounds()._northEast.lat, northEastLong:map.getBounds()._northEast.lng, southWestLat:map.getBounds()._southWest.lat, southWestLong:map.getBounds()._southWest.lng}
                 let frictionOrWeatherStation = document.getElementById('frictionOrWeatherStation').value
-                const radius = document.getElementById('radius').value;
+                const distance = document.getElementById('distance').value;
                 let timeAggregation = '1';
                 let maxFriction = document.getElementById('maxFrictionForm').value
                 if(maxFriction === "") {
@@ -285,7 +285,7 @@
                 let autoAggregation = document.getElementById('autoChooseAggregation').checked
 
                 //await getFrictionData(frictionOrWeatherStation);
-                getAggregatedFrictionData(radius, timeAggregation, dates[0], dates[1], frictionOrWeatherStation, mapBounds, maxFriction, autoAggregation);
+                getAggregatedFrictionData(distance, timeAggregation, dates[0], dates[1], frictionOrWeatherStation, mapBounds, maxFriction, autoAggregation);
             }
             /* Kollar så att formuläret bara har tal mellan 0-1 */ 
             function checkFormLength(input){

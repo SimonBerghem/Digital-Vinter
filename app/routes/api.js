@@ -79,7 +79,7 @@ router.get('/getFrictionData', function(req, res, next) {
 /* GET FROM AGGREGATED FRICTION DATA  */
 router.get('/getAggregatedFrictionData', function(req, res, next) {
     try{
-        const radius = req["query"]["radius"];
+        const distance = req["query"]["distance"];
         const timeAggregation = req["query"]["timeAggregation"];
         const startTime = req["query"]["startTime"];
         const endTime = req["query"]["endTime"];
@@ -92,16 +92,16 @@ router.get('/getAggregatedFrictionData', function(req, res, next) {
             // Auto aggregate
             friction.autoAggregate(res, startTime, endTime, reporterOrganization, mapBounds, maxFriction)
         } else {
-            if(radius === "No Aggregation") {
+            if(distance === "No Aggregation") {
                 friction.getSpecificFrictionData(startTime, endTime, reporterOrganization, mapBounds, maxFriction).then(result => {
                     if(result.length > 50000) {
                         res.send({ success:false, autoAggregation:false })
                     } else {
-                        res.send({ radius:'No Aggregation', timeAggregation:'No Aggregation', result,  success: true, autoAggregation:false })
+                        res.send({ distance:'No Aggregation', timeAggregation:'No Aggregation', result,  success: true, autoAggregation:false })
                     }
                 })
             } else {
-                friction.getAggregatedFrictionData(radius, timeAggregation, startTime, endTime, reporterOrganization, mapBounds, maxFriction).then(result => {
+                friction.getAggregatedFrictionData(distance, timeAggregation, startTime, endTime, reporterOrganization, mapBounds, maxFriction).then(result => {
                     if(result.length > 50000) {
                         res.send({ success:false, autoAggregation:false })
                     } else {
