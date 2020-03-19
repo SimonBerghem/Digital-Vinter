@@ -199,12 +199,6 @@ pub fn get_opts(user: &str, pass: &str, addr: &str, database: &str) -> Opts {
 pub fn create_mysql_tables(pool: Pool) {
 
 
-    pool.prep_exec(r"create table if not exists reporter_organisations
-    (
-    ReporterOrganisation varchar(50) not null,
-    primary key (ReporterOrganisation)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;",()).expect("Failed to create table: reporter_organisations");
-
     pool.prep_exec(r"CREATE TABLE IF NOT EXISTS station_data (
                         id VARCHAR(50) NOT NULL,
                         lat DECIMAL(10, 8) DEFAULT NULL,
