@@ -342,6 +342,7 @@ I testning av projektet har inte någon etisk fråga lyfts då detta projekt int
 
 ### 4.4 Fortsättning
 Kompetensen och kunskapen som krävs för att vidareutveckla detta projekt finns sammanfattat i 7) Instruktioner. Några potentiella utökningar kan vara följande:
+
 **Kortsiktiga mål**
 * Säkerhet - Ifall projektet ska deployas så bör sessions implementeras som håller reda på vilka som är inloggade.
 * Live uppdatering och utritning - I framtiden så vore det bra om hemsidan hämtar ner den senaste datan under körning och ritar ut den utan att man är tvungen att uppdatera hemsidan.
