@@ -44,8 +44,10 @@ pub fn insert_camera_data(pool: Pool, camera_data: Vec<CameraData>) {
 pub fn insert_road_accident_row(pool: Pool, accident_row: Vec<roadAccidentData>){
 
     for i in accident_row.iter(){
-        let query = format!(r#"INSERT IGNORE INTO road_accident_data (Id, CreationTime, EndTime, IconId, SWEREF99TM, WGS84, SeverityCode) VALUES('{}', '{}', '{}', '{}', '{}', '{}', '{}');"#,
-        i.RoadAccident_id, i.RoadAccident_CreationTime, i.RoadAccident_EndTime, i.RoadAccident_icon_id,i.RoadAccident_Geometry_SWEREF99TM, i.RoadAccident_Geometry_WGS84, i.RoadAccident_SeverityCode);
+        let query = format!(r#"INSERT IGNORE INTO road_accident_data (Id, CreationTime, EndTime, IconId, SWEREF99TM, WGS84, SeverityCode) VALUES('{}', '{}', '{}', '{}', '{}', '{}', '{}')
+        ON DUPLICATE KEY UPDATE CreationTime='{}', EndTime='{}',IconId='{}', SWEREF99TM='{}', WGS84='{}', SeverityCode='{}';"#,
+        i.RoadAccident_id, i.RoadAccident_CreationTime, i.RoadAccident_EndTime, i.RoadAccident_icon_id,i.RoadAccident_Geometry_SWEREF99TM, i.RoadAccident_Geometry_WGS84, i.RoadAccident_SeverityCode,
+        i.RoadAccident_CreationTime, i.RoadAccident_EndTime, i.RoadAccident_icon_id,i.RoadAccident_Geometry_SWEREF99TM, i.RoadAccident_Geometry_WGS84, i.RoadAccident_SeverityCode);
         //println!("{:?} ", query);
        pool.prep_exec(query,()).expect("Failed to insert Road Accident Data, Pls contact support");
 
@@ -225,7 +227,7 @@ pub fn create_mysql_tables(pool: Pool) {
                     air_humidity FLOAT DEFAULT NULL,
                     wind_speed FLOAT DEFAULT NULL,
                     wind_direction VARCHAR(10) DEFAULT NULL,
-                    PRIMARY KEY (id),
+                    PRIMARY KEY (id, timestamp),
                     KEY station_id (station_id),
                     FOREIGN KEY (station_id) REFERENCES station_data (id)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;", ()).expect("Failed to create table: weather_data");
@@ -252,7 +254,7 @@ pub fn create_mysql_tables(pool: Pool) {
         `SWEREF99TM` VARCHAR(45) NULL,
         `WGS84` VARCHAR(45) NULL,
         `SeverityCode` VARCHAR(45) NULL,
-        PRIMARY KEY (`Id`))ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;;"#,()).expect("Failed to create table: road_accident_data");
+        PRIMARY KEY (`Id`, `CreationTime`))ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;;"#,()).expect("Failed to create table: road_accident_data");
     pool.prep_exec(r"create table if not exists reporter_organizations
     (
         ReporterOrganization varchar(255) not null
@@ -290,9 +292,27 @@ pub fn create_mysql_tables(pool: Pool) {
                     station_id VARCHAR(50) DEFAULT NULL,
                     url TEXT DEFAULT NULL,
                     url_thumb TEXT DEFAULT NULL,
-                    PRIMARY KEY (id)
+                    PRIMARY KEY (id, time)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;", ()).expect("Failed to create table: camera_data");
 
+
+    pool.prep_exec(r"CREATE TABLE IF NOT EXISTS traffic_flow (
+        `AverageVehicleSpeed` VARCHAR(45) NULL,
+        `CountyNo` VARCHAR(45) NULL,
+        `Deleted` VARCHAR(45) NULL,
+        `Geometry.SWEREF99TM` VARCHAR(45) NULL,
+        `Geometry.WGS84` VARCHAR(45) NULL,
+        `MeasurementOrCalculationPeriod` VARCHAR(45) NULL,
+        `MeasurementSide` VARCHAR(45) NULL,
+        `MeasurementTime` VARCHAR(45) NOT NULL,
+        `ModifiedTime` VARCHAR(45) NULL,
+        `RegionId` VARCHAR(45) NULL,
+        `SiteId` VARCHAR(45) NOT NULL,
+        `SpecificLane` VARCHAR(45) NULL,
+        `VehicleFlowRate` VARCHAR(45) NULL,
+        `VehicleType` VARCHAR(45) NOT NULL,
+        PRIMARY KEY (`MeasurementTime`, `SiteId`, `VehicleType`)
+        )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;", ()).expect("Failed to create table: traffic_flow");
 
 }
 

@@ -44,7 +44,7 @@ pub struct WeatherData {
     _secret: (),
 
 }
-//NYTT RoadAccident == Olyc
+//NYTT RoadAccident == Olycka
 #[derive(Debug)]
 pub struct roadAccidentData {
     pub RoadAccident_id: String,
@@ -56,6 +56,25 @@ pub struct roadAccidentData {
     pub RoadAccident_CreationTime: String,
     _secret: (),
 
+}
+//NYTT TrafficFlow
+#[derive(Debug)]
+pub struct TrafficFlowData {
+    pub TrafficFlow_AverageVehivleSpeed: String,
+    pub TrafficFlow_CountyNo: String,
+    pub TrafficFlow_Deleted: String,
+    pub TrafficFlow_Geometry_SWEREF99TM: String,
+    pub TrafficFlow_Geometry_WGS84: String,
+    pub TrafficFlow_MeasurementOrCalculationPeriod: String,
+    pub TrafficFlow_MeasurementSide: String,
+    pub TrafficFlow_MeasurementTime: String,
+    pub TrafficFlow_ModifiedTime: String,
+    pub TrafficFlow_RegionId: String,
+    pub TrafficFlow_SiteId: String,
+    pub TrafficFlow_SpecificLane: String,
+    pub TrafficFlow_VehicleFlowRate: String,
+    pub TrafficFlow_VehicleType: String,
+    _secret: (),
 }
 
 
@@ -249,6 +268,121 @@ pub fn parse_roadAccident(xmlfile: &str) -> Vec<roadAccidentData>{
 
     }
     RoadAccident_data
+}
+
+
+pub fn parse_traffic_flow(xmlfile: &str) -> Vec<TrafficFlowData>{
+    let mut xml = Reader::from_file(xmlfile).expect("failed to open file");
+
+    xml.trim_text(true);// remove whitespaces
+
+    let mut TrafficFlow_Data = Vec::new();
+    let mut buf = Vec::new();
+
+    loop {
+
+        match xml.read_event(&mut buf){
+            Ok(Event::Start(ref e)) => match e.name(){
+                b"TrafficFlow" => {
+                    let TrafficFlow = TrafficFlowData {
+                        TrafficFlow_AverageVehivleSpeed : String::new(),
+                        TrafficFlow_CountyNo : String::new(),
+                        TrafficFlow_Deleted : String::new(),
+                        TrafficFlow_Geometry_SWEREF99TM : String::new(),
+                        TrafficFlow_Geometry_WGS84 : String::new(),
+                        TrafficFlow_MeasurementOrCalculationPeriod : String::new(),
+                        TrafficFlow_MeasurementSide : String::new(),
+                        TrafficFlow_MeasurementTime : String::new(),
+                        TrafficFlow_ModifiedTime : String::new(),
+                        TrafficFlow_RegionId : String::new(),
+                        TrafficFlow_SiteId : String::new(),
+                        TrafficFlow_SpecificLane : String::new(),
+                        TrafficFlow_VehicleFlowRate : String::new(),
+                        TrafficFlow_VehicleType : String::new(),
+                        _secret : (),
+                    };
+                    
+                    TrafficFlow_Data.push(TrafficFlow);
+                    let TrafficFlow = TrafficFlow_Data.last_mut();
+
+                }    
+                    b"AverageVehicleSpeed" => {
+                        let TrafficFlow = TrafficFlow_Data.last_mut().unwrap();
+                        TrafficFlow.TrafficFlow_AverageVehivleSpeed = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                    }
+                    b"CountyNo" => {
+                        let TrafficFlow = TrafficFlow_Data.last_mut().unwrap();
+                        TrafficFlow.TrafficFlow_CountyNo = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                    }
+                    b"SWEREF99TM" => {
+                        let TrafficFlow = TrafficFlow_Data.last_mut().unwrap();
+                        TrafficFlow.TrafficFlow_Geometry_SWEREF99TM = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        
+                    }
+                    b"WGS84" =>{
+                        let TrafficFlow = TrafficFlow_Data.last_mut().unwrap();
+                        TrafficFlow.TrafficFlow_Geometry_WGS84 = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        
+                    }
+                    b"MeasurementOrCalculationPeriod" => {
+                        let TrafficFlow = TrafficFlow_Data.last_mut().unwrap();
+                        TrafficFlow.TrafficFlow_MeasurementOrCalculationPeriod = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        
+                    }
+                    b"MeasurementTime" => {
+                        let TrafficFlow = TrafficFlow_Data.last_mut().unwrap();
+                        TrafficFlow.TrafficFlow_MeasurementTime = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        
+                    }
+                    b"ModifiedTime" => {
+                        let TrafficFlow = TrafficFlow_Data.last_mut().unwrap();
+                        TrafficFlow.TrafficFlow_ModifiedTime = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                    
+
+                    }
+                    b"RegionId" => {
+                        let TrafficFlow = TrafficFlow_Data.last_mut().unwrap();
+                        TrafficFlow.TrafficFlow_RegionId = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        
+                    }
+
+                    b"SiteId" => {
+                        let TrafficFlow = TrafficFlow_Data.last_mut().unwrap();
+                        TrafficFlow.TrafficFlow_SiteId = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        
+                    }
+
+                    b"SpecificLane" => {
+                        let TrafficFlow = TrafficFlow_Data.last_mut().unwrap();
+                        TrafficFlow.TrafficFlow_SpecificLane = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        
+                    }
+
+
+                    b"VehicleFlowRate" => {
+                        let TrafficFlow = TrafficFlow_Data.last_mut().unwrap();
+                        TrafficFlow.TrafficFlow_VehicleFlowRate = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        
+                    }
+
+
+                    b"VehicleType" => {
+                        let TrafficFlow = TrafficFlow_Data.last_mut().unwrap();
+                        TrafficFlow.TrafficFlow_VehicleType = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        
+                    }
+                    _ => (), // Else
+                }
+                Ok(Event::Eof) => break,
+                Err(e) => panic!("Error at pos {}: {:?}", xml.buffer_position(), e),_=> (),
+
+
+            }
+            buf.clear();
+        
+
+    }
+    TrafficFlow_Data
 }
 
 // Parse xml file and return station_data vector
