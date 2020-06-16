@@ -37,8 +37,8 @@ fn main() {
     let friction_pool = pool.clone();
     let camera_pool = pool.clone();
     let road_accident_pool = pool.clone();
+    let traffic_flow_pool = pool.clone();
 
-   
 
     //database::insert_road_accident_data(road_accident_pool.clone(), roadAccident_data);
 
@@ -47,14 +47,14 @@ fn main() {
     // First insert
    
     let station_data = parse_xml::parse_station("station_data_cache.xml");
-    //println!("{:?}: StationData", station_data);
+    //println!("{:?}: StationData", station_data[0]);
     
     database::insert_station_data(station_pool.clone(), station_data);
     //Accident Data
     thread::spawn(move || loop {
         let fetch_thread = thread::spawn(|| {
             fetch::get_situation_data();
-            println!("{:?}: Road Accident Data file fetched from DATEX II",Local::now().naive_local());
+            println!("{:?}: Situation file fetched from DATEX II",Local::now().naive_local());
 
 
         });
@@ -64,7 +64,7 @@ fn main() {
         let roadAccident_data = parse_xml::parse_roadAccident("TESTFILE.xml");
         //println!("{:?}: Deviation Data", roadAccident_data);
         database::insert_road_accident_row(road_accident_pool.clone(),roadAccident_data);
-
+        //println!("{:?}: Situation Data Inserted ", Local::now().naive_local());
         // Sleep for 15 min
         thread::sleep(Duration::from_secs(900));
 
@@ -74,21 +74,22 @@ fn main() {
     thread::spawn(move || loop {
         let fetch_thread = thread::spawn(|| {
             fetch::get_traffic_flow_data();
-            println!("{:?}: Traffic Flow Data file fetched from DATEX II",Local::now().naive_local());
+            println!("{:?}: Traffic Flow file fetched from DATEX II",Local::now().naive_local());
 
         });
         fetch_thread.join().unwrap();
         // Fungerar fram hit
         let traffic_flow_data = parse_xml::parse_traffic_flow("TrafficFlow.xml");
-        println!("{:?}: Traffic Flow","Tjo");
-
+        //println!("{:?}: Traffic Flow Data", traffic_flow_data[0]);
+        database::insert_traffic_flow_data(traffic_flow_pool.clone(), traffic_flow_data);
+        //println!("{:?}: Traffic Flow Inserted ",Local::now().naive_local());
         thread::sleep(Duration::from_secs(900));
     });
     
     thread::spawn(move || loop {
         let fetch_thread = thread::spawn(|| {
             fetch::fetch_xml(auth::URL_C, auth::USER_DATEX, auth::PASS_DATEX, "camera_data_cache.xml");
-            println!("{:?}: camera file fetched from DATEX II", Local::now().naive_local());
+            println!("{:?}: Camera file fetched from DATEX II", Local::now().naive_local());
         });
         // Wait for fetch to complete
         fetch_thread.join().unwrap();
@@ -105,7 +106,7 @@ fn main() {
     thread::spawn(move || loop {
         let fetch_thread = thread::spawn(|| {
             fetch::fetch_xml(auth::URL_W, auth::USER_DATEX, auth::PASS_DATEX, "weather_data_cache.xml");
-            println!("{:?}: weather file fetched from DATEX II", Local::now().naive_local());
+            println!("{:?}: Weather file fetched from DATEX II", Local::now().naive_local());
 
 
         });
@@ -127,7 +128,7 @@ fn main() {
     loop { 
         let fetch_thread = thread::spawn(|| {
             fetch::fetch_xml(auth::URL_S, auth::USER_DATEX, auth::PASS_DATEX, "station_data_cache.xml");
-            println!("{:?}: station file fetched from DATEX II", Local::now().naive_local());
+            println!("{:?}: Station file fetched from DATEX II", Local::now().naive_local());
         });
         // Wait for fetch to complete
         fetch_thread.join().unwrap();

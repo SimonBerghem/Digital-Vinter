@@ -11,7 +11,7 @@ use quick_xml::events::Event;
 pub fn fetch_xml(url: &str, user: &str, pass: &str, file_name: &str) {
    
     let client = reqwest::blocking::Client::new();
-
+    
     let mut response = client.get(url)
         .basic_auth(user, Some(pass))
         .send()
@@ -23,7 +23,7 @@ pub fn fetch_xml(url: &str, user: &str, pass: &str, file_name: &str) {
         .expect("Error creating file, station_data");
     io::copy(&mut response, &mut file)
         .expect("Failed to read response to file");
-
+    
 }
 // Get the XML file from, DATEX II. 
 // The function assumes that another part of the system will read the XML file and parse it into the SQL-Database
@@ -64,7 +64,6 @@ pub fn get_situation_data(){
       .send()
       .unwrap();
      
-  println!("Status: {}",res.status());
   let mut file = File::create("TESTFILE.xml")
           .expect("Error creating file, SituationData");
   io::copy(&mut res, &mut file)
@@ -73,13 +72,11 @@ pub fn get_situation_data(){
   //println!("Headers:\n{}", res.headers());
   let c = reqwest::blocking::Client::new();
   let res = c.get("https://rust-lang.org").send().unwrap();
-      println!("Status: {}", res.status());
   
   
       
   let cl = reqwest::blocking::Client::new();
   let res = cl.post("http://httpbin.org/post").body("the exact body that is sent").send().unwrap();
-   println!("Status: {}", res.status());
   }
 
 // Get the XML file from, DATEX II. 

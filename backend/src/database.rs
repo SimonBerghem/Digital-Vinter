@@ -5,7 +5,7 @@ use mysql::OptsBuilder;
 use mysql::chrono::{DateTime, FixedOffset};
 // use mysql::from_row;
 
-use crate::parse_xml::{StationData, WeatherData, CameraData, roadAccidentData};
+use crate::parse_xml::{StationData, WeatherData, CameraData, roadAccidentData, TrafficFlowData};
 
 pub fn insert_friction_data(mut conn: PooledConn, url: &str) {
     //conn.query(r"LOAD DATA LOCAL INFILE ".to_owned() + "'" + url + "'" + " INTO TABLE friction_data LINES TERMINATED BY '\r\n' IGNORE 1 LINES SET `lat`= REPLACE(`lat`, ',', '.'), `lon`=REPLACE(`lon`, ',', '.'), `MeasurementValue`=REPLACE(`MeasurementValue`, ',', '.');").unwrap();
@@ -24,7 +24,6 @@ pub fn insert_camera_data(pool: Pool, camera_data: Vec<CameraData>) {
                                     ON DUPLICATE KEY UPDATE time=:time, lat=:latitude, lon=:longitude, name=:name, url:=url, url_thumb:=url_thumb;";
 
     for mut stmt in pool.prepare(insert_stmt).into_iter() { 
-        
         for i in camera_data.iter() {
             // `execute` takes ownership of `params` so we pass account name by reference.
             stmt.execute(params!{
@@ -42,17 +41,17 @@ pub fn insert_camera_data(pool: Pool, camera_data: Vec<CameraData>) {
 }
 //Skrev en egen för att något dampade med den andra, denna är nog inte SQL-injection safe, den tar inte hänsyn till om Trafikverket updaterar sin data
 pub fn insert_road_accident_row(pool: Pool, accident_row: Vec<roadAccidentData>){
-
+    println!("{:?} Warning! SQL-Injection Vurnable","§");
     for i in accident_row.iter(){
         let query = format!(r#"INSERT IGNORE INTO road_accident_data (Id, CreationTime, EndTime, IconId, SWEREF99TM, WGS84, SeverityCode) VALUES('{}', '{}', '{}', '{}', '{}', '{}', '{}')
         ON DUPLICATE KEY UPDATE CreationTime='{}', EndTime='{}',IconId='{}', SWEREF99TM='{}', WGS84='{}', SeverityCode='{}';"#,
         i.RoadAccident_id, i.RoadAccident_CreationTime, i.RoadAccident_EndTime, i.RoadAccident_icon_id,i.RoadAccident_Geometry_SWEREF99TM, i.RoadAccident_Geometry_WGS84, i.RoadAccident_SeverityCode,
         i.RoadAccident_CreationTime, i.RoadAccident_EndTime, i.RoadAccident_icon_id,i.RoadAccident_Geometry_SWEREF99TM, i.RoadAccident_Geometry_WGS84, i.RoadAccident_SeverityCode);
-        //println!("{:?} ", query);
+        
        pool.prep_exec(query,()).expect("Failed to insert Road Accident Data, Pls contact support");
 
     }
-
+   
 }
 
 // Insert the data to MYSQL, TABLE assumed to exist
@@ -64,7 +63,6 @@ pub fn insert_station_data(pool: Pool, station_data: Vec<StationData>) {
                                     county_number=:county_number;";
 
     for mut stmt in pool.prepare(insert_stmt).into_iter() { 
-       println!("{:?}: ", "FOR LOP");
         for i in station_data.iter() {
             
             // `execute` takes ownership of `params` so we pass account name by reference.
@@ -86,34 +84,13 @@ pub fn insert_road_accident_data(pool: Pool, road_accident_data: Vec<roadAcciden
     let insert_stmt = r"INSERT INTO road_accident_data (Id, CreationTime, EndTime, IconId, SWEREF99TM, WGS84, SeverityCode)
                         VALUES(:Id, :CreationTime, :EndTime, :IconId, 
                         :SWEREF99TM, :WGS84, :SeverityCode);";
-                        
-    /*pool.prep_exec(format!("INSERT INTO road_accident_data (Id, CreationTime, EndTime, IconId, SWEREF99TM, WGS84, SeverityCode)
-    VALUES({}, {}, {}, {}, 
-    {}, {}, {});"), "SE_STA_TRISSID_1_14741474", "roadAccident");*/
-
-    /*let mut stmt = pool.prepare(r"INSERT INTO road_accident_data (Id, CreationTime, EndTime, IconId, SWEREF99TM, WGS84, SeverityCode)
-    VALUES(:Id, :CreationTime, :EndTime, :IconId, 
-    :SWEREF99TM, :WGS84, :SeverityCode);").into_iter(); 
-
-    println!("{:?}", "HEJ första loop");
-    for p in road_accident_data.iter() {
-        println!("{:?} ", "Hej");
-        stmt.execute(params!{
-            "Id" => p.RoadAccident_id.clone(),
-            "CreationTime" => p.RoadAccident_CreationTime.clone(),
-            "EndTime" => p.RoadAccident_EndTime.clone(),
-            "IconId" => p.RoadAccident_icon_id.clone(),
-            "SWEREF99TM" => p.RoadAccident_Geometry_SWEREF99TM.clone(),
-            "WGS84" => p.RoadAccident_Geometry_WGS84.clone(),
-            "SeverityCode" => p.RoadAccident_SeverityCode.clone(),
-        }).unwrap();*/
     
     let insert_stmt = r"INSERT INTO road_accident_data (Id, CreationTime, EndTime, IconId, SWEREF99TM, WGS84, SeverityCode)
         VALUES(:Id, :CreationTime, :EndTime, :IconId, 
         :SWEREF99TM, :WGS84, :SeverityCode);";
 
     for mut stmt in pool.prepare(insert_stmt).into_iter() { 
-       println!("{:?}: ", "FOR LOP");
+
         for i in road_accident_data.iter() {
             
             // `execute` takes ownership of `params` so we pass account name by reference.
@@ -129,26 +106,45 @@ pub fn insert_road_accident_data(pool: Pool, road_accident_data: Vec<roadAcciden
         }
     }
 
-
-  /*  for mut stmt in pool.prepare(insert_stmt).into_iter(){
-        for i in road_accident_data.iter(){
-            println!("{:?}: Road", i);
-            //Någon jävla rust grej
-            stmt.execute(params!{
-                "Id" => i.RoadAccident_id.clone(),
-                "CreationTime" => i.RoadAccident_CreationTime.clone(),
-                "EndTime" => i.RoadAccident_EndTime.clone(),
-                "IconId" => i.RoadAccident_icon_id.clone(),
-                "SWEREF99TM" => i.RoadAccident_Geometry_SWEREF99TM.clone(),
-                "WGS84" => i.RoadAccident_Geometry_WGS84.clone(),
-                "SeverityCode" => i.RoadAccident_SeverityCode.clone(),
-
-            }).expect("Failed to execute statement when reading from Road Accident Data");
-        }
-    }*/
-    println!("{:?}:", "Road Accident Inserted");
 }
+pub fn insert_traffic_flow_data(pool:Pool, traffic_flow_data: Vec<TrafficFlowData>){
+//AverageVehicleSpeed, CountyNo, Deleted, Geometry.SWEREF99TM, Geometry.WGS84, MeasurementOrCalculationPeriod, MeasurementSide, MeasurementTime, ModifiedTime, RegionId, SiteId, SpecificLane, VehicleFlowRate, VehicleType
+    let insert_stmt = r"INSERT IGNORE INTO `db`.`traffic_flow` 
+                        (`AverageVehicleSpeeD`, `CountyNo`, `SWEREF99TM`, `WGS84`,
+                         `MeasurementOrCalculationPeriod`, `MeasurementSide`, `MeasurementTime`, 
+                         `ModifiedTime`, `RegionId`, `SiteId`, `SpecificLane`, `VehicleFlowRate`, `VehicleType`)
+                 VALUES (:speed, :county, :swe, :wg, 
+                        :period, :mside, :mtime, 
+                        :modtime, :rid, :sid, :slane, :vfr, :vt);";
+      
+    
+    
+    for mut stmt in pool.prepare(insert_stmt).into_iter() {
+        //println!("{:?}:","Loop deapth: 1");
+        for i in traffic_flow_data.iter(){
+            //println!("{:?}:","Loop deapth: 2");
+            stmt.execute(params!{
+                "speed" => i.AverageVehicleSpeed.clone(),
+                "county" => i.CountyNo.clone(),
+                "swe" => i.Geometry_SWEREF99TM.clone(),
+                "wg" => i.Geometry_WGS84.clone(),
+                "period" => i.MeasurementOrCalculationPeriod.clone(),
+                "mside" => i.MeasurementSide.clone(),
+                "mtime" => i.MeasurementTime.clone(),
+                "modtime" => i.ModifiedTime.clone(),
+                "rid" => i.RegionId.clone(),
+                "sid" => i.SiteId.clone(),
+                "slane" => i.SpecificLane.clone(),
+                "vfr" => i.VehicleFlowRate.clone(),
+                "vt" => i.VehicleType.clone(),
+            }).expect("Failed to execute statement when reading from traffic_flow_data");
 
+
+        }
+
+    }
+    
+}
 // Insert the data to MYSQL, TABLE assumed to exist
 pub fn insert_weather_data(pool: Pool, weather_data: Vec<WeatherData>) {
    
@@ -158,10 +154,7 @@ pub fn insert_weather_data(pool: Pool, weather_data: Vec<WeatherData>) {
                         NULLIF(:precipitation_type, '') ,NULLIF(:precipitation_millimetres, ''),
                         NULLIF(:air_humidity, ''), NULLIF(:wind_speed, ''), NULLIF(:wind_direction, ''));";
     
-
-    
     for mut stmt in pool.prepare(insert_stmt).into_iter() { 
-        
         for i in weather_data.iter() {
             // `execute` takes ownership of `params` so we pass account name by reference.
             stmt.execute(params!{
@@ -281,7 +274,8 @@ pub fn create_mysql_tables(pool: Pool) {
         NrOfAddedPoints         int         null
     );",()).expect("Failed to create table aggregated friction data");
 
-    pool.prep_exec("ALTER TABLE aggregated_friction_data ADD INDEX (Time, TimeAggregation, Longitude, Latitude, Radius, MeasureValueMin);",()).expect("Failed to create index: aggregated_friction_data_Time_MULTI_index ");
+    //Grabben är lurig FIXA, TODO 
+    //pool.prep_exec("ALTER TABLE aggregated_friction_data ADD INDEX (Time, TimeAggregation, Longitude, Latitude, Radius, MeasureValueMin);",()).expect("Failed to create index: aggregated_friction_data_Time_MULTI_index ");
     
     pool.prep_exec(r"CREATE TABLE IF NOT EXISTS camera_data (
                     id INT(8) NOT NULL,

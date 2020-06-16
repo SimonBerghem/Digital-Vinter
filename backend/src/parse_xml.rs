@@ -60,25 +60,23 @@ pub struct roadAccidentData {
 //NYTT TrafficFlow
 #[derive(Debug)]
 pub struct TrafficFlowData {
-    pub TrafficFlow_AverageVehivleSpeed: String,
-    pub TrafficFlow_CountyNo: String,
-    pub TrafficFlow_Deleted: String,
-    pub TrafficFlow_Geometry_SWEREF99TM: String,
-    pub TrafficFlow_Geometry_WGS84: String,
-    pub TrafficFlow_MeasurementOrCalculationPeriod: String,
-    pub TrafficFlow_MeasurementSide: String,
-    pub TrafficFlow_MeasurementTime: String,
-    pub TrafficFlow_ModifiedTime: String,
-    pub TrafficFlow_RegionId: String,
-    pub TrafficFlow_SiteId: String,
-    pub TrafficFlow_SpecificLane: String,
-    pub TrafficFlow_VehicleFlowRate: String,
-    pub TrafficFlow_VehicleType: String,
+    pub AverageVehicleSpeed: String,
+    pub CountyNo: String,
+    pub Deleted: String,
+    pub Geometry_SWEREF99TM: String,
+    pub Geometry_WGS84: String,
+    pub MeasurementOrCalculationPeriod: String,
+    pub MeasurementSide: String,
+    pub MeasurementTime: String,
+    pub ModifiedTime: String,
+    pub RegionId: String,
+    pub SiteId: String,
+    pub SpecificLane: String,
+    pub VehicleFlowRate: String,
+    pub VehicleType: String,
     _secret: (),
 }
 
-
-//<RESPONSE><RESULT><Situation><RoadAccident><Geometry><SWEREF99TM>POINT (730069.97 7094714.13)</SWEREF99TM><WGS84>POINT (19.6907749 63.9034)</WGS84></Geometry><IconId>roadAccident</IconId><Id>SE_STA_TRISSID_1_4798382</Id><SeverityCode>4</SeverityCode></RoadAccident></Situation><Situation><RoadAccident><Geometry><SWEREF99TM>POINT (568274.04 6366488.85)</SWEREF99TM><WGS84>POINT (16.1372547 57.43597)</WGS84></Geometry><IconId>roadAccident</IconId><Id>SE_STA_TRISSID_1_8509792</Id><SeverityCode>4</SeverityCode></RoadAccident></Situation></RESULT></RESPONSE>
 
 pub fn parse_cameras(xmlfile: &str) -> Vec<CameraData> {
 
@@ -285,20 +283,20 @@ pub fn parse_traffic_flow(xmlfile: &str) -> Vec<TrafficFlowData>{
             Ok(Event::Start(ref e)) => match e.name(){
                 b"TrafficFlow" => {
                     let TrafficFlow = TrafficFlowData {
-                        TrafficFlow_AverageVehivleSpeed : String::new(),
-                        TrafficFlow_CountyNo : String::new(),
-                        TrafficFlow_Deleted : String::new(),
-                        TrafficFlow_Geometry_SWEREF99TM : String::new(),
-                        TrafficFlow_Geometry_WGS84 : String::new(),
-                        TrafficFlow_MeasurementOrCalculationPeriod : String::new(),
-                        TrafficFlow_MeasurementSide : String::new(),
-                        TrafficFlow_MeasurementTime : String::new(),
-                        TrafficFlow_ModifiedTime : String::new(),
-                        TrafficFlow_RegionId : String::new(),
-                        TrafficFlow_SiteId : String::new(),
-                        TrafficFlow_SpecificLane : String::new(),
-                        TrafficFlow_VehicleFlowRate : String::new(),
-                        TrafficFlow_VehicleType : String::new(),
+                        AverageVehicleSpeed : String::new(),
+                        CountyNo : String::new(),
+                        Deleted : String::new(),
+                        Geometry_SWEREF99TM : String::new(),
+                        Geometry_WGS84 : String::new(),
+                        MeasurementOrCalculationPeriod : String::new(),
+                        MeasurementSide : String::new(),
+                        MeasurementTime : String::new(),
+                        ModifiedTime : String::new(),
+                        RegionId : String::new(),
+                        SiteId: String::new(),
+                        SpecificLane: String::new(),
+                        VehicleFlowRate: String::new(),
+                        VehicleType: String::new(),
                         _secret : (),
                     };
                     
@@ -308,67 +306,67 @@ pub fn parse_traffic_flow(xmlfile: &str) -> Vec<TrafficFlowData>{
                 }    
                     b"AverageVehicleSpeed" => {
                         let TrafficFlow = TrafficFlow_Data.last_mut().unwrap();
-                        TrafficFlow.TrafficFlow_AverageVehivleSpeed = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        TrafficFlow.AverageVehicleSpeed = xml.read_text(e.name(),&mut Vec::new()).unwrap();
                     }
                     b"CountyNo" => {
                         let TrafficFlow = TrafficFlow_Data.last_mut().unwrap();
-                        TrafficFlow.TrafficFlow_CountyNo = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        TrafficFlow.CountyNo = xml.read_text(e.name(),&mut Vec::new()).unwrap();
                     }
                     b"SWEREF99TM" => {
                         let TrafficFlow = TrafficFlow_Data.last_mut().unwrap();
-                        TrafficFlow.TrafficFlow_Geometry_SWEREF99TM = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        TrafficFlow.Geometry_SWEREF99TM = xml.read_text(e.name(),&mut Vec::new()).unwrap();
                         
                     }
                     b"WGS84" =>{
                         let TrafficFlow = TrafficFlow_Data.last_mut().unwrap();
-                        TrafficFlow.TrafficFlow_Geometry_WGS84 = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        TrafficFlow.Geometry_WGS84 = xml.read_text(e.name(),&mut Vec::new()).unwrap();
                         
                     }
                     b"MeasurementOrCalculationPeriod" => {
                         let TrafficFlow = TrafficFlow_Data.last_mut().unwrap();
-                        TrafficFlow.TrafficFlow_MeasurementOrCalculationPeriod = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        TrafficFlow.MeasurementOrCalculationPeriod = xml.read_text(e.name(),&mut Vec::new()).unwrap();
                         
                     }
                     b"MeasurementTime" => {
                         let TrafficFlow = TrafficFlow_Data.last_mut().unwrap();
-                        TrafficFlow.TrafficFlow_MeasurementTime = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        TrafficFlow.MeasurementTime = xml.read_text(e.name(),&mut Vec::new()).unwrap();
                         
                     }
                     b"ModifiedTime" => {
                         let TrafficFlow = TrafficFlow_Data.last_mut().unwrap();
-                        TrafficFlow.TrafficFlow_ModifiedTime = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        TrafficFlow.ModifiedTime = xml.read_text(e.name(),&mut Vec::new()).unwrap();
                     
 
                     }
                     b"RegionId" => {
                         let TrafficFlow = TrafficFlow_Data.last_mut().unwrap();
-                        TrafficFlow.TrafficFlow_RegionId = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        TrafficFlow.RegionId = xml.read_text(e.name(),&mut Vec::new()).unwrap();
                         
                     }
 
                     b"SiteId" => {
                         let TrafficFlow = TrafficFlow_Data.last_mut().unwrap();
-                        TrafficFlow.TrafficFlow_SiteId = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        TrafficFlow.SiteId = xml.read_text(e.name(),&mut Vec::new()).unwrap();
                         
                     }
 
                     b"SpecificLane" => {
                         let TrafficFlow = TrafficFlow_Data.last_mut().unwrap();
-                        TrafficFlow.TrafficFlow_SpecificLane = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        TrafficFlow.SpecificLane = xml.read_text(e.name(),&mut Vec::new()).unwrap();
                         
                     }
 
 
                     b"VehicleFlowRate" => {
                         let TrafficFlow = TrafficFlow_Data.last_mut().unwrap();
-                        TrafficFlow.TrafficFlow_VehicleFlowRate = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        TrafficFlow.VehicleFlowRate = xml.read_text(e.name(),&mut Vec::new()).unwrap();
                         
                     }
 
 
                     b"VehicleType" => {
                         let TrafficFlow = TrafficFlow_Data.last_mut().unwrap();
-                        TrafficFlow.TrafficFlow_VehicleType = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        TrafficFlow.VehicleType = xml.read_text(e.name(),&mut Vec::new()).unwrap();
                         
                     }
                     _ => (), // Else
