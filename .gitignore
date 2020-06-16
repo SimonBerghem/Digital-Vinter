@@ -4,6 +4,6 @@ node_modules/
 
 backend/e6.txt
 
-./backend/*.xml
+backend/*.xml
 .DS_Store
-./backend/*.txt
+backend/*.txt

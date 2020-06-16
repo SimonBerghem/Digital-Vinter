@@ -64,7 +64,7 @@ const parse = (data) => {
           if(startDate > row.ObservationTimeUTC) {
             startDate = row.ObservationTimeUTC
           }
-          if(endDate< row.ObservationTimeUTC) {
+          if(endDate < row.ObservationTimeUTC) {
             endDate = row.ObservationTimeUTC
           }
           frictionData.push([
@@ -81,13 +81,12 @@ const parse = (data) => {
             ])
         })
         updateReporterOrganizationsTable(reporterOrganizations)
-
-        let startDateObject = new Date(startDate)
-        let endDateObject = new Date(endDate)
-
+        startDate = new Date(startDate)
+        endDate = new Date(endDate)
+        endDate.setDate(endDate.getDate() + 1)
         // Upload the data sequentially in rounds, do 1000 rows each insert (did some testing to see which insert size is fastest)
         const t0 = performance.now()
-        sendFrictionData(frictionData, 1000, t0, startDateObject, endDateObject)
+        sendFrictionData(frictionData, 1000, t0, startDate, endDate)
       } catch(error) {
         console.log(error)
       }

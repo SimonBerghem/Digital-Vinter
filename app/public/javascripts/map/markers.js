@@ -74,9 +74,11 @@ function removeMarkerOnZoom(group){
 
 
 var layerGroups = [];
-var circleGroup = [];
+var markerGroup = []
 var accidentGroup = [];
+
 let frictionCanvas = L.canvas({ padding: 0.5, pane: "circlemarkers", });
+let accidentCanvas = L.canvas({paddin: 0.5, pane: "circlemarkers", });
 //let frictionCanvas = new L.layerGroup();
 
 function createFrictionLayer(filteredfrictionData) {
@@ -123,69 +125,88 @@ function createFrictionLayer(filteredfrictionData) {
     $( "#search-container" ).hide();
 }
 
+let markers = L.markerClusterGroup({ chunkedLoading: true });
 
 function drawAccidentData(accidentData){
-    accidentGroup = [];
-    console.log(accidentData)
-    frictionCanvas = L.canvas({paddin: 0.5, pane: "circlemarkers", });
-    //console.log(accidentData[0])
+    circleGroup = [];
+    accidentCanvas = L.canvas({paddin: 0.5, pane: "circlemarkers", });
 
     for (var i = 0; i < accidentData.length; i+=1){
         try{
-
             let str = accidentData[i].WGS84;
             let str1 = accidentData[i].WGS84;
-            console.log(str,str1)
-            var longitude = parseFloat(str.split(" ")[1].split("(")[1]);
-            var  latitude = parseFloat(str1.split(" ")[2].split(")")[0]);
-            console.log("latitude: ", latitude, "longitude: ", longitude)
+            let longitude = parseFloat(str.split(" ")[1].split("(")[1]);
+            let latitude = parseFloat(str1.split(" ")[2].split(")")[0]);
             let circle = L.circleMarker([latitude, longitude],{
-            renderer: frictionCanvas,
+            renderer: accidentCanvas,
             color: '#00FFFF'
             });
             circle.bindPopup(popupAccident(accidentData[i], circle));
             circleGroup.push(circle);
             circle.addTo(map);
-
-
         }catch(error){
-            console.log("Något blev fel, segt ")
-
+            // Ignore error
         }
-       
-            
     }
-    console.log("SIE: ",accidentData.length)
-    //Taget från createAggregatedFrictionLayer
-     //Det är här för att det ska ladda snyggare. Motsvarande för att sätta igång är i maptilelayers.js i början av funktionen.
-     geojson.eachLayer(function (layer) {    
-        layer.setStyle({fillOpacity :0 }) 
-        noColor = true;
-    });
-
-    info.remove(map);
-    //temperatureScale.remove(map);
-    $( "#search-container" ).hide();
-
 }
 
 
-function createAggregatedFrictionLayer(aggregatedFrictionData) {
-    circleGroup = [];
-    //map.removeLayer(frictionCanvas);
-    frictionCanvas = L.canvas({ padding: 0.5, pane: "circlemarkers", });
-    //frictionCanvas.clearLayers();
+function createAggregatedFrictionLayer(aggregatedFrictionData, notAggregated) {
+    markerGroup = [];
+    map.removeLayer(markers);
+    markers = L.markerClusterGroup({ chunkedLoading: true,
+        iconCreateFunction: function (cluster) {
+            children = cluster.getAllChildMarkers()
+            childCount = cluster.getChildCount()
+            let measureValueMin = 1
+            
+            // Separate logic depending on if we want to display aggregated friction data or not
+            if(notAggregated) {
+                children.forEach(child => {
+                    if(measureValueMin > child.measureValue) {
+                        measureValueMin = child.measureValue
+                    }
+                })
+            } else {
+                children.forEach(child => {
+                    if(measureValueMin > child.measureValueMin) {
+                        measureValueMin = child.measureValueMin
+                    }
+                })
+            }
+            
 
-    for (var i = 0; i < aggregatedFrictionData.length; i += 1) { 
-        let circle = L.circleMarker([aggregatedFrictionData[i].latitude, aggregatedFrictionData[i].longitude], {
-        renderer: frictionCanvas,
-        color: '#9400D3'
-        });
-        circle.bindPopup(popupAggregatedFriction(aggregatedFrictionData[i], circle));
-        circleGroup.push(circle);
-        circle.addTo(map);
-        
-    }
+            var c = 'marker-cluster-';
+            if (measureValueMin < 0.26) {
+              c += 'red';
+            } 
+            else if (measureValueMin < 0.36) {
+              c += 'yellow';
+            } 
+            else {
+              c += 'green';
+            }
+           
+            return new L.DivIcon({ html: '<div><span>' + childCount + '</span></div>', 
+             className: "marker-cluster" + " " + c, iconSize: new L.Point(40, 40) });
+            } });
+
+    aggregatedFrictionData.map(data => {
+        let marker
+        // Separate logic depending on if we want to display aggregated friction data or not
+        if(notAggregated) {
+            marker = L.marker(L.latLng(data.Latitude, data.Longitude));
+            marker.measureValue = data.MeasureValue
+        } else {
+            marker = L.marker(L.latLng(data.latitude, data.longitude));
+            marker.measureValueMin = data.measureValueMin
+        }
+        marker.bindPopup(popupAggregatedFriction(data, notAggregated));
+        markerGroup.push(marker);
+    })
+    
+    markers.addLayers(markerGroup);
+    map.addLayer(markers);
 
 
     //Det är här för att det ska ladda snyggare. Motsvarande för att sätta igång är i maptilelayers.js i början av funktionen.

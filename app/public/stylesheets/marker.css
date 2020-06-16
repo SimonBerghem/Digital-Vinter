@@ -1,0 +1,38 @@
+.marker-cluster-green {
+	background-color: rgba(0, 112, 0, 0.6);
+	}
+.marker-cluster-green div {
+  background-color: rgba(2, 201, 2, 0.6)
+	}
+
+.marker-cluster-yellow {
+	background-color: rgba(255,191,0, 0.6);
+	}
+.marker-cluster-yellow div {
+  background-color: rgba(255, 217, 102, 0.6);
+	}
+
+.marker-cluster-red {
+  background-color: rgba(204, 0, 0, 0.6);
+	}
+.marker-cluster-red div {
+  background-color: rgba(245, 57, 57, 0.6);
+  }
+  
+.marker-cluster {
+	background-clip: padding-box;
+	border-radius: 50%;
+	}
+.marker-cluster div {
+	width: 30px;
+	height: 30px;
+	margin-left: 5px;
+	margin-top: 5px;
+
+	text-align: center;
+	border-radius: 15px;
+	font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
+	}
+.marker-cluster span {
+	line-height: 30px;
+	}

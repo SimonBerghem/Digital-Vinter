@@ -24,6 +24,7 @@ module.exports = {
           const aggregationTime = [1, 24, 24*7, 24*7*4]
           const t0 = performance.now()
           for(let i = 0; i < res.length; i++) {
+            console.log("Aggregating friction data from reporterOrganization: " + res[i].ReporterOrganization)
             await aggregate(startDate, endDate, res[i].ReporterOrganization, aggregationTime[0])
             await aggregate(startDate, endDate, res[i].ReporterOrganization, aggregationTime[1])
             await aggregate(startDate, endDate, res[i].ReporterOrganization, aggregationTime[2])
@@ -46,37 +47,56 @@ const aggregate = async (startDateInput, endDateInput, reporterOrganization, agg
   let startDate = new Date(startDateInput.getTime())
   let endDate = new Date(endDateInput.getTime())
   let tempDate = new Date(startDate.getTime())
-  
+  // lastIterationFlag is a flag which gets set when the time loop is att the last iteration. This needs to be done
+  // since the query to get fricitondata is not doubly inclusive for start and enddate (it is [startDate, endDate)
+  // NOT [startDate, endDate]). This is done intentionally since we dont want to aggregate friciondata on borders twice.
+  let lastIterationFlag = false
+
   while(startDate < endDate) {
     switch(aggregationTime) {
       case aggregationTime = 1:
         tempDate.setHours(tempDate.getHours() + 1)
+        if(tempDate >= endDate) {
+          lastIterationFlag = true
+        }
         break
       case aggregationTime = 24:
         tempDate.setDate(tempDate.getDate() + 1)
+        if(tempDate >= endDate) {
+          lastIterationFlag = true
+        }
         break
       case aggregationTime = 24*7:
         tempDate.setDate(tempDate.getDate() + 7)
+        if(tempDate >= endDate) {
+          lastIterationFlag = true
+        }
         break
       case aggregationTime = 24*7*4:
         tempDate.setMonth(tempDate.getMonth() + 1)
+        if(tempDate >= endDate) {
+          lastIterationFlag = true
+        }
         break
     }
-    
-    
-    await fetchFrictionData(startDate, tempDate, reporterOrganization).then(async res => {
+
+    await fetchFrictionData(startDate, tempDate, reporterOrganization, lastIterationFlag).then(res => {
       let result = []
       // Take the friction data and aggregate it in groups.
       let res1KM = [...res]
       let res10KM = [...res]
       let res100KM = [...res]
       // Take the friction data and aggregate it in groups.
-      const aggregatedData1KM = await aggregateData(res1KM, 1, aggregationTime)
-      const aggregatedData10KM = await aggregateData(res10KM, 10, aggregationTime)
-      const aggregatedData100KM = await aggregateData(res100KM, 100, aggregationTime)
-      result = result.concat(aggregatedData1KM, aggregatedData10KM, aggregatedData100KM)
+      let aggregatedData1KM = aggregateData(res1KM, 1, aggregationTime)
+      // Aggregate the aggregation to fix that the solution was split
+      const aggregatedAggregation1KM = aggregateAggregation(aggregatedData1KM, 1)
+      let aggregatedData10KM = aggregateData(res10KM, 10, aggregationTime)
+      const aggregatedAggregation10KM = aggregateAggregation(aggregatedData10KM, 10)
+      let aggregatedData100KM = aggregateData(res100KM, 100, aggregationTime)
+      const aggregatedAggregation100KM = aggregateAggregation(aggregatedData100KM, 100)
+      result = result.concat(aggregatedAggregation1KM, aggregatedAggregation10KM, aggregatedAggregation100KM)
       if(result.length !== 0) {
-        uploadAggregatedFrictionData(result)
+        uploadAggregatedFrictionData(result, aggregationTime)
       }
     }).catch(err => {
       throw(err)
@@ -103,11 +123,13 @@ const aggregate = async (startDateInput, endDateInput, reporterOrganization, agg
 /* Helper function to fetch friciton data from db
 * @param data
 */
-const fetchFrictionData = async (startDate, endDate, reporterOrganization) => {
+const fetchFrictionData = async (startDate, endDate, reporterOrganization, lastIterationFlag) => {
   // Make sql query to fetch frictiondata
   return new Promise((resolve, reject) => {
     authorization.getConnection(function(err, pool){
-      const sql = `
+      let sql = ""
+      if(lastIterationFlag) {
+        sql = `
         SELECT 
           Id,
           ObservationTimeUTC,
@@ -119,10 +141,26 @@ const fetchFrictionData = async (startDate, endDate, reporterOrganization) => {
           MeasureValue,
           MeasureConfidence,
           ReporterOrganization
-        FROM db.friction_data WHERE ObservationTimeUTC BETWEEN ? AND ? AND ReporterOrganization = ?
+        FROM db.friction_data WHERE ObservationTimeUTC > ? AND ObservationTimeUTC <= ? AND ReporterOrganization = ?
         ORDER BY Longitude DESC, Latitude DESC
         ;`
-  
+      } else {
+        sql = `
+          SELECT 
+            Id,
+            ObservationTimeUTC,
+            ReportTimeUTC,
+            Longitude,
+            Latitude,
+            AreaCode,
+            NumberOfMeasurements,
+            MeasureValue,
+            MeasureConfidence,
+            ReporterOrganization
+          FROM db.friction_data WHERE ObservationTimeUTC >= ? AND ObservationTimeUTC < ? AND ReporterOrganization = ?
+          ORDER BY Longitude DESC, Latitude DESC
+          ;`
+      }
       pool.query(sql, [startDate, endDate, reporterOrganization], (err, response) => {
         pool.release()
         
@@ -188,13 +226,13 @@ const fetchReporterOrg =  () => {
 }
 
 // Divide and conquer method for aggregating the data
-const aggregateData = (data, radiusInKm, timeAggregation) => {
-  if(data.length > 5000) {
-    const firstHalf = aggregateData(data.splice(data.length/2), radiusInKm, timeAggregation)
-    const secondHalf = aggregateData(data, radiusInKm, timeAggregation)
+const aggregateData = (data, distanceInKm, timeAggregation) => {
+  if(data.length > 500) {
+    const firstHalf = aggregateData(data.splice(data.length/2), distanceInKm, timeAggregation)
+    const secondHalf = aggregateData(data, distanceInKm, timeAggregation)
     return firstHalf.concat(secondHalf)
   } else {
-    // Fetch the case when there is a day in which there is no data
+    // Catch the case when there is a day in which there is no data
     if(data.length === 0 || !data) {
       return []
     }
@@ -203,15 +241,15 @@ const aggregateData = (data, radiusInKm, timeAggregation) => {
     // Loop through the data - Remove the points which are added to a group. Continue until all points
     // are added in groups. Each iteration will create 1 group.
     while(data.length > 0) {
-      /* This solution uses the fact that the first data point always will be in the circle(since it is this
-        data point which determines the middle point of the circle). The data group get the time, reporterOrganization
+      /* This solution uses the fact that the first data point always will be in the rectangle(since it is this
+        data point which determines the middle point of the rectangle). The data group get the time, reporterOrganization
         longitude, latitude from the first data point
       */
-      const lat = data[0].Latitude
-      const long = data[0].Longitude
+      const lat = parseFloat(data[0].Latitude)
+      const long = parseFloat(data[0].Longitude)
       const kmInLongitudeDegree = 111.320 * Math.cos( lat / 180.0 * Math.PI)
-      const deltaLat = radiusInKm / 111.1;
-      const deltaLong = radiusInKm / kmInLongitudeDegree;
+      const deltaLat = distanceInKm / 111.1;
+      const deltaLong = distanceInKm / kmInLongitudeDegree;
       
       const minLat = lat - deltaLat;  
       const maxLat = lat + deltaLat;
@@ -222,32 +260,32 @@ const aggregateData = (data, radiusInKm, timeAggregation) => {
       let groupObject = new Object
       groupObject.Time = data[0].ObservationTimeUTC
       groupObject.TimeAggregation = timeAggregation
-      groupObject.Radius = radiusInKm
+      groupObject.Distance = distanceInKm
       groupObject.ReporterOrganization = data[0].ReporterOrganization
       groupObject.Longitude = data[0].Longitude
       groupObject.Latitude = data[0].Latitude
       // These numbers need to be updated by going through the grouping
       groupObject.NumberOfMeasurements = 0
       groupObject.MeasureValueMedian = 0
-      groupObject.MeasureValueMax = data[0].MeasureValue
-      groupObject.MeasureValueMin = data[0].MeasureValue
+      groupObject.MeasureValueMax = parseFloat(data[0].MeasureValue)
+      groupObject.MeasureValueMin = parseFloat(data[0].MeasureValue)
       groupObject.MeasureConfidenceMedian = 0
-      groupObject.MeasureConfidenceMax = data[0].MeasureValue
-      groupObject.MeasureConfidenceMin = data[0].MeasureValue
+      groupObject.MeasureConfidenceMax = parseFloat(data[0].MeasureValue)
+      groupObject.MeasureConfidenceMin = parseFloat(data[0].MeasureValue)
       groupObject.NrOfAddedDataPoints = 0
-      
+
       data.forEach((row, index)=> {
-        if(row.Latitude < maxLat && row.Latitude > minLat && row.Longitude < maxLong && row.Longitude > minLong) {
+        if(parseFloat(row.Latitude) <= maxLat && parseFloat(row.Latitude) >= minLat && parseFloat(row.Longitude) < maxLong && parseFloat(row.Longitude) > minLong) {
           groupObject.NumberOfMeasurements = groupObject.NumberOfMeasurements + parseFloat(row.NumberOfMeasurements)
           groupObject.MeasureValueMedian = groupObject.MeasureValueMedian + parseFloat(row.MeasureValue)
-          if(row.MeasureValue > groupObject.MeasureValueMax) {
+          if(parseFloat(row.MeasureValue) > groupObject.MeasureValueMax) {
             groupObject.MeasureValueMax = parseFloat(row.MeasureValue)
           }
-          if(row.MeasureValue < groupObject.MeasureValueMin) {
+          if(parseFloat(row.MeasureValue) < groupObject.MeasureValueMin) {
             groupObject.MeasureValueMin = parseFloat(row.MeasureValue)
           }
           groupObject.MeasureConfidenceMedian = groupObject.MeasureConfidenceMedian + parseFloat(row.MeasureConfidence)
-          if(row.MeasureConfidence > groupObject.MeasureConfidenceMax) {
+          if(parseFloat(row.MeasureConfidence) > groupObject.MeasureConfidenceMax) {
             groupObject.MeasureConfidenceMax = parseFloat(row.MeasureConfidence)
           }
           if(row.MeasureConfidence < groupObject.MeasureConfidenceMin) {
@@ -265,7 +303,7 @@ const aggregateData = (data, radiusInKm, timeAggregation) => {
       const {
         Time,
         TimeAggregation,
-        Radius,
+        Distance,
         ReporterOrganization,
         Longitude,
         Latitude,
@@ -280,7 +318,7 @@ const aggregateData = (data, radiusInKm, timeAggregation) => {
 
         result.push([Time,
           TimeAggregation,
-          Radius,
+          Distance,
           ReporterOrganization,
           Longitude,
           Latitude,
@@ -297,10 +335,126 @@ const aggregateData = (data, radiusInKm, timeAggregation) => {
   }
 }
 
+const aggregateAggregation = (data, distanceInKm) => {
+  const result = new Array
+    // Loop through the data - Remove the points which are added to a group. Continue until all points
+    // are added in groups. Each iteration will create 1 group.
+    while(data.length > 0) {
+      /* This solution uses the fact that the first data point always will be in the circle(since it is this
+        data point which determines the middle point of the circle). The data group get the time, reporterOrganization
+        longitude, latitude from the first data point
+      */
+      const lat = parseFloat(data[0][5])
+      const long = parseFloat(data[0][4])
+      const kmInLongitudeDegree = 111.320 * Math.cos( lat / 180.0 * Math.PI)
+      const deltaLat = distanceInKm / 111.1;
+      const deltaLong = distanceInKm / kmInLongitudeDegree;
+      
+      const minLat = lat - deltaLat;  
+      const maxLat = lat + deltaLat;
+      const minLong = long - deltaLong; 
+      const maxLong = long + deltaLong;
+      
+
+      // groupObject contains one grouping of datapoints
+      let groupObject = new Object
+      groupObject.Time = data[0][0]
+      groupObject.TimeAggregation = data[0][1]
+      groupObject.Distance = distanceInKm
+      groupObject.ReporterOrganization = data[0][3]
+      groupObject.Longitude = data[0][4]
+      groupObject.Latitude = data[0][5]
+      // These numbers need to be updated by going through the grouping
+      groupObject.NumberOfMeasurements = parseFloat(data[0][6])
+      groupObject.MeasureValueMedian = 0
+      groupObject.MeasureValueMax = parseFloat(data[0][8])
+      groupObject.MeasureValueMin = parseFloat(data[0][9])
+      groupObject.MeasureConfidenceMedian = 0
+      groupObject.MeasureConfidenceMax = parseFloat(data[0][11])
+      groupObject.MeasureConfidenceMin = parseFloat(data[0][12])
+      groupObject.NrOfAddedDataPoints = 0
+      groupObject.NrOfAggregationsAdded = 0
+          /*
+          [0]   Time,
+          [1]   TimeAggregation,
+          [2]   Distance,
+          [3]   ReporterOrganization,
+          [4]   Longitude,
+          [5]   Latitude,
+          [6]   NumberOfMeasurements,
+          [7]   MeasureValueMedian,
+          [8]   MeasureValueMax,
+          [9]   MeasureValueMin,
+          [10]  MeasureConfidenceMedian,
+          [11]  MeasureConfidenceMax,
+          [12]  MeasureConfidenceMin,
+          [13]  NrOfAddedDataPoints */
+
+      data.forEach((row, index)=> {
+        if(parseFloat(row[5]) < maxLat && parseFloat(row[5]) > minLat && parseFloat(row[4]) < maxLong && parseFloat(row[4]) > minLong) {
+          groupObject.NumberOfMeasurements = groupObject.NumberOfMeasurements + parseFloat(row[6])
+          groupObject.MeasureValueMedian = groupObject.MeasureValueMedian + parseFloat(row[7])
+          if(parseFloat(row[8]) > groupObject.MeasureValueMax) {
+            groupObject.MeasureValueMax = parseFloat(row[8])
+          }
+          if(parseFloat(row[9]) < groupObject.MeasureValueMin) {
+            groupObject.MeasureValueMin = parseFloat(row[9])
+          }
+          groupObject.MeasureConfidenceMedian = groupObject.MeasureConfidenceMedian + parseFloat(row[10])
+          if(parseFloat(row[11]) > groupObject.MeasureConfidenceMax) {
+            groupObject.MeasureConfidenceMax = parseFloat(row[11])
+          }
+          if(parseFloat(row[12]) < groupObject.MeasureConfidenceMin) {
+            groupObject.MeasureConfidenceMin = parseFloat(row[12])
+          }
+          groupObject.NrOfAddedDataPoints = groupObject.NrOfAddedDataPoints + parseFloat(row[13])
+          groupObject.NrOfAggregationsAdded++
+          // remove row from array
+          data.splice(index, 1)
+        }
+      })
+
+      groupObject.MeasureValueMedian = groupObject.MeasureValueMedian / groupObject.NrOfAggregationsAdded
+      groupObject.MeasureConfidenceMedian = groupObject.MeasureConfidenceMedian / groupObject.NrOfAggregationsAdded
+
+      const {
+        Time,
+        TimeAggregation,
+        Distance,
+        ReporterOrganization,
+        Longitude,
+        Latitude,
+        NumberOfMeasurements,
+        MeasureValueMedian,
+        MeasureValueMax,
+        MeasureValueMin,
+        MeasureConfidenceMedian,
+        MeasureConfidenceMax,
+        MeasureConfidenceMin,
+        NrOfAddedDataPoints } = groupObject
+
+        result.push([Time,
+          TimeAggregation,
+          Distance,
+          ReporterOrganization,
+          Longitude,
+          Latitude,
+          NumberOfMeasurements,
+          MeasureValueMedian,
+          MeasureValueMax,
+          MeasureValueMin,
+          MeasureConfidenceMedian,
+          MeasureConfidenceMax,
+          MeasureConfidenceMin,
+          NrOfAddedDataPoints])
+    }
+    return result
+}
+
 /* Helper function to upload aggregated friction data to to db
 * @param data
 */
-const uploadAggregatedFrictionData = (data) => {
+const uploadAggregatedFrictionData = (data, timeAggregation) => {
   authorization.getConnection(function(err, pool){
     if(err){
       throw (err)
@@ -309,7 +463,7 @@ const uploadAggregatedFrictionData = (data) => {
       INSERT INTO db.aggregated_friction_data (
         Time,
         TimeAggregation,
-        Radius,
+        Distance,
         ReporterOrganization,
         Longitude,
         Latitude,

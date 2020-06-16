@@ -36,7 +36,6 @@ var obj = {
   Tidväderdata: [latestWeatherData[index]['timestamp'],""],
   Tidkamera: [timestampcamera,""]
 };
- 
   var strings = "";
   Object.keys(obj).forEach(function(key){
     if(obj[key][0] != null){
@@ -141,9 +140,10 @@ function popupfriction(friction, circle){
 function popupAccident(accident, circle){
   const popupContent = document.createElement("table-data");
   var obj = {
-
-    Severity : [accident.SeverityCode,""]
-
+    StartTime : [accident.CreationTime.replace("T", " / ").replace("Z", " "), ""],
+    EndTime : [accident.EndTime.replace("T", " / ").replace("Z", " "), ""],
+    Severity : [accident.SeverityCode,""],
+    AccidentType: [accident.IconId, ""],
   };
 
   var strings = "";
@@ -158,21 +158,6 @@ function popupAccident(accident, circle){
 
  popupContent.innerHTML  = htmlvar;
 
- let button = document.createElement("button");
- button.id = accident.id;
- /*
- if(chosenFriction.includes(friction)){
-   button.className = "remove-button";
-   button.innerText = "Ta bort";
- }else{
-   button.className = "add-button";
-   button.innerText = "Lägg till";
- }*/
- button.addEventListener("click" , function() {
-       handleChosenFriction(accident, circle, this);
- });
- popupContent.appendChild(button);
-
  return popupContent;
 }
 
@@ -182,24 +167,42 @@ function popupAccident(accident, circle){
  * 
  * @param {*} friction return popup content for aggregated frictiondata circlemarkers
  */
-function popupAggregatedFriction(friction, circle){
+function popupAggregatedFriction(friction, notAggregated){
   const popupContent = document.createElement("table-data");
-   // Tar bort oönskade element i strängen.
-  const timestring = friction.time.replace("T", " / ").replace("Z", " ");
-
- var obj = {
-   MätvärdeMedian  : [friction.measureValueMedian,""],
-   MätvärdeMax  : [friction.measureValueMax,""],
-   MätvärdeMin  : [friction.measureValueMin,""],
-   Tid  : [timestring,""],
-   Latitude  : [friction.latitude,""],
-   Longitud  : [friction.longitude,""],
-   KonfidensMedian: [friction.measureConfidenceMedian,""],
-   KonfidensMax: [friction.measureConfidenceMax,""],
-   KonfidensMin: [friction.measureConfidenceMin,""],
-   AggregeradePunkter: [friction.nrOfAddedPoints,""],
-     
- };
+  let timestring
+  let obj
+   
+   // Separate logic depending on if we want to display aggregated friction data or not
+  if(notAggregated) {
+    // Tar bort oönskade element i strängen.
+    timestring = friction.ObservationTimeUTC.replace("T", " / ").replace("Z", " ");
+    obj = {
+      Mätvärde  : [friction.MeasureValue,""],
+      Tid  : [timestring,""],
+      Latitude  : [friction.latitude,""],
+      Longitud  : [friction.longitude,""],
+      Konfidens: [friction.MeasureConfidence,""],
+    };
+  } else {
+    // Tar bort oönskade element i strängen.
+    timestring = friction.time.replace("T", " / ").replace("Z", " ");
+    obj = {
+      AggregationsRadie : [friction.distance, ""],
+      AggregationsTid : [TIMEAGGREGATIONENUM[friction.timeAggregation], ""],
+      MätvärdeMedian  : [friction.measureValueMedian,""],
+      MätvärdeMax  : [friction.measureValueMax,""],
+      MätvärdeMin  : [friction.measureValueMin,""],
+      Tid  : [timestring,""],
+      Latitude  : [friction.latitude,""],
+      Longitud  : [friction.longitude,""],
+      KonfidensMedian: [friction.measureConfidenceMedian,""],
+      KonfidensMax: [friction.measureConfidenceMax,""],
+      KonfidensMin: [friction.measureConfidenceMin,""],
+      AggregeradePunkter: [friction.nrOfAddedPoints,""],
+        
+    };
+  }
+  
  var strings = "";
  Object.keys(obj).forEach(function(key){
    if(obj[key][0] != null){
@@ -212,7 +215,7 @@ function popupAggregatedFriction(friction, circle){
 
  popupContent.innerHTML  = htmlvar;
 
- let button = document.createElement("button");
+ /* let button = document.createElement("button");
  button.id = friction.id;
  if(chosenFriction.includes(friction)){
    button.className = "remove-button";
@@ -220,11 +223,11 @@ function popupAggregatedFriction(friction, circle){
  }else{
    button.className = "add-button";
    button.innerText = "Lägg till";
- }
- button.addEventListener("click" , function() {
+ } */
+ /* button.addEventListener("click" , function() {
        handleChosenFriction(friction, circle, this);
- });
- popupContent.appendChild(button);
+ }); */
+ /* popupContent.appendChild(button); */
 
  return popupContent;
 }

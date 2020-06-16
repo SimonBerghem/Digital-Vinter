@@ -25,9 +25,7 @@ router.get('/getAccidentData', function(req, res, next){
     try{
     datumStart = req["query"]["startTime"];
     datumEnd = req["query"]["endTime"];
-    console.log(datumStart)
     accident.getAccidentData(req, res, next, datumStart, datumEnd)
-    console.log("HAJ")
     } catch(error) {
         console.log(error)
     }
@@ -80,12 +78,41 @@ router.get('/getFrictionData', function(req, res, next) {
 
 /* GET FROM AGGREGATED FRICTION DATA  */
 router.get('/getAggregatedFrictionData', function(req, res, next) {
-    const radius = req["query"]["radius"];
-    const timeAggregation = req["query"]["timeAggregation"];
-    const startTime = req["query"]["startTime"];
-    const endTime = req["query"]["endTime"];
-    const reporterOrganization = req["query"]["reporterOrganization"]
-    friction.getAggregatedFrictionData(req, res, next, radius, timeAggregation, startTime, endTime, reporterOrganization);
+    try{
+        const distance = req["query"]["distance"];
+        const timeAggregation = req["query"]["timeAggregation"];
+        const startTime = req["query"]["startTime"];
+        const endTime = req["query"]["endTime"];
+        const reporterOrganization = req["query"]["reporterOrganization"]
+        const mapBounds = req["query"]["mapBounds"]
+        const maxFriction = req["query"]["maxFriction"]
+        const autoAggregation = req["query"]["autoAggregation"]
+        
+        if(autoAggregation === "true") {
+            // Auto aggregate
+            friction.autoAggregate(res, startTime, endTime, reporterOrganization, mapBounds, maxFriction)
+        } else {
+            if(distance === "No Aggregation") {
+                friction.getSpecificFrictionData(startTime, endTime, reporterOrganization, mapBounds, maxFriction).then(result => {
+                    if(result.length > 50000) {
+                        res.send({ success:false, autoAggregation:false })
+                    } else {
+                        res.send({ distance:'No Aggregation', timeAggregation:'No Aggregation', result,  success: true, autoAggregation:false })
+                    }
+                })
+            } else {
+                friction.getAggregatedFrictionData(distance, timeAggregation, startTime, endTime, reporterOrganization, mapBounds, maxFriction).then(result => {
+                    if(result.length > 50000) {
+                        res.send({ success:false, autoAggregation:false })
+                    } else {
+                        res.send({ result, success:true, autoAggregation:false })
+                    }
+                })
+            }
+        }
+    } catch(error) {
+        console.log(error)
+    }
 });
 
 /* GET ALL FROM FRICTION DATA */
@@ -165,6 +192,21 @@ router.get('/getAverageWeatherData', function(req, res, next) {
     
     weather.getAverageWeatherData(req,res,next,station_id, start_time, stop_time);
 });
+
+/* GET data date range for friction and accident data used to set boundary for slider*/
+router.get('/getDataDateRange', async (req, res, next) => {
+    frictionPromise = friction.getDataDateRange(req, res, next)
+    accidentPromise = accident.getDataDateRange(req, res, next)
+    await Promise.all([frictionPromise, accidentPromise]).then(data => {
+        const startDateFriction = data[0][0].startDate
+        const endDateFriction = data[0][0].endDate
+        const startDateAccident = new Date(data[1][0].startDate)
+        const endDateAccident = new Date(data[1][0].endDate)
+        const startDate = startDateFriction < startDateAccident ? startDateFriction : startDateAccident
+        const endDate = endDateFriction > endDateAccident ? endDateFriction : endDateAccident
+        res.send({startDate, endDate});
+    })
+})
 
 /* POST frictiondata to db. Request contains a .csv file. */
 router.post('/uploadFrictionData', upload.single('file'), async (req, res, next) => {

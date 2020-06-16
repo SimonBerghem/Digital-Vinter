@@ -118,13 +118,13 @@ function drawFriction(filteredfrictionData) {
     createFrictionLayer(filteredfrictionData);
 }
 
-function drawAggregatedFriction(aggregatedFrictionData) {
+function drawAggregatedFriction(aggregatedFrictionData, notAggregated) {
     for (let i = 0; i < layerGroups.length; i++) {
         map.removeLayer(layerGroups[i]);
 
     }
     layerGroups = [];
-    createAggregatedFrictionLayer(aggregatedFrictionData);
+    createAggregatedFrictionLayer(aggregatedFrictionData, notAggregated);
 }
 
 /**
@@ -294,9 +294,23 @@ const stateChangingButton = L.easyButton({
     ]
 }).addTo(map);
 
+
+
 const modalButton = L.easyButton('fas fa-upload', function(btn, map) {
     $('#exampleModal').modal('show');
 }, 'Ladda upp ny friktionsdata').addTo(map);
+
+
+//OLYCKOR 
+const accidentButton = L.control({position: 'topleft'})
+let accidentHTML= '<button id="accidentToggle" onclick="accidentToggle()">Olyckor</button>'
+accidentButton.onAdd = () => {
+    var div = L.DomUtil.create('div')
+    div.innerHTML = accidentHTML
+    return div
+}
+accidentButton.addTo(map)
+
 
 
 /**
@@ -306,22 +320,33 @@ const modalButton = L.easyButton('fas fa-upload', function(btn, map) {
 function addtoMAPtoggle(data){
     /* Välj WeatherStationData eller friction reporterOrganization */
     const toggleFriction = L.control({position: 'topleft'});
-    let stringreport = '<select id="frictionOrWeatherStation"><option>WeatherStationData</option>';
-        for(var i=0; i<data.length; i++){
-            stringreport += '<option>'+data[i].reporterorganization+'</option>';
-        }
-        stringreport += '</select>';
+    let stringreport = '<p class="selectparagraph">Datatyp</p><select id="frictionOrWeatherStation"><option>WeatherStationData</option>';
+    for(var i=0; i<data.length; i++){
+        stringreport += '<option>'+data[i].reporterorganization+'</option>';
+    }
+    stringreport += '</select>';
 
-        toggleFriction.onAdd = function (map) {
-            var div = L.DomUtil.create('div');
-            div.innerHTML = stringreport;
-            div.firstChild.onmousedown = div.firstChild.ondblclick = L.DomEvent.stopPropagation;
-            return div;
-        };
-        toggleFriction.addTo(map);
+    toggleFriction.onAdd = function (map) {
+        var div = L.DomUtil.create('div');
+        div.innerHTML = stringreport;
+        div.firstChild.onmousedown = div.firstChild.ondblclick = L.DomEvent.stopPropagation;
+        return div;
+    };
+    toggleFriction.addTo(map);
+
+    /* Auto choose aggregation options checkbox */
+    const autoCheckbox = L.control({position: 'topleft'});
+    let autoCheckboxHTML = '<p class="selectparagraph">Auto välj aggregering</p><input type="checkbox" onClick="enableAggregationOptions()" id="autoChooseAggregation" name="Auto choose aggregation" value="autoChooseAgg" checked>'
+    autoCheckbox.onAdd = (map) => {
+        var div = L.DomUtil.create('div')
+        div.innerHTML = autoCheckboxHTML
+        return div
+    }
+    autoCheckbox.addTo(map)
+
     /* Välj radie */ 
     const radiemeny = L.control({position: 'topleft'});
-    let radieoptions = '<p>Aggregationsradie</p><select id="radius"><option>1</option><option>10</option><option>100</option></select>';
+    let radieoptions = '<p class="selectparagraph">Aggregationsdistans</p><select id="distance" disabled=true><option>1</option><option>10</option><option selected="selected">100</option><option>No Aggregation</option></select> km';
 
     radiemeny.onAdd = function (map) {
         var div = L.DomUtil.create('div');
@@ -331,9 +356,10 @@ function addtoMAPtoggle(data){
     };
     radiemeny.addTo(map);
 
-    /* Välj tidsaggretation */ 
+
+    /* Välj tidsaggreation */ 
     const tidsaggregationmeny = L.control({position: 'topleft'});
-    let tidoptions = '<p>Aggregationstid</p><select id="timeAggregation"><option>Timme</option><option>Dag</option><option>Vecka</option><option>Månad</option></select>';
+    let tidoptions = '<p class="selectparagraph">Aggregationstid</p><select id="timeAggregation" disabled=true><option>Timme</option><option>Dag</option><option>Vecka</option><option selected="selected">Månad</option><option>No Aggregation</option></select>';
 
     tidsaggregationmeny.onAdd = function (map) {
         var div = L.DomUtil.create('div');
@@ -343,6 +369,20 @@ function addtoMAPtoggle(data){
     };
     tidsaggregationmeny.addTo(map);
 
+
+    /* Välj högsta friktionsvärdet */ 
+    const frictionValueForm = L.control({position: 'topleft'});
+    let frictionValueFormHTML = '<p class="selectparagraph">Välj högsta friktionsvärdet</p><input id="maxFrictionForm" type="number" value="1.00" step="0.01" min="0.0" max ="1.0" oninput="checkFormLength(this)">';
+
+    frictionValueForm.onAdd = function (map) {
+        var div = L.DomUtil.create('div');
+        div.innerHTML = frictionValueFormHTML;
+        div.firstChild.onmousedown = div.firstChild.ondblclick = L.DomEvent.stopPropagation;
+        return div;
+    };
+    frictionValueForm.addTo(map);
+
+    /*  Visar slidern för datum */
     const sliderButton = L.control({position: 'topleft'})
     let sliderHTML= '<button id="slidertoggle" onclick="sliderToggle()">Välj datum</button>'
     sliderButton.onAdd = () => {
@@ -350,56 +390,46 @@ function addtoMAPtoggle(data){
         div.innerHTML = sliderHTML
         return div
     }
-    sliderButton.addTo(map)
 
-    //OLYCKOR 
-    const accidentButton = L.control({position: 'topleft'})
-    let accidentHTML= '<button id="accidentToggle" onclick="accidentToggle()">Olyckor</button>'
-    accidentButton.onAdd = () => {
+
+
+    /* Utför friktionsqueryn */
+    sliderButton.addTo(map)
+    const searchButton = L.control({position: 'topleft'})
+    let searchButtonHTML= '<button id="searchButton" disabled=true onclick="searchButtonQuery()">Sök</button>'
+    searchButton.onAdd = () => {
         var div = L.DomUtil.create('div')
-        div.innerHTML = accidentHTML
+        div.innerHTML = searchButtonHTML
         return div
     }
-    accidentButton.addTo(map)
+    searchButton.addTo(map)
 
+
+
+    /* Infoknapp */
+    const infoButton = L.easyButton('fas fa-info', function(btn, map) {
+        $('#infoModal').modal('show');
+    }, 'Informationsmeny').addTo(map);
 
     $('select').change(async function() {       
-        const radius = document.getElementById('radius').value
-        let timeAggregation = '1'
-        // Translate timeAggregation value to a numeric hourly value
-        switch (document.getElementById('timeAggregation').value) {
-            case 'Timme':
-                timeAggregation = 1
-                break
-            case 'Dag':
-                timeAggregation = 24
-                break
-            case 'Vecka':
-                timeAggregation = 24*7
-                break
-            case 'Månad':
-                timeAggregation = 24*7*4
-                break
-        }
-        let dates = getDates() 
-        
         let frictionOrWeatherStation = document.getElementById('frictionOrWeatherStation').value
         if(frictionOrWeatherStation=="WeatherStationData"){
+            document.getElementById('searchButton').disabled = true
             geojson.eachLayer(function (layer) {    
                 layer.setStyle({fillOpacity : 0.7 }) 
                 noColor = false;
             });
             info.addTo(map);
-            //temperatureScale.addTo(map);
             $( "#search-container" ).show();
-            circleGroup = [];
+            markerGroup = [];
+            map.removeLayer(markers);
             createLayers(stationsData,cameraArrayData);
-        } else{
-            await getFrictionData(frictionOrWeatherStation);
-            getAggregatedFrictionData(radius, timeAggregation, dates[0], dates[1], frictionOrWeatherStation)
+        } else {
+            document.getElementById('searchButton').disabled = false
         }
     })
 }
+
 
 
 
@@ -430,7 +460,7 @@ function nth(d) {
 
 // En sträng av hela datumet
 function formatDate(date) {
-    return date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate()
+    return date.getFullYear() + "-" + (date.getMonth()+1 < 10 ? "0" + (date.getMonth()+1) : (date.getMonth()+1)) + "-" + (date.getDate() < 10 ? "0" + date.getDate() : date.getDate())
 }
 
 
@@ -447,56 +477,53 @@ function toFormat ( v ) {
 
 /* Datum slidern  */
 var dateSlider = document.getElementById('slider');
-noUiSlider.create(dateSlider, {
-
-    behaviour: 'tap',
-    connect: true,
-    tooltips: [ true, true ],
-    format: { to: toFormat, from: Number },
-
-    range: {
-        min: timestamp('2019'),
-        max: timestamp(date)
-    },
-
-    // Steps of one week
-    step: 1 * 24 * 60 * 60 * 1000,
-
-    start: [timestamp(previousMonth), timestamp(date)],
-
-
-});
-
 var dateValues = [
     document.getElementById('event-start'),
     document.getElementById('event-end')
 ];
 
+const createSlider = (startDate, endDate) => {
+    noUiSlider.create(dateSlider, {
 
-// Tooltips på handles
-dateSlider.noUiSlider.on('update', function (values, handle) {
-    dateValues[handle].innerHTML = values[handle]; 
-});
+        behaviour: 'tap',
+        connect: true,
+        tooltips: [ true, true ],
+        format: { to: toFormat, from: Number },
+        range: {
+            min: timestamp(startDate),
+            max: timestamp(endDate)
+        },
 
-//  Fråntar kontrollen av kartan medans man drar i slidern.
-dateSlider.noUiSlider.on('start', function (values, handle) {    
-    map.dragging.disable();
-    map.touchZoom.disable();
-    map.doubleClickZoom.disable();
-    map.scrollWheelZoom.disable();
-    map.boxZoom.disable();
-    map.keyboard.disable();  
-});
+        // Steps of one week
+        step: 1 * 24 * 60 * 60 * 1000,
+        start: [timestamp(startDate), timestamp(endDate)],
+    });
 
-// Återger kontrollen efter man släppt slidern.
-dateSlider.noUiSlider.on('end', function (values, handle) {
-    map.dragging.enable();
-    map.touchZoom.enable();
-    map.doubleClickZoom.enable();
-    map.scrollWheelZoom.enable();
-    map.boxZoom.enable();
-    map.keyboard.enable();
-});
+    // Tooltips på handles
+    dateSlider.noUiSlider.on('update', function (values, handle) {
+        dateValues[handle].innerHTML = values[handle]; 
+    });
+
+    //  Fråntar kontrollen av kartan medans man drar i slidern.
+    dateSlider.noUiSlider.on('start', function (values, handle) {    
+        map.dragging.disable();
+        map.touchZoom.disable();
+        map.doubleClickZoom.disable();
+        map.scrollWheelZoom.disable();
+        map.boxZoom.disable();
+        map.keyboard.disable();  
+    });
+
+    // Återger kontrollen efter man släppt slidern.
+    dateSlider.noUiSlider.on('end', function (values, handle) {
+        map.dragging.enable();
+        map.touchZoom.enable();
+        map.doubleClickZoom.enable();
+        map.scrollWheelZoom.enable();
+        map.boxZoom.enable();
+        map.keyboard.enable();
+    });
+}
 
 // Returnerar Datumsträngen
 function getDates(){
