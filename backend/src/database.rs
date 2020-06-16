@@ -232,8 +232,8 @@ pub fn create_mysql_tables(pool: Pool) {
         MeasureConfidence    int         null,
         ReporterOrganization varchar(50) null
     )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;", ()).expect("Failed to create table: friction_data");
-
-    pool.prep_exec("ALTER TABLE friction_data ADD INDEX (ObservationTimeUTC, Longitude, Latitude, ReporterOrganization, MeasureValue);",()).expect("Failed to create index: friction_data_Time_MULTI_index ");
+    //Grabben är lurig fixa så den itne skapar index om det redan finns
+    //pool.prep_exec("ALTER TABLE aggregated_friction_data ADD INDEX (Time, TimeAggregation, Longitude, Latitude, Radius, MeasureValueMin);",()).expect("Failed to create index: aggregated_friction_data_Time_MULTI_index ");
 
     pool.prep_exec(r#"CREATE TABLE IF NOT EXISTS road_accident_data (
         `Id` VARCHAR(32) NOT NULL,
