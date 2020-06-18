@@ -77,6 +77,33 @@ pub struct TrafficFlowData {
     _secret: (),
 }
 
+//NYTT RoadCondition
+pub struct RoadCondition{
+    pub cause: String,
+    pub condition_code: String,
+    pub condition_info: String,
+    pub condition_text: String,
+    pub county_no: String,
+    pub creator: String,
+    pub deleted: String,
+    pub end_time: String,
+    pub geometry_modified_time: String,
+    pub SWEREF99TM: String,
+    pub WGS84: String,
+    pub icon_id: String,
+    pub id: String,
+    pub location_text: String,
+    pub measurement: String,
+    pub modified_time: String,
+    pub road_number: String,
+    pub road_number_numeric: String,
+    pub safety_related_message: String,
+    pub start_time: String,
+    pub warning: String,
+    _secret: (),
+
+}
+
 
 pub fn parse_cameras(xmlfile: &str) -> Vec<CameraData> {
 
@@ -372,7 +399,9 @@ pub fn parse_traffic_flow(xmlfile: &str) -> Vec<TrafficFlowData>{
                     _ => (), // Else
                 }
                 Ok(Event::Eof) => break,
-                Err(e) => panic!("Error at pos {}: {:?}", xml.buffer_position(), e),_=> (),
+                Err(e) => panic!("Error at pos {}: {:?}", xml.buffer_position(), e),
+                
+                _=> (),
 
 
             }
@@ -383,6 +412,169 @@ pub fn parse_traffic_flow(xmlfile: &str) -> Vec<TrafficFlowData>{
     TrafficFlow_Data
 }
 
+
+pub fn parse_road_condition(xmlfile: &str) -> Vec<RoadCondition>{
+
+    let mut xml = Reader::from_file(xmlfile).expect("Failed to open file");
+   
+    xml.trim_text(true);
+
+    let mut road_condition_data = Vec::new();
+    let mut buf = Vec::new();
+
+    loop {
+
+        match xml.read_event(&mut buf) {
+            Ok(Event::Start(ref e)) => match e.name() {
+                b"RoadCondition" => {
+                    let roadCondition = RoadCondition{
+
+                        cause: String::new(),
+                        condition_code: String::new(),
+                        condition_info: String::new(),
+                        condition_text: String::new(),
+                        county_no: String::new(),
+                        creator: String::new(),
+                        deleted: String::new(),
+                        end_time: String::new(),
+                        geometry_modified_time: String::new(),
+                        SWEREF99TM: String::new(),
+                        WGS84: String::new(),
+                        icon_id: String::new(),
+                        id: String::new(),
+                        location_text: String::new(),
+                        measurement: String::new(),
+                        modified_time: String::new(),
+                        road_number: String::new(),
+                        road_number_numeric: String::new(),
+                        safety_related_message: String::new(),
+                        start_time: String::new(),
+                        warning: String::new(),
+                        _secret: (),
+
+                    };
+                    road_condition_data.push(roadCondition);
+                    let roadCondition = road_condition_data.last_mut().unwrap();
+                    
+                }
+
+                b"Cause" => {
+                    let roadCondition = road_condition_data.last_mut().unwrap();
+                    roadCondition.cause = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+
+                }
+                b"ConditionCode" => {
+                    let roadCondition = road_condition_data.last_mut().unwrap();
+                    roadCondition.condition_code = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+
+                }
+                b"ConditionText" => {
+                    let roadCondition = road_condition_data.last_mut().unwrap();
+                    roadCondition.condition_text = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+
+                }
+                b"CountyNo" => {
+                    let roadCondition = road_condition_data.last_mut().unwrap();
+                    roadCondition.county_no = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+
+                }
+                b"Creator" => {
+                    let roadCondition = road_condition_data.last_mut().unwrap();
+                    roadCondition.creator = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+
+                }
+                b"Deleted" => {
+                    let roadCondition = road_condition_data.last_mut().unwrap();
+                    roadCondition.deleted = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+
+                }
+                b"EndTime" => {
+                    let roadCondition = road_condition_data.last_mut().unwrap();
+                    roadCondition.end_time = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+
+                }
+                b"ModifiedTime" => {
+                    let roadCondition = road_condition_data.last_mut().unwrap();
+                    roadCondition.geometry_modified_time = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+
+                }
+                
+                b"SWEREF99TM" => {
+                    let roadCondition = road_condition_data.last_mut().unwrap();
+                    roadCondition.SWEREF99TM = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+
+                }
+                b"WGS84" => {
+                    let roadCondition = road_condition_data.last_mut().unwrap();
+                    roadCondition.WGS84 = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+
+                }
+                b"IconId" => {
+                    let roadCondition = road_condition_data.last_mut().unwrap();
+                    roadCondition.icon_id = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+
+                }
+
+                b"Id" => {
+                    let roadCondition = road_condition_data.last_mut().unwrap();
+                    roadCondition.id = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+
+                }
+
+                b"LocationText" => {
+                    let roadCondition = road_condition_data.last_mut().unwrap();
+                    roadCondition.location_text = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+
+                }
+                b"Measurement" => {
+                    let roadCondition = road_condition_data.last_mut().unwrap();
+                    roadCondition.measurement = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+
+                }
+                b"ModifiedTime" => {
+                    let roadCondition = road_condition_data.last_mut().unwrap();
+                    roadCondition.modified_time = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+
+                }
+
+                b"RoadNumber" => {
+                    let roadCondition = road_condition_data.last_mut().unwrap();
+                    roadCondition.road_number = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+
+                }
+                b"RoadNumberNumeric" => {
+                    let roadCondition = road_condition_data.last_mut().unwrap();
+                    roadCondition.road_number_numeric = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+
+                }
+                b"SafetyRelatedMessage" => {
+                    let roadCondition = road_condition_data.last_mut().unwrap();
+                    roadCondition.safety_related_message = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+
+                }
+                b"StartTime" => {
+                    let roadCondition = road_condition_data.last_mut().unwrap();
+                    roadCondition.start_time = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+
+                }
+                b"Warning" => {
+                    let roadCondition = road_condition_data.last_mut().unwrap();
+                    roadCondition.road_number_numeric = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+
+                }
+
+                _ => (),
+
+            }
+            Ok(Event::Eof) => break,
+            Err(e) => panic!("Error at pos {}: {:?}", xml.buffer_position(), e),
+            
+            _ => (),
+        }
+        buf.clear();
+    }
+    road_condition_data
+}
 // Parse xml file and return station_data vector
 pub fn parse_station(xmlfile: &str) -> Vec<StationData> {
 

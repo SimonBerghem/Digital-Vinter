@@ -38,6 +38,7 @@ fn main() {
     let camera_pool = pool.clone();
     let road_accident_pool = pool.clone();
     let traffic_flow_pool = pool.clone();
+    let road_condition_pool = pool.clone();
 
 
     //database::insert_road_accident_data(road_accident_pool.clone(), roadAccident_data);
@@ -50,6 +51,17 @@ fn main() {
     //println!("{:?}: StationData", station_data[0]);
     
     database::insert_station_data(station_pool.clone(), station_data);
+
+
+/* Hej framtida utveklare, ifall du undrar varför alla kall är trådade så
+är svaret att en tidigare utvecklare resonerade: "Varför inte" den tidigare
+utvecklarens struktur har bibeholts. Det finns ingen större anledning att ha så
+många trådar som just nu finns mer än "det är cool". 
+
+Designa vidare som du anser bäst.
+*/
+
+
     //Accident Data
     thread::spawn(move || loop {
         let fetch_thread = thread::spawn(|| {
@@ -69,6 +81,21 @@ fn main() {
         thread::sleep(Duration::from_secs(900));
 
 
+    });
+
+    thread::spawn(move || loop{
+        let fetch_thread = thread::spawn(|| {
+            fetch::get_road_condition_data();
+            println!("{:?} Road condition file fetched from DATEX II", Local::now().naive_local());
+
+        });
+        fetch_thread.join().unwrap();
+
+        let road_condition_data = parse_xml::parse_road_condition("RoadCondition.xml");
+        //println!("Road condition data: {:?}",road_condition_data);
+        database::insert_road_condition_data(road_condition_pool.clone(), road_condition_data);
+
+        thread::sleep(Duration::from_secs(900));
     });
 
     thread::spawn(move || loop {
@@ -133,7 +160,6 @@ fn main() {
         // Wait for fetch to complete
         fetch_thread.join().unwrap();
         
-
         let station_data = parse_xml::parse_station("station_data_cache.xml");
         database::insert_station_data(station_pool.clone(), station_data);
 
@@ -143,94 +169,3 @@ fn main() {
 
 
 }
-
-
-
-fn testPost(){
-
-
-  //<LOGIN authenticationkey="{AUTH}" />´
-    
-    let client = reqwest::blocking::Client::new();
-  //  .user_agent(APP_USER_AGENT)
-    //.build();POST /v2/data.xml HTTP/1.1
-  /*  Content-Type: text/xml
-    User-Agent: TEST
-    Accept: **
-    Cache-Control: no-cache
-    Host: api.trafikinfo.trafikverket.se
-    Content-Length: 433
-    Connection: keep-alive*/
-    let mut res = client.post("https://api.trafikinfo.trafikverket.se/v2/data.xml").header(USER_AGENT,"DATAEXLTU20").header(CONTENT_TYPE,"text/xml")
-    .body("
-    <REQUEST>
-    <LOGIN authenticationkey=\"d8b542b2dafe40f999f223c7aff04046\" />
-    <QUERY objecttype=\"Situation\" schemaversion=\"1.2\" includedeletedobjects=\"true\">
-        <FILTER>
-            <EQ name=\"Deviation.MessageType\" value=\"Olycka\" />
-            <EQ name=\"Deviation.IconId\" value=\"roadAccident\" />
-        </FILTER>
-        <INCLUDE>Deviation.Id</INCLUDE>
-        <INCLUDE>Deviation.Header</INCLUDE>
-        <INCLUDE>Deviation.IconId</INCLUDE>
-        <INCLUDE>Deviation.Geometry.SWEREF99TM</INCLUDE>
-        <INCLUDE>Deviation.Geometry.WGS84</INCLUDE>
-        <INCLUDE>Deviation.SeverityCode</INCLUDE>
-        <INCLUDE>Deviation.CreationTime</INCLUDE>
-        <INCLUDE>Deviation.EndTime</INCLUDE>
-    </QUERY>
-</REQUEST>")
-    .send()
-    .unwrap();
-   
-println!("Status: {}",res.status());
-let mut file = File::create("TESTFILE.xml")
-        .expect("Error creating file, station_data");
-io::copy(&mut res, &mut file)
-    .expect("Failed to read response to file");
-//println!("Status: {}",res.text());
-//println!("Headers:\n{}", res.headers());
-let c = reqwest::blocking::Client::new();
-let res = c.get("https://rust-lang.org").send().unwrap();
-    println!("Status: {}", res.status());
-
-
-    
-let cl = reqwest::blocking::Client::new();
-let res = cl.post("http://httpbin.org/post").body("the exact body that is sent").send().unwrap();
- println!("Status: {}", res.status());
-}
-
-
-// fn testParse(){
-
-        
-//     let xml = r#"<RESPONSE><RESULT><Situation><Deviation><Geometry><SWEREF99TM>POINT (568274.04 6366488.85)</SWEREF99TM><WGS84>POINT (16.1372547 57.43597)</WGS84></Geometry><IconId>roadAccident</IconId><Id>SE_STA_TRISSID_1_8509792</Id><SeverityCode>4</SeverityCode></Deviation></Situation></RESULT></RESPONSE>"#;
-//     let mut reader = Reader::from_str(xml);
-//     reader.trim_text(true);
-
-//     let mut count = 0;
-//     let mut txt = Vec::new();
-//     let mut buf = Vec::new();
-
-//     // The `Reader` does not implement `Iterator` because it outputs borrowed data (`Cow`s)
-//         loop {
-//             match reader.read_event(&mut buf) {
-//                 Ok(Event::Start(ref e)) => {
-//                     match e.name() {
-//                     b"SeverityCode" => {
-//                         println!("attributes values: {:?}", xml.read_text(e.name(), &mut Vec::new()).unwrap());
-//                     }
-//                 _ => (),
-//                 }
-//             },
-//             Ok(Event::Text(e)) => txt.push(e.unescape_and_decode(&reader).unwrap()),
-//             Ok(Event::Eof) => break, // exits the loop when reaching end of file
-//             Err(e) => panic!("Error at position {}: {:?}", reader.buffer_position(), e),
-//             _ => (), // There are several other `Event`s we do not consider here
-//         }
-
-//         // if we don't keep a borrow elsewhere, we can clear the buffer to keep memory usage low
-//         buf.clear();
-//     }
-// }

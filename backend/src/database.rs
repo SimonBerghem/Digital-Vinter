@@ -5,7 +5,7 @@ use mysql::OptsBuilder;
 use mysql::chrono::{DateTime, FixedOffset};
 // use mysql::from_row;
 
-use crate::parse_xml::{StationData, WeatherData, CameraData, roadAccidentData, TrafficFlowData};
+use crate::parse_xml::{StationData, WeatherData, CameraData, roadAccidentData, TrafficFlowData, RoadCondition};
 
 pub fn insert_friction_data(mut conn: PooledConn, url: &str) {
     //conn.query(r"LOAD DATA LOCAL INFILE ".to_owned() + "'" + url + "'" + " INTO TABLE friction_data LINES TERMINATED BY '\r\n' IGNORE 1 LINES SET `lat`= REPLACE(`lat`, ',', '.'), `lon`=REPLACE(`lon`, ',', '.'), `MeasurementValue`=REPLACE(`MeasurementValue`, ',', '.');").unwrap();
@@ -77,6 +77,10 @@ pub fn insert_station_data(pool: Pool, station_data: Vec<StationData>) {
         }
     }
 }
+
+
+
+
 // Insert the data to MYSQ, TABLE assumed to exist ROAD
 pub fn insert_road_accident_data(pool: Pool, road_accident_data: Vec<roadAccidentData>){
 
@@ -106,7 +110,88 @@ pub fn insert_road_accident_data(pool: Pool, road_accident_data: Vec<roadAcciden
         }
     }
 
+
+
+
+
 }
+
+pub fn insert_road_condition_data(pool:Pool, road_condition_data: Vec<RoadCondition>){
+
+    let mut insert_stmt = r"INSERT IGNORE INTO `db`.`road_condition_data` (`cause`, `condition_code`, 
+        `condition_info`, `condition_text`, `county_no`, `creator`, `deleted`, `end_time`, 
+        `geometry_modified_time`, `icon_id`, `id`, `location_text`, `measurement`, `modified_time`, 
+        `road_number`, `road_number_numeric`, `safety_related_message`, `start_time`) 
+        VALUES (:cause, :condition_code, :condition_info, :condition_text, :county_no, :creator, 
+            :deleted, :end_time, :geometry_modified_time, :icon_id, :id, :location_text, 
+            :measurement, :modified_time, :road_number, :road_number_numeric, :safety_related_message, :start_time)
+            ON DUPLICATE KEY UPDATE `geometry_modified_time` = :geometry_modified_time;
+    ";
+   
+    let mut insert_stmt_prep = pool.prepare(insert_stmt);
+    //println!("SQL STATEMENT: {:?}", insert_stmt_prep);
+    for mut stmt in insert_stmt_prep.into_iter(){
+        //println!("SQL : {:?}","I for lop");
+        for i in road_condition_data.iter(){
+
+            stmt.execute(params!{
+                "cause" => i.cause.clone(),
+                "condition_code" => i.condition_code.clone(),
+                "condition_info" => i.condition_info.clone(), 
+                "condition_text" => i.condition_text.clone(),
+                "county_no" => i.county_no.clone(),
+                "creator" => i.creator.clone(),
+                "deleted" => i.deleted.clone(),
+                "end_time" => i.end_time.clone(),
+                "geometry_modified_time" => i.geometry_modified_time.clone(),
+                "icon_id" => i.icon_id.clone(),
+                "id" => i.id.clone(),
+                "location_text" => i.location_text.clone(),
+                "measurement" => i.measurement.clone(),
+                "modified_time" => i.modified_time.clone(),
+                "road_number" => i.road_number.clone(),
+                "road_number_numeric" => i.road_number_numeric.clone(),
+                "safety_related_message" => i.safety_related_message.clone(),
+                "start_time" => i.start_time.clone(),
+            }).expect("Failed to execute statement when inseting Road Conditiond Data");
+        }
+    }
+
+    insert_stmt = "INSERT IGNORE INTO `db`.`road_condition_geometry` 
+    (`road_condition_id`, `SWEREF99TM`) 
+    VALUES (:road_condition_id, :swe);";
+    
+    let mut insert_stmt_prep = pool.prepare(insert_stmt);
+
+    println!("SQL STATEMENT: {:?}", insert_stmt_prep);
+
+    for mut stmt in insert_stmt_prep.into_iter(){
+
+        for i in road_condition_data.iter(){
+            let mut swe_ref = i.SWEREF99TM.clone();
+            let mut swe_ref_string:Vec<&str> = swe_ref.split("(").collect();
+            let mut swe_ref_string_2:Vec<&str> = swe_ref_string[1].split(")").collect();
+            let mut swe_ref_string_3:Vec<&str> = swe_ref_string_2[0].split(", ").collect();
+
+            for e in swe_ref_string_3.into_iter(){
+                //println!("id: {:?} . swe: {:?}",i.id.clone(), e.clone());
+                stmt.execute(params!{
+                    "road_condition_id" => i.id.clone(),
+                    "swe" => e.clone(),
+                }).expect("Failed to execute statement when inserting Road Condition Geometry");
+                //println!("Sweref: {:?}", e);
+            }
+            
+           
+            
+
+        
+    
+        }
+    }
+
+}
+
 pub fn insert_traffic_flow_data(pool:Pool, traffic_flow_data: Vec<TrafficFlowData>){
 //AverageVehicleSpeed, CountyNo, Deleted, Geometry.SWEREF99TM, Geometry.WGS84, MeasurementOrCalculationPeriod, MeasurementSide, MeasurementTime, ModifiedTime, RegionId, SiteId, SpecificLane, VehicleFlowRate, VehicleType
     let insert_stmt = r"INSERT IGNORE INTO `db`.`traffic_flow` 
@@ -193,6 +278,47 @@ pub fn get_opts(user: &str, pass: &str, addr: &str, database: &str) -> Opts {
 // Create the tables, only for new db!
 pub fn create_mysql_tables(pool: Pool) {
 
+    pool.prep_exec(r"CREATE TABLE IF NOT EXISTS`db`.`road_condition_data` (
+        `cause` VARCHAR(45) NULL,
+        `condition_code` VARCHAR(45) NULL,
+        `condition_info` VARCHAR(45) NULL,
+        `condition_text` VARCHAR(45) NULL,
+        `county_no` VARCHAR(45) NULL,
+        `creator` VARCHAR(45) NULL,
+        `deleted` VARCHAR(45) NULL,
+        `end_time` VARCHAR(45) NULL,
+        `geometry_modified_time` VARCHAR(45) NULL,
+        `icon_id` VARCHAR(45) NULL,
+        `id` VARCHAR(45) NOT NULL,
+        `location_text` VARCHAR(45) NULL,
+        `measurement` VARCHAR(45) NULL,
+        `modified_time` VARCHAR(45) NULL,
+        `road_number` VARCHAR(45) NULL,
+        `road_number_numeric` VARCHAR(45) NULL,
+        `safety_related_message` VARCHAR(45) NULL,
+        `start_time` VARCHAR(45) NOT NULL,
+        `warning` VARCHAR(45) NULL,
+        PRIMARY KEY (`id`, `start_time`));
+      ", ()).expect("Failed to create table: Road Condition");
+
+    pool.prep_exec(r"CREATE TABLE IF NOT EXISTS `db`.`road_condition_geometry` (
+        `id` INT(11) NOT NULL AUTO_INCREMENT,
+        `road_condition_id` VARCHAR(45) NULL,
+        `SWEREF99TM` VARCHAR(45) NULL,
+        `WGS84` VARCHAR(45) NULL,
+        PRIMARY KEY (`id`));
+      ", ()).expect("Failed to create table Road Condition Geometry");
+    //NÅgon bör fixa så att denna inte körs ifall databasen redan har en Foreign Key
+    /*
+    pool.prep_exec(r"ALTER TABLE `db`.`road_condition_geometry` 
+    ADD INDEX `road_condition_id_idx` (`road_condition_id` ASC) VISIBLE;
+    ;
+    ALTER TABLE `db`.`road_condition_geometry` 
+    ADD CONSTRAINT `road_condition_id`
+      FOREIGN KEY (`road_condition_id`)
+      REFERENCES `db`.`road_condition_data` (`id`)
+      ON DELETE NO ACTION
+      ON UPDATE NO ACTION;")*/
 
     pool.prep_exec(r"CREATE TABLE IF NOT EXISTS station_data (
                         id VARCHAR(50) NOT NULL,

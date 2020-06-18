@@ -128,6 +128,61 @@ pub fn get_traffic_flow_data(){
    //println!("Status: {}", res.status());
   }
 
-  
+  // Get the XML file from, DATEX II. 
+// The function assumes that another part of the system will read the XML file and parse it into the SQL-Database
+// See git repo for documentation
+pub fn get_road_condition_data(){
+
+    let client = reqwest::blocking::Client::new();
+
+    let mut res = client.post("https://api.trafikinfo.trafikverket.se/v2/data.xml").header(USER_AGENT,"DATAEXLTU20").header(CONTENT_TYPE,"text/xml")
+    .body("
+    <REQUEST>
+    <LOGIN authenticationkey=\"d8b542b2dafe40f999f223c7aff04046\" />
+    <QUERY objecttype=\"RoadCondition\" schemaversion=\"1.2\" includedeletedobjects=\"true\">
+        <INCLUDE>Cause</INCLUDE>
+        <INCLUDE>ConditionCode</INCLUDE>
+        <INCLUDE>ConditionInfo</INCLUDE>
+        <INCLUDE>ConditionText</INCLUDE>
+        <INCLUDE>CountyNo</INCLUDE>
+        <INCLUDE>Creator</INCLUDE>
+        <INCLUDE>Deleted</INCLUDE>
+        <INCLUDE>EndTime</INCLUDE>
+        <INCLUDE>Geometry.ModifiedTime</INCLUDE>
+        <INCLUDE>Geometry.SWEREF99TM</INCLUDE>
+        <INCLUDE>Geometry.WGS84</INCLUDE>
+        <INCLUDE>IconId</INCLUDE>
+        <INCLUDE>Id</INCLUDE>
+        <INCLUDE>LocationText</INCLUDE>
+        <INCLUDE>Measurement</INCLUDE>
+        <INCLUDE>ModifiedTime</INCLUDE>
+        <INCLUDE>RoadNumber</INCLUDE>
+        <INCLUDE>RoadNumberNumeric</INCLUDE>
+        <INCLUDE>SafetyRelatedMessage</INCLUDE>
+        <INCLUDE>StartTime</INCLUDE>
+        <INCLUDE>Warning</INCLUDE>
+        
+    </QUERY>
+</REQUEST>")
+    .send()
+    .unwrap();
+   
+//println!("Status: {}",res.status());
+let mut file = File::create("RoadCondition.xml")
+        .expect("Error creating file, RoadCondition.xml");
+io::copy(&mut res, &mut file)
+    .expect("Failed to read response to file");
+//println!("Status: {}",res.text());
+//println!("Headers:\n{}", res.headers());
+let c = reqwest::blocking::Client::new();
+let res = c.get("https://rust-lang.org").send().unwrap();
+    //println!("Status: {}", res.status());
+
+
+    
+let cl = reqwest::blocking::Client::new();
+let res = cl.post("http://httpbin.org/post").body("the exact body that is sent").send().unwrap();
+ //println!("Status: {}", res.status());
+}
   
 
