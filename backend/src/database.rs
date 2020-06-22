@@ -163,7 +163,7 @@ pub fn insert_road_condition_data(pool:Pool, road_condition_data: Vec<RoadCondit
     
     let mut insert_stmt_prep = pool.prepare(insert_stmt);
 
-    println!("SQL STATEMENT: {:?}", insert_stmt_prep);
+    //println!("SQL STATEMENT: {:?}", insert_stmt_prep);
 
     for mut stmt in insert_stmt_prep.into_iter(){
 
@@ -183,10 +183,6 @@ pub fn insert_road_condition_data(pool:Pool, road_condition_data: Vec<RoadCondit
             }
             
            
-            
-
-        
-    
         }
     }
 

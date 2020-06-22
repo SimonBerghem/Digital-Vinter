@@ -3,7 +3,7 @@ backend/target/*
 node_modules/
 
 backend/e6.txt
-
+*.xml
 backend/*.xml
 .DS_Store
 backend/*.txt
