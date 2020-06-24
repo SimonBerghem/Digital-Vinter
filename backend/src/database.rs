@@ -458,6 +458,58 @@ pub fn create_mysql_tables(pool: Pool) {
         PRIMARY KEY (`MeasurementTime`, `SiteId`, `VehicleType`)
         )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;", ()).expect("Failed to create table: traffic_flow");
 
+    pool.prep_exec(r"CREATE TABLE IF NOT EXISTS `db`.`road_geometry` (
+        `road_geometry_id` INT NOT NULL AUTO_INCREMENT,
+        `County` VARCHAR(45) NULL,
+        `Deleted` VARCHAR(45) NULL,
+        `Direction.Code` VARCHAR(45) NULL,
+        `Direction.Value` VARCHAR(45) NULL,
+        `Geometry.SWEREF99TM3D` VARCHAR(45) NULL,
+        `Geometry.WGS843D` VARCHAR(45) NULL,
+        `Length` VARCHAR(45) NULL,
+        `ModifiedTime` VARCHAR(45) NULL,
+        `RoadMainNumber` VARCHAR(45) NULL,
+        `RoadSubNumber` VARCHAR(45) NULL,
+        `TimeStamp` VARCHAR(45) NULL,
+        PRIMARY KEY (`road_geometry_id`));",());
+
+
+    pool.prep_exec(r"CREATE TABLE IF NOT EXISTS`db`.`road_data` (
+        `road_data_id` INT NOT NULL AUTO_INCREMENT,
+        `AADDT` VARCHAR(45) NULL,
+        `AADTHeavyVehicles` VARCHAR(45) NULL,
+        `AADTMeasurementMethod.Code` VARCHAR(45) NULL,
+        `AADTMeasurementMethod.Value` VARCHAR(45) NULL,
+        `AADTMeasurementYear` VARCHAR(45) NULL,
+        `BearingCapacity.Code` VARCHAR(45) NULL,
+        `BearingCapacity.Value` VARCHAR(45) NULL,
+        `County` VARCHAR(45) NULL,
+        `Deleted` VARCHAR(45) NULL,
+        `Direction.Code` VARCHAR(45) NULL,
+        `Direction.Value` VARCHAR(45) NULL,
+        `EndContinuousLength` VARCHAR(45) NULL,
+        `LaneDescription` VARCHAR(45) NULL,
+        `Length` VARCHAR(45) NULL,
+        `ModifiedTime` VARCHAR(45) NULL,
+        `RoadCategory.Code` VARCHAR(45) NULL,
+        `RoadCategory.Value` VARCHAR(45) NULL,
+        `RoadConstruction2009` VARCHAR(45) NULL,
+        `RoadMainNumber` VARCHAR(45) NULL,
+        `RoadOwner.Code` VARCHAR(45) NULL,
+        `RoadOwner.Value` VARCHAR(45) NULL,
+        `RoadSubNumber` VARCHAR(45) NULL,
+        `RoadType.Code` VARCHAR(45) NULL,
+        `RoadType.Value` VARCHAR(45) NULL,
+        `RoadWidth` VARCHAR(45) NULL,
+        `SpeedLimit` VARCHAR(45) NULL,
+        `StartContinuousLength` VARCHAR(45) NULL,
+        `TimeStamp` VARCHAR(45) NULL,
+        `WearLayer` VARCHAR(45) NULL,
+        `Winter2003.Code` VARCHAR(45) NULL,
+        `Winter2003.Value` VARCHAR(45) NULL,
+        PRIMARY KEY (`road_data_id`));
+      ",());
+
 }
 
 

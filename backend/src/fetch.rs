@@ -7,7 +7,10 @@ use reqwest::header::CONTENT_TYPE;
 use quick_xml::Reader;
 use quick_xml::events::Event;
 
+//This file holds all the communication with the rest-API DATEX II, there are functionality for https get and post requests, 
+
 // Get the XML file from datex using basic auth
+//Borde inte vara unwrap, det krachar programmet, fixa med '?' opperatorn hur den nu fungerar. TODO
 pub fn fetch_xml(url: &str, user: &str, pass: &str, file_name: &str) {
    
     let client = reqwest::blocking::Client::new();
@@ -25,118 +28,66 @@ pub fn fetch_xml(url: &str, user: &str, pass: &str, file_name: &str) {
         .expect("Failed to read response to file");
     
 }
-// Get the XML file from, DATEX II. 
-// The function assumes that another part of the system will read the XML file and parse it into the SQL-Database
-// Se git repo for documentation
+
+
+//Följande POST Body;s skulle kunna läggas i en egen fil för bättre läslighet, en upp till en framtida utvecklare.
+
+//The following get functions sets the https post body and calls a generic post function.
+
 pub fn get_situation_data(){
+    let body = "<REQUEST>
+        <LOGIN authenticationkey=\"d8b542b2dafe40f999f223c7aff04046\" />
+        <QUERY objecttype=\"Situation\" schemaversion=\"1.2\" includedeletedobjects=\"true\">
+            <FILTER>
+                <EQ name=\"Deviation.MessageType\" value=\"Olycka\" />
+                <EQ name=\"Deviation.IconId\" value=\"roadAccident\" />
+            </FILTER>
+            <INCLUDE>Deviation.Id</INCLUDE>
+            <INCLUDE>Deviation.Header</INCLUDE>
+            <INCLUDE>Deviation.IconId</INCLUDE>
+            <INCLUDE>Deviation.Geometry.SWEREF99TM</INCLUDE>
+            <INCLUDE>Deviation.Geometry.WGS84</INCLUDE>
+            <INCLUDE>Deviation.SeverityCode</INCLUDE>
+            <INCLUDE>Deviation.CreationTime</INCLUDE>
+            <INCLUDE>Deviation.EndTime</INCLUDE>
+        </QUERY>
+    </REQUEST>";
+    let mut file_name = "TESTFILE.xml";
 
-    //<LOGIN authenticationkey="{AUTH}" />´
-      
-      let client = reqwest::blocking::Client::new();
-    //  .user_agent(APP_USER_AGENT)
-      //.build();POST /v2/data.xml HTTP/1.1
-    /*  Content-Type: text/xml
-      User-Agent: TEST
-      Accept: **
-      Cache-Control: no-cache
-      Host: api.trafikinfo.trafikverket.se
-      Content-Length: 433
-      Connection: keep-alive*/
-      let mut res = client.post("https://api.trafikinfo.trafikverket.se/v2/data.xml").header(USER_AGENT,"DATAEXLTU20").header(CONTENT_TYPE,"text/xml")
-      .body("
-      <REQUEST>
-      <LOGIN authenticationkey=\"d8b542b2dafe40f999f223c7aff04046\" />
-      <QUERY objecttype=\"Situation\" schemaversion=\"1.2\" includedeletedobjects=\"true\">
-          <FILTER>
-              <EQ name=\"Deviation.MessageType\" value=\"Olycka\" />
-              <EQ name=\"Deviation.IconId\" value=\"roadAccident\" />
-          </FILTER>
-          <INCLUDE>Deviation.Id</INCLUDE>
-          <INCLUDE>Deviation.Header</INCLUDE>
-          <INCLUDE>Deviation.IconId</INCLUDE>
-          <INCLUDE>Deviation.Geometry.SWEREF99TM</INCLUDE>
-          <INCLUDE>Deviation.Geometry.WGS84</INCLUDE>
-          <INCLUDE>Deviation.SeverityCode</INCLUDE>
-          <INCLUDE>Deviation.CreationTime</INCLUDE>
-          <INCLUDE>Deviation.EndTime</INCLUDE>
-      </QUERY>
-  </REQUEST>")
-      .send()
-      .unwrap();
-     
-  let mut file = File::create("TESTFILE.xml")
-          .expect("Error creating file, SituationData");
-  io::copy(&mut res, &mut file)
-      .expect("Failed to read response to file");
-  //println!("Status: {}",res.text());
-  //println!("Headers:\n{}", res.headers());
-  let c = reqwest::blocking::Client::new();
-  let res = c.get("https://rust-lang.org").send().unwrap();
-  
-  
-      
-  let cl = reqwest::blocking::Client::new();
-  let res = cl.post("http://httpbin.org/post").body("the exact body that is sent").send().unwrap();
-  }
+    get_from_post(body, file_name);
+}
 
-// Get the XML file from, DATEX II. 
-// The function assumes that another part of the system will read the XML file and parse it into the SQL-Database
-// See git repo for documentation
 pub fn get_traffic_flow_data(){
 
-      
-      let client = reqwest::blocking::Client::new();
-
-      let mut res = client.post("https://api.trafikinfo.trafikverket.se/v2/data.xml").header(USER_AGENT,"DATAEXLTU20").header(CONTENT_TYPE,"text/xml")
-      .body("
-      <REQUEST>
+    let body = "
+    <REQUEST>
     <LOGIN authenticationkey=\"d8b542b2dafe40f999f223c7aff04046\" />
     <QUERY objecttype=\"TrafficFlow\" schemaversion=\"1.4\" includedeletedobjects=\"true\">
-        <INCLUDE>AverageVehicleSpeed</INCLUDE>
-        <INCLUDE>CountyNo</INCLUDE>
-        <INCLUDE>Geometry.SWEREF99TM</INCLUDE>
-        <INCLUDE>Geometry.WGS84</INCLUDE>
-        <INCLUDE>MeasurementOrCalculationPeriod</INCLUDE>
-        <INCLUDE>MeasurementSide</INCLUDE>
-    	<INCLUDE>MeasurementTime</INCLUDE>
-    	<INCLUDE>ModifiedTime</INCLUDE>
-    	<INCLUDE>RegionId</INCLUDE>
-        <INCLUDE>SiteId</INCLUDE>
-        <INCLUDE>SpecificLane</INCLUDE>
-        <INCLUDE>VehicleFlowRate</INCLUDE>
-        <INCLUDE>VehicleType</INCLUDE>
+    <INCLUDE>AverageVehicleSpeed</INCLUDE>
+    <INCLUDE>CountyNo</INCLUDE>
+    <INCLUDE>Geometry.SWEREF99TM</INCLUDE>
+    <INCLUDE>Geometry.WGS84</INCLUDE>
+    <INCLUDE>MeasurementOrCalculationPeriod</INCLUDE>
+    <INCLUDE>MeasurementSide</INCLUDE>
+    <INCLUDE>MeasurementTime</INCLUDE>
+    <INCLUDE>ModifiedTime</INCLUDE>
+    <INCLUDE>RegionId</INCLUDE>
+    <INCLUDE>SiteId</INCLUDE>
+    <INCLUDE>SpecificLane</INCLUDE>
+    <INCLUDE>VehicleFlowRate</INCLUDE>
+    <INCLUDE>VehicleType</INCLUDE>
     </QUERY>
-</REQUEST>")
-      .send()
-      .unwrap();
-     
-  //println!("Status: {}",res.status());
-  let mut file = File::create("TrafficFlow.xml")
-          .expect("Error creating file, TrafficFlow.xml");
-  io::copy(&mut res, &mut file)
-      .expect("Failed to read response to file");
-  //println!("Status: {}",res.text());
-  //println!("Headers:\n{}", res.headers());
-  let c = reqwest::blocking::Client::new();
-  let res = c.get("https://rust-lang.org").send().unwrap();
-      //println!("Status: {}", res.status());
-  
-  
-      
-  let cl = reqwest::blocking::Client::new();
-  let res = cl.post("http://httpbin.org/post").body("the exact body that is sent").send().unwrap();
-   //println!("Status: {}", res.status());
-  }
+    </REQUEST>";
 
-  // Get the XML file from, DATEX II. 
-// The function assumes that another part of the system will read the XML file and parse it into the SQL-Database
-// See git repo for documentation
-pub fn get_road_condition_data(){
+    let file_name = "TrafficFlow.xml";
 
-    let client = reqwest::blocking::Client::new();
+    get_from_post(body,file_name);
 
-    let mut res = client.post("https://api.trafikinfo.trafikverket.se/v2/data.xml").header(USER_AGENT,"DATAEXLTU20").header(CONTENT_TYPE,"text/xml")
-    .body("
+
+}
+ pub fn get_road_condition_data(){
+
+    let body = "
     <REQUEST>
     <LOGIN authenticationkey=\"d8b542b2dafe40f999f223c7aff04046\" />
     <QUERY objecttype=\"RoadCondition\" schemaversion=\"1.2\" includedeletedobjects=\"true\">
@@ -163,26 +114,25 @@ pub fn get_road_condition_data(){
         <INCLUDE>Warning</INCLUDE>
         
     </QUERY>
-</REQUEST>")
-    .send()
-    .unwrap();
-   
-//println!("Status: {}",res.status());
-let mut file = File::create("RoadCondition.xml")
-        .expect("Error creating file, RoadCondition.xml");
-io::copy(&mut res, &mut file)
-    .expect("Failed to read response to file");
-//println!("Status: {}",res.text());
-//println!("Headers:\n{}", res.headers());
-let c = reqwest::blocking::Client::new();
-let res = c.get("https://rust-lang.org").send().unwrap();
-    //println!("Status: {}", res.status());
+    </REQUEST>";
 
+    let file_name = "RoadCondition.xml";
 
-    
-let cl = reqwest::blocking::Client::new();
-let res = cl.post("http://httpbin.org/post").body("the exact body that is sent").send().unwrap();
- //println!("Status: {}", res.status());
-}
+    get_from_post(body,file_name);
+ }
+//Takes a https post body as a string and a file name. 
+//A post request with the body is sent to DATEX II and creates a local XML file  with the data returned from Datex II.
+pub fn get_from_post(body:&'static str, file_name:&str){
+    let client = reqwest::blocking::Client::new();
   
+      let mut res = client.post("https://api.trafikinfo.trafikverket.se/v2/data.xml").header(USER_AGENT,"DATAEXLTU20").header(CONTENT_TYPE,"text/xml")
+      .body(body)
+      .send()
+      .unwrap();
 
+      let mut file = File::create(file_name)
+        .expect("Error creating file, SituationData");
+    io::copy(&mut res, &mut file)
+        .expect("Failed to read response to file");
+
+}
