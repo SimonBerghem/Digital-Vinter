@@ -32,6 +32,7 @@ fn main() {
     // // // Create new pool connections 
     let pool = mysql::Pool::new(opts).expect("Pool failed to get opts!");
     database::create_mysql_tables(pool.clone());
+    println!("{:?}: MYSQL-Setup Completed",Local::now().naive_local());
     let station_pool = pool.clone();
     let weather_pool = pool.clone();
     let friction_pool = pool.clone();
@@ -54,7 +55,7 @@ fn main() {
 
 
 /* Hej framtida utveklare, ifall du undrar varför alla kall är trådade så
-är svaret att en tidigare utvecklare resonerade: "Varför inte" den tidigare
+är svaret att en tidigare utvecklare resonerade: "Varför inte", den tidigare
 utvecklarens struktur har bibeholts. Det finns ingen större anledning att ha så
 många trådar som just nu finns mer än "det är cool". 
 
@@ -71,11 +72,11 @@ Designa vidare som du anser bäst.
 
         });
         fetch_thread.join().unwrap();
-
-       
+        
+        
         let roadAccident_data = parse_xml::parse_roadAccident("TESTFILE.xml");
         //println!("{:?}: Deviation Data", roadAccident_data);
-        database::insert_road_accident_row(road_accident_pool.clone(),roadAccident_data);
+        database::insert_road_accident_data(road_accident_pool.clone(),roadAccident_data);
         //println!("{:?}: Situation Data Inserted ", Local::now().naive_local());
         // Sleep for 15 min
         thread::sleep(Duration::from_secs(900));

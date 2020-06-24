@@ -81,31 +81,30 @@ pub fn insert_station_data(pool: Pool, station_data: Vec<StationData>) {
 
 
 
-// Insert the data to MYSQ, TABLE assumed to exist ROAD
+// Insert the Road accident data to MYSQ, TABLE assumed to exist ROAD
 pub fn insert_road_accident_data(pool: Pool, road_accident_data: Vec<roadAccidentData>){
 
-    println!("{:?}: Lenght", road_accident_data.len());
-    let insert_stmt = r"INSERT INTO road_accident_data (Id, CreationTime, EndTime, IconId, SWEREF99TM, WGS84, SeverityCode)
-                        VALUES(:Id, :CreationTime, :EndTime, :IconId, 
-                        :SWEREF99TM, :WGS84, :SeverityCode);";
+
     
-    let insert_stmt = r"INSERT INTO road_accident_data (Id, CreationTime, EndTime, IconId, SWEREF99TM, WGS84, SeverityCode)
-        VALUES(:Id, :CreationTime, :EndTime, :IconId, 
-        :SWEREF99TM, :WGS84, :SeverityCode);";
+    let mut insert_stmt = r"INSERT IGNORE INTO road_accident_data (Id, CreationTime, EndTime, IconId, SWEREF99TM, WGS84, SeverityCode)
+                        VALUES(:id, :ctime, :etime, :iid, 
+                        :swe, :wg, :scode);";
 
-    for mut stmt in pool.prepare(insert_stmt).into_iter() { 
-
+    let mut insert_stmt_prep = pool.prepare(insert_stmt);
+    //println!("SQL:  {:?}" ,insert_stmt_prep);
+    for mut stmt in insert_stmt_prep.into_iter() {
+        println!("{:?}: Lenght", road_accident_data.len());
         for i in road_accident_data.iter() {
             
             // `execute` takes ownership of `params` so we pass account name by reference.
             stmt.execute(params!{
-                "Id" => i.RoadAccident_id.clone(),
-                "CreationTime" => i.RoadAccident_CreationTime.clone(),
-                "EndTime" => i.RoadAccident_EndTime.clone(),
-                "IconId" => i.RoadAccident_icon_id.clone(),
-                "SWEREF99TM" => i.RoadAccident_Geometry_SWEREF99TM.clone(),
-                "WGS84" => i.RoadAccident_Geometry_WGS84.clone(),
-                "SeverityCode" => i.RoadAccident_SeverityCode.clone(),
+                "id" => i.RoadAccident_id.clone(),
+                "ctime" => i.RoadAccident_CreationTime.clone(),
+                "etime" => i.RoadAccident_EndTime.clone(),
+                "iid" => i.RoadAccident_icon_id.clone(),
+                "swe" => i.RoadAccident_Geometry_SWEREF99TM.clone(),
+                "wg" => i.RoadAccident_Geometry_WGS84.clone(),
+                "scode" => i.RoadAccident_SeverityCode.clone(),
             }).expect("Failed to execute statement when reading from road_accident_data");
         }
     }
@@ -163,7 +162,7 @@ pub fn insert_road_condition_data(pool:Pool, road_condition_data: Vec<RoadCondit
     
     let mut insert_stmt_prep = pool.prepare(insert_stmt);
 
-    println!("SQL STATEMENT: {:?}", insert_stmt_prep);
+   // println!("SQL STATEMENT: {:?}", insert_stmt_prep);
 
     for mut stmt in insert_stmt_prep.into_iter(){
 
@@ -308,18 +307,33 @@ pub fn create_mysql_tables(pool: Pool) {
         `WGS84` VARCHAR(45) NULL,
         PRIMARY KEY (`id`));
       ", ()).expect("Failed to create table Road Condition Geometry");
-    //NÅgon bör fixa så att denna inte körs ifall databasen redan har en Foreign Key
-    /*
-    pool.prep_exec(r"ALTER TABLE `db`.`road_condition_geometry` 
-    ADD INDEX `road_condition_id_idx` (`road_condition_id` ASC) VISIBLE;
-    ;
-    ALTER TABLE `db`.`road_condition_geometry` 
-    ADD CONSTRAINT `road_condition_id`
-      FOREIGN KEY (`road_condition_id`)
-      REFERENCES `db`.`road_condition_data` (`id`)
-      ON DELETE NO ACTION
-      ON UPDATE NO ACTION;")*/
+    
+    //This checks for en certain index, 1 == exists, 0 == does not exists.  
+    let mut result =  pool.prep_exec(r"SELECT COUNT(1) IndexIsThere FROM INFORMATION_SCHEMA.STATISTICS 
+        WHERE table_schema=DATABASE() AND table_name='road_condition_geometry' 
+        AND index_name='road_condition_id_idx';",()).unwrap();
 
+    let val = match result.next().unwrap().unwrap()[0] {
+        mysql::Value::Int(i) => i,
+        _ => 0,
+    };
+   //If the Foreing Key exists this setup query does not run. 
+   if(val == 0){
+    pool.prep_exec(r#"
+        SET @x := (SELECT COUNT(1) IndexIsThere FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema=DATABASE() AND table_name='road_condition_geometry' AND index_name='road_condition_id_idx');
+        SET @sql := if( @x > 0, 'select ''Index exists. ''', 'ALTER TABLE `db`.`road_condition_geometry` 
+        ADD INDEX `road_condition_id_idx` (`road_condition_id` ASC) VISIBLE;
+        ALTER TABLE `db`.`road_condition_geometry` 
+        ADD CONSTRAINT `road_condition_id`
+        FOREIGN KEY (`road_condition_id`)
+        REFERENCES `db`.`road_condition_data` (`id`)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION;'); 
+        PREPARE stmt FROM @sql;
+        EXECUTE stmt;
+        
+        "#,()).expect("Failed to create Foreign Key to Road Condition Geometry");
+}
     pool.prep_exec(r"CREATE TABLE IF NOT EXISTS station_data (
                         id VARCHAR(50) NOT NULL,
                         lat DECIMAL(10, 8) DEFAULT NULL,
@@ -359,6 +373,7 @@ pub fn create_mysql_tables(pool: Pool) {
         ReporterOrganization varchar(50) null
     )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;", ()).expect("Failed to create table: friction_data");
     //Grabben är lurig fixa så den itne skapar index om det redan finns
+    //let mut result =
     //pool.prep_exec("ALTER TABLE aggregated_friction_data ADD INDEX (Time, TimeAggregation, Longitude, Latitude, Radius, MeasureValueMin);",()).expect("Failed to create index: aggregated_friction_data_Time_MULTI_index ");
 
     pool.prep_exec(r#"CREATE TABLE IF NOT EXISTS road_accident_data (
@@ -397,6 +412,19 @@ pub fn create_mysql_tables(pool: Pool) {
     );",()).expect("Failed to create table aggregated friction data");
 
     //Grabben är lurig FIXA, TODO 
+    let mut result = pool.prep_exec("SELECT COUNT(1) IndexIsThere FROM INFORMATION_SCHEMA.STATISTICS 
+    WHERE table_schema=DATABASE() AND table_name='aggregated_friction_data' 
+    AND index_name='aggregated_friction_data_Time_MULTI_index';",()).unwrap();
+
+    let val = match result.next().unwrap().unwrap()[0] {
+        mysql::Value::Int(i) => i,
+        _ => 0,
+    };
+
+    if(val == 6){
+        pool.prep_exec("ALTER TABLE aggregated_friction_data ADD INDEX (Time, TimeAggregation, Longitude, Latitude, Radius, MeasureValueMin);",()).expect("Failed to create index: aggregated_friction_data_Time_MULTI_index ");
+
+    }
     //pool.prep_exec("ALTER TABLE aggregated_friction_data ADD INDEX (Time, TimeAggregation, Longitude, Latitude, Radius, MeasureValueMin);",()).expect("Failed to create index: aggregated_friction_data_Time_MULTI_index ");
     
     pool.prep_exec(r"CREATE TABLE IF NOT EXISTS camera_data (
