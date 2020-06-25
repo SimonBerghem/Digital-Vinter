@@ -103,7 +103,33 @@ pub struct RoadCondition{
     _secret: (),
 
 }
+//parse_changeid will find the changeid of an XML-File 
+//and return the text value as a string
+pub fn parse_changeid(xmlfile: &str) -> &str{
 
+    let mut xml = Reader::from_file(xmlfile).expect("Failed to open file!");
+    xml.trim_text(true);
+
+
+    let mut changeid = String::new();
+    let mut buf = Vec::new();
+    loop{
+        match xml.read_event(&mut buf){
+            Ok(Event::Start(ref e)) => match ( e.name()){
+                b"LASTCHANGEID" => {
+                    changeid = String::from(xml.read_text(e.name(),&mut Vec::new()).expect("Failed to read changeid"));
+                }
+            _ => (),
+            }
+            Ok(Event::Eof) => break,
+            Err(e) => panic!("Error at pos {}: {:?}", xml.buffer_position(), e),
+            _ => (),
+        }
+
+        buf.clear()
+    }
+    &changeid
+}
 
 pub fn parse_cameras(xmlfile: &str) -> Vec<CameraData> {
 
@@ -285,7 +311,8 @@ pub fn parse_roadAccident(xmlfile: &str) -> Vec<roadAccidentData>{
 
             }
             Ok(Event::Eof) => break,
-            Err(e) => panic!("Error at pos {}: {:?}", xml.buffer_position(), e),_ => (),
+            Err(e) => panic!("Error at pos {}: {:?}", xml.buffer_position(), e),
+            _ => (),
 
 
         }

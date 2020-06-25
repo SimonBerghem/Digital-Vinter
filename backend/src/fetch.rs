@@ -120,6 +120,39 @@ pub fn get_traffic_flow_data(){
 
     get_from_post(body,file_name);
  }
+
+pub fn get_road_geometry(changeid:&str){
+
+
+    let body = format!("<REQUEST>
+    <LOGIN authenticationkey=\"d8b542b2dafe40f999f223c7aff04046\" />
+    <QUERY objecttype=\"RoadGeometry\" schemaversion=\"1\" changeid=\"{:?}\">
+        <INCLUDE>County</INCLUDE>
+        <INCLUDE>Deleted</INCLUDE>
+        <INCLUDE>Direction.Code</INCLUDE>
+        <INCLUDE>Direction.Value</INCLUDE>
+        <INCLUDE>Geometry.SWEREF99TM3D</INCLUDE>
+        <INCLUDE>Geometry.WGS843D</INCLUDE>
+        <INCLUDE>Length</INCLUDE>
+        <INCLUDE>ModifiedTime</INCLUDE>
+        <INCLUDE>RoadMainNumber</INCLUDE>
+        <INCLUDE>RoadSubNumber</INCLUDE>
+        <INCLUDE>TimeStamp</INCLUDE>
+    </QUERY>
+    </REQUEST>",changeid);
+
+    println!("body {:?}", body);
+
+
+    //get_from_post(body,"Road_Geometry.xml");
+/*
+
+    let mut file = File::create("Road_Geometry.xml").expect("Error creating file, Road_Geometry.xml ");
+    io::copy(&mut res, &mut file).expect("Faled to read response to file");
+*/
+}
+
+
 //Takes a https post body as a string and a file name. 
 //A post request with the body is sent to DATEX II and creates a local XML file  with the data returned from Datex II.
 pub fn get_from_post(body:&'static str, file_name:&str){
@@ -131,7 +164,7 @@ pub fn get_from_post(body:&'static str, file_name:&str){
       .unwrap();
 
       let mut file = File::create(file_name)
-        .expect("Error creating file, SituationData");
+        .expect("Error creating file");
     io::copy(&mut res, &mut file)
         .expect("Failed to read response to file");
 

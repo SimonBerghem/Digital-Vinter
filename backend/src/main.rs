@@ -54,13 +54,26 @@ fn main() {
     database::insert_station_data(station_pool.clone(), station_data);
 
 
-/* Hej framtida utveklare, ifall du undrar varför alla kall är trådade så
-är svaret att en tidigare utvecklare resonerade: "Varför inte", den tidigare
-utvecklarens struktur har bibeholts. Det finns ingen större anledning att ha så
-många trådar som just nu finns mer än "det är cool". 
+    /* Hej framtida utveklare, ifall du undrar varför alla kall är trådade så
+    är svaret att en tidigare utvecklare resonerade: "Varför inte", den tidigare
+    utvecklarens struktur har bibeholts. Det finns ingen större anledning att ha så
+    många trådar som just nu finns mer än "det är cool". 
 
-Designa vidare som du anser bäst.
-*/
+    Designa vidare som du anser bäst.
+    */
+
+
+    thread::spawn(move || loop {
+        let changeid = "0";
+        let fetch_thread = thread::spawn(||{
+            fetch::get_road_geometry(changeid);
+
+        });
+
+        fetch_thread.join().unwrap();
+
+        let changeid = parse_xml::parse_changeid("Road_Geometry.xml");
+    });
 
 
     //Accident Data

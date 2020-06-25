@@ -464,8 +464,6 @@ pub fn create_mysql_tables(pool: Pool) {
         `Deleted` VARCHAR(45) NULL,
         `Direction.Code` VARCHAR(45) NULL,
         `Direction.Value` VARCHAR(45) NULL,
-        `Geometry.SWEREF99TM3D` VARCHAR(45) NULL,
-        `Geometry.WGS843D` VARCHAR(45) NULL,
         `Length` VARCHAR(45) NULL,
         `ModifiedTime` VARCHAR(45) NULL,
         `RoadMainNumber` VARCHAR(45) NULL,
@@ -509,6 +507,13 @@ pub fn create_mysql_tables(pool: Pool) {
         `Winter2003.Value` VARCHAR(45) NULL,
         PRIMARY KEY (`road_data_id`));
       ",());
+
+    pool.prep_exec(r"CREATE TABLE `db`.`road_geometry_geometry` (
+        `id` INT NOT NULL AUTO_INCREMENT,
+        `road_geometry_id` INT(11) NULL,
+        `Geometry.SWEREF99TM3D` VARCHAR(45) NULL,
+        `Geometry.WGS843D` VARCHAR(45) NULL,
+        PRIMARY KEY (`id`));",());
 
 }
 
