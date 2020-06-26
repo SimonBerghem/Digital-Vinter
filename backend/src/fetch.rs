@@ -123,10 +123,9 @@ pub fn get_traffic_flow_data(){
 
 pub fn get_road_geometry(changeid:&str){
 
-
-    let body = format!("<REQUEST>
+    let mut body = format!("<REQUEST>
     <LOGIN authenticationkey=\"d8b542b2dafe40f999f223c7aff04046\" />
-    <QUERY objecttype=\"RoadGeometry\" schemaversion=\"1\" changeid=\"{:?}\">
+    <QUERY objecttype=\"RoadGeometry\" schemaversion=\"1\" changeid={:?}>
         <INCLUDE>County</INCLUDE>
         <INCLUDE>Deleted</INCLUDE>
         <INCLUDE>Direction.Code</INCLUDE>
@@ -141,10 +140,17 @@ pub fn get_road_geometry(changeid:&str){
     </QUERY>
     </REQUEST>",changeid);
 
-    println!("body {:?}", body);
+    //println!("body {:?}", body);
+    let client = reqwest::blocking::Client::new();
+    let mut res = client.post("https://api.trafikinfo.trafikverket.se/v2/data.xml").header(USER_AGENT,"DATAEXLTU20").header(CONTENT_TYPE,"text/xml")
+      .body(body)
+      .send().unwrap();
 
-
-    //get_from_post(body,"Road_Geometry.xml");
+    
+    let mut file = File::create("Road_Geometry.xml")
+        .expect("Error creating file");
+    io::copy(&mut res, &mut file)
+        .expect("Failed to read response to file");
 /*
 
     let mut file = File::create("Road_Geometry.xml").expect("Error creating file, Road_Geometry.xml ");

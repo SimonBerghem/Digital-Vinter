@@ -62,10 +62,9 @@ fn main() {
     Designa vidare som du anser bäst.
     */
 
-
+    let mut changeid = "0";
     thread::spawn(move || loop {
-        let changeid = "0";
-        let fetch_thread = thread::spawn(||{
+        let fetch_thread = thread::spawn(move ||{
             fetch::get_road_geometry(changeid);
 
         });
@@ -73,6 +72,7 @@ fn main() {
         fetch_thread.join().unwrap();
 
         let changeid = parse_xml::parse_changeid("Road_Geometry.xml");
+        println!("{:?}", changeid);
     });
 
 

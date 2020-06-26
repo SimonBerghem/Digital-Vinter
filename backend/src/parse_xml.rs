@@ -57,6 +57,15 @@ pub struct roadAccidentData {
     _secret: (),
 
 }
+
+//Skapad för jag viste inte hur man skrev minnesäker kod.
+//Rust är svårt och jag kommer inte dömma er om ni byter till python.
+#[derive(Debug)]
+pub struct ChangeId {
+    pub change_id: String,
+    _secret: (),
+
+}
 //NYTT TrafficFlow
 #[derive(Debug)]
 pub struct TrafficFlowData {
@@ -74,6 +83,22 @@ pub struct TrafficFlowData {
     pub SpecificLane: String,
     pub VehicleFlowRate: String,
     pub VehicleType: String,
+    _secret: (),
+}
+
+#[derive)(Debug)]
+pub struct RoadGeometry{
+    pub county: String,
+    pub deleted: String,
+    pub direction_code: String,
+    pub direction_value: String,
+    pub SWEREF99TM: String,
+    pub WGS84: String,
+    pub length: String,
+    pub modified_time: String,
+    pub road_main_number: String,
+    pub road_sub_number: String,
+    pub time_stamp: String,
     _secret: (),
 }
 
@@ -103,34 +128,113 @@ pub struct RoadCondition{
     _secret: (),
 
 }
+
+
+
 //parse_changeid will find the changeid of an XML-File 
 //and return the text value as a string
-pub fn parse_changeid(xmlfile: &str) -> &str{
 
-    let mut xml = Reader::from_file(xmlfile).expect("Failed to open file!");
+
+pub fn parse_road_geometry(xmlfile: &str)-> Vec<RoadGeometry>{
+
+    let mut xml = Reader::from_file(xmlfile).expect("Failed to open File");
     xml.trim_text(true);
 
-
-    let mut changeid = String::new();
+    let mut RoadGeometry_data = Vec::new();
     let mut buf = Vec::new();
+
     loop{
         match xml.read_event(&mut buf){
-            Ok(Event::Start(ref e)) => match ( e.name()){
-                b"LASTCHANGEID" => {
-                    changeid = String::from(xml.read_text(e.name(),&mut Vec::new()).expect("Failed to read changeid"));
+            Ok(Event:Start(ref e)) => match e.name(){
+                b"RoadGeometry" => {
+                    let Road_Geometry = RoadGeometry{
+                        county : String::new(),
+                        deleted : String::new(),
+                        direction_code : String::new(),
+                        direction_value : String::new(),
+                        SWEREF99TM : String::new(),
+                        WGS84 : String::new(),
+                        length : String::new(),
+                        modified_time : String::new(),
+                        road_main_number : String::new(),
+                        road_sub_number : String::new(),
+                        time_stamp : String::new(),
+                        _secret : (),
+                    };
+                    RoadGeometry_data.push(Road_Geometry);
+                    let Road_Geometry = RoadGeometry_data.last_mut().unwrap();
                 }
-            _ => (),
+                b"County" => {
+                    let Road_Geometry = RoadGeometry_data.last_mut().unwrap();
+                    Road_Geometry.county = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                }
+                b"Deleted" => {
+                    let Road_Geometry = RoadGeometry_data.last_mut().unwrap();
+                    Road_Geometry.deleted = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                }
+                b"Code" => {
+                    let Road_Geometry = RoadGeometry_data.last_mut().unwrap();
+                    Road_Geometry.direction_code = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                }
+                
+                b"Value" => {
+                    let Road_Geometry = RoadGeometry_data.last_mut().unwrap();
+                    Road_Geometry.direction_value = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                }
+
+                b"Lenght" => {
+                    let Road_Geometry = RoadGeometry_data.last_mut().unwrap();
+                    Road_Geometry..length = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                }
+                b"SWEREF99TM3D" => {
+                    let Road_Geometry = RoadGeometry_data.last_mut().unwrap();
+                    Road_Geometry.SWEREF99TM3D = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                }
+            }
+
+        }
+
+    }
+
+}
+
+pub fn parse_changeid(xmlfile: &str)-> Vec<ChangeId> {
+
+    let mut xml = Reader::from_file(xmlfile).expect("Failed to open file1");
+    xml.trim_text(true);
+
+    let mut ChangeId_data = Vec::new();
+    let mut buf = Vec::new();
+
+    loop {
+        match xml.read_event(&mut buf){
+            Ok(Event::Start(ref e)) => match e.name(){
+                b"INFO" => {
+                    let Change_Id = ChangeId{
+                        change_id : String::new(),
+                        _secret: (),
+
+                    }; 
+                    ChangeId_data.push(Change_Id);
+                    let Change_Id = ChangeId_data.last_mut().unwrap();
+                }
+
+                b"LASTCHANGEID" => {
+                    let Change_Id = ChangeId_data.last_mut().unwrap();
+                    Change_Id.change_id = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+
+                }
+
+                _ => (), //Else typ
             }
             Ok(Event::Eof) => break,
             Err(e) => panic!("Error at pos {}: {:?}", xml.buffer_position(), e),
             _ => (),
         }
-
-        buf.clear()
+        buf.clear();
     }
-    &changeid
+    ChangeId_data
 }
-
 pub fn parse_cameras(xmlfile: &str) -> Vec<CameraData> {
 
     #[derive(Clone, Copy)]

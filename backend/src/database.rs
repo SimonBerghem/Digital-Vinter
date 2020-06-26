@@ -7,6 +7,9 @@ use mysql::chrono::{DateTime, FixedOffset};
 
 use crate::parse_xml::{StationData, WeatherData, CameraData, roadAccidentData, TrafficFlowData, RoadCondition};
 
+
+
+
 pub fn insert_friction_data(mut conn: PooledConn, url: &str) {
     //conn.query(r"LOAD DATA LOCAL INFILE ".to_owned() + "'" + url + "'" + " INTO TABLE friction_data LINES TERMINATED BY '\r\n' IGNORE 1 LINES SET `lat`= REPLACE(`lat`, ',', '.'), `lon`=REPLACE(`lon`, ',', '.'), `MeasurementValue`=REPLACE(`MeasurementValue`, ',', '.');").unwrap();
     conn.query(r"LOAD DATA LOCAL INFILE '/Users/samuelgraden/Documents/Projectrcm-sommar-2019/backend/e6.txt' INTO TABLE friction_data LINES TERMINATED BY '\r\n' IGNORE 1 LINES (`id`, `MeasureTimeUTC`, `ReportTimeUTC`, `lat`, `lon`, `RoadCondition`, `MeasurementType`, `NumberOfMeasurements`, `MeasurementValue`, `MeasurementConfidence`, `MeasurementsVelocity`, `ReporterOrganisation`, `EquipmentType`) SET `lat`= REPLACE(`lat`, ',', '.'), `lon`=REPLACE(`lon`, ',', '.');)").unwrap();
@@ -40,6 +43,8 @@ pub fn insert_camera_data(pool: Pool, camera_data: Vec<CameraData>) {
     }
 }
 //Skrev en egen för att något dampade med den andra, denna är nog inte SQL-injection safe, den tar inte hänsyn till om Trafikverket updaterar sin data
+#[depricated(Since = "0.1"
+note = "Använd insert_road_accident_data istället")]
 pub fn insert_road_accident_row(pool: Pool, accident_row: Vec<roadAccidentData>){
     println!("{:?} Warning! SQL-Injection Vurnable","§");
     for i in accident_row.iter(){
@@ -53,7 +58,27 @@ pub fn insert_road_accident_row(pool: Pool, accident_row: Vec<roadAccidentData>)
     }
    
 }
+//Det är ett dåligt namn med det är det trafikverket kallar det så då fick det bli så, 
+//men vad den gör är att mata in kordinaterna för en väg
+pub fn insert_road_geometry(pool: Pool, road_geometry_data: Vec<RoadGeomtry>){
 
+    let insert_stmt = r"INSERT INTO `db`.`road_geometry_geometry` 
+    (`Geometry.SWEREF99TM3D`, `Geometry.WGS843D`, `RoadMainNumber`, `RoadSubNumber`) 
+    VALUES (:swe, ':wgs, rmn, rsn);
+    ";
+
+    for mut stmt in pool.prepare(insert_stmt).into_iter() { 
+        for i in camera_data.iter() {
+            // `execute` takes ownership of `params` so we pass account name by reference.
+            stmt.execute(params!{
+                "swe" => i.id.clone(),
+                "wgs" => i.time.clone(),
+                "rmn" => i.latitude.clone(),
+                "rsn" => i.latitude.clone(),
+            }).expect("Failed to execute statement when reading from camera_data");
+        }
+    }
+}
 // Insert the data to MYSQL, TABLE assumed to exist
 pub fn insert_station_data(pool: Pool, station_data: Vec<StationData>) {
 
@@ -510,9 +535,10 @@ pub fn create_mysql_tables(pool: Pool) {
 
     pool.prep_exec(r"CREATE TABLE `db`.`road_geometry_geometry` (
         `id` INT NOT NULL AUTO_INCREMENT,
-        `road_geometry_id` INT(11) NULL,
         `Geometry.SWEREF99TM3D` VARCHAR(45) NULL,
         `Geometry.WGS843D` VARCHAR(45) NULL,
+        `RoadMainNumber` VARCHAR(45) NULL,
+        `RoadSubNumber` VARCHAR(45) NULL,
         PRIMARY KEY (`id`));",());
 
 }
