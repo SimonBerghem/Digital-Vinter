@@ -40,6 +40,7 @@ fn main() {
     let road_accident_pool = pool.clone();
     let traffic_flow_pool = pool.clone();
     let road_condition_pool = pool.clone();
+    let road_geometry_pool = pool.clone();
 
 
     //database::insert_road_accident_data(road_accident_pool.clone(), roadAccident_data);
@@ -72,9 +73,10 @@ fn main() {
         fetch_thread.join().unwrap();
 
         let changeid = parse_xml::parse_changeid("Road_Geometry.xml");
+        let road_geometry_data = parse_xml::parse_road_geometry("Road_Geometry.xml");
+        database::insert_road_geometry(road_geometry_pool.clone(),road_geometry_data);
         println!("{:?}", changeid);
     });
-
 
     //Accident Data
     thread::spawn(move || loop {

@@ -5,7 +5,7 @@ use mysql::OptsBuilder;
 use mysql::chrono::{DateTime, FixedOffset};
 // use mysql::from_row;
 
-use crate::parse_xml::{StationData, WeatherData, CameraData, roadAccidentData, TrafficFlowData, RoadCondition};
+use crate::parse_xml::{StationData, WeatherData, CameraData, roadAccidentData, TrafficFlowData, RoadCondition, RoadGeometry};
 
 
 
@@ -18,6 +18,7 @@ pub fn insert_friction_data(mut conn: PooledConn, url: &str) {
     //LOAD DATA LOCAL INFILE '/home/aron/rcm-sommar-2019/backend/e6.txt' INTO TABLE friction_data LINES TERMINATED BY '\r\n' IGNORE 1 LINES SET `lat`= REPLACE(`lat`, ',', '.'), `lon`=REPLACE(`lon`, ',', '.'), `MeasurementValue`=REPLACE(`MeasurementValue`, ',', '.');
 
 }
+
 pub fn insert_camera_data(pool: Pool, camera_data: Vec<CameraData>) {
 
 
@@ -42,9 +43,9 @@ pub fn insert_camera_data(pool: Pool, camera_data: Vec<CameraData>) {
         }
     }
 }
+
+
 //Skrev en egen för att något dampade med den andra, denna är nog inte SQL-injection safe, den tar inte hänsyn till om Trafikverket updaterar sin data
-#[depricated(Since = "0.1"
-note = "Använd insert_road_accident_data istället")]
 pub fn insert_road_accident_row(pool: Pool, accident_row: Vec<roadAccidentData>){
     println!("{:?} Warning! SQL-Injection Vurnable","§");
     for i in accident_row.iter(){
@@ -60,22 +61,67 @@ pub fn insert_road_accident_row(pool: Pool, accident_row: Vec<roadAccidentData>)
 }
 //Det är ett dåligt namn med det är det trafikverket kallar det så då fick det bli så, 
 //men vad den gör är att mata in kordinaterna för en väg
-pub fn insert_road_geometry(pool: Pool, road_geometry_data: Vec<RoadGeomtry>){
+pub fn insert_road_geometry(pool: Pool, road_geometry_data: Vec<RoadGeometry>){
 
-    let insert_stmt = r"INSERT INTO `db`.`road_geometry_geometry` 
-    (`Geometry.SWEREF99TM3D`, `Geometry.WGS843D`, `RoadMainNumber`, `RoadSubNumber`) 
-    VALUES (:swe, ':wgs, rmn, rsn);
-    ";
+    let mut insert_stmt_geometry = r"INSERT INTO `db`.`road_geometry_geometry` 
+        (`RoadMainNumber`, `RoadSubNumber`, `Longitude`, `Latitude`, `RH2000_Altitude`) 
+        VALUES (:road_main_number, :road_sub_number, :long, :lat, :alt);
+        ";
 
-    for mut stmt in pool.prepare(insert_stmt).into_iter() { 
-        for i in camera_data.iter() {
-            // `execute` takes ownership of `params` so we pass account name by reference.
+    let mut insert_stmt_prep =  pool.prepare(insert_stmt_geometry);
+    println!("SQL: {:?} ",insert_stmt_prep);
+    for mut stmt in pool.prepare(insert_stmt_geometry).into_iter() { 
+
+        for i in road_geometry_data.iter() {
+
+            //String manupulation to separate the values, 
+            //Anledningen till varför du inte kan kedja funktioner som ett vanligt språk, är för att det är rust.
+            //Framtida utvecklare får gärna snygga till koden.
+            let mut swe_ref = i.SWEREF99TM3D.clone();
+            let mut swe_ref_string:Vec<&str> = swe_ref.split("(").collect();
+            let mut swe_ref_string_2:Vec<&str> = swe_ref_string[1].split(")").collect();
+            let mut swe_ref_string_3:Vec<&str> = swe_ref_string_2[0].split(", ").collect();
+            
+            for e in swe_ref_string_3.into_iter(){
+                let mut long_lat_alt:Vec<&str> = e.split(" ").collect();
+                println!("Swe ref:  {:?}",e);
+                //println!("id: {:?} . swe: {:?}",i.id.clone(), e.clone());
+                stmt.execute(params!{
+                    "road_main_number" => i.road_main_number.clone(),
+                    "road_sub_number" => i.road_sub_number.clone(),
+                    "lat" => long_lat_alt[0],
+                    "alt" => long_lat_alt[1],
+                    "long" => long_lat_alt[2],
+                }).expect("Failed to execute statement when inserting Road DATA Geometry cordinates");
+                //println!("Sweref: {:?}", e);
+            }
+
+
+        }
+    }
+    insert_stmt_geometry = r"INSERT INTO `db`.`road_geometry` 
+        (`County`, `Deleted`, `Direction.Code`, 
+        `Direction.Value`, `Length`, `ModifiedTime`, `RoadMainNumber`, 
+        `RoadSubNumber`, `TimeStamp`) 
+        VALUES (:county, :deleted, :direction_code, :direction_value, :length, 
+            :modified_time, :road_main_number, :road_sub_number, :time_stamp);";
+
+    for mut stmt in pool.prepare(insert_stmt_geometry).into_iter(){
+
+
+        for i in road_geometry_data.iter(){
             stmt.execute(params!{
-                "swe" => i.id.clone(),
-                "wgs" => i.time.clone(),
-                "rmn" => i.latitude.clone(),
-                "rsn" => i.latitude.clone(),
-            }).expect("Failed to execute statement when reading from camera_data");
+                "counyt" => i.county.clone(),
+                "deleted" => i.deleted.clone(),
+                "direction_code" => i.direction_code.clone(),
+                "direction_value" => i.direction_value.clone(),
+                "length" => i.length.clone(),
+                "modified_time" => i.modified_time.clone(),
+                "road_main_number" => i.road_main_number.clone(),
+                "road_sub_number" =>  i.road_sub_number.clone(),
+                "time_stamp" => i.time_stamp.clone(),
+            
+            }).expect("Failed to insert road data geometry");
         }
     }
 }
@@ -109,8 +155,16 @@ pub fn insert_station_data(pool: Pool, station_data: Vec<StationData>) {
 // Insert the Road accident data to MYSQ, TABLE assumed to exist ROAD
 pub fn insert_road_accident_data(pool: Pool, road_accident_data: Vec<roadAccidentData>){
 
+    let mut insert_stmt = r"INSERT INTO `db`.`road_geometry` 
+        (`County`, `Deleted`, `Direction.Code`, `Direction.Value`, `Length`, 
+            `ModifiedTime`, `RoadMainNumber`, `RoadSubNumber`, `TimeStamp`) 
+        VALUES (:county, :deleted, :dir_code, :dir_value, _length, 
+            :modified_time, :road_main_number, :road_sub_number, :time_stamp);";
 
-    
+
+    let mut instert_stmt_prep = pool.prepare(insert_stmt);
+    //println!("SQL:  {:?}" ,insert_stmt_prep);
+
     let mut insert_stmt = r"INSERT IGNORE INTO road_accident_data (Id, CreationTime, EndTime, IconId, SWEREF99TM, WGS84, SeverityCode)
                         VALUES(:id, :ctime, :etime, :iid, 
                         :swe, :wg, :scode);";
@@ -118,7 +172,7 @@ pub fn insert_road_accident_data(pool: Pool, road_accident_data: Vec<roadAcciden
     let mut insert_stmt_prep = pool.prepare(insert_stmt);
     //println!("SQL:  {:?}" ,insert_stmt_prep);
     for mut stmt in insert_stmt_prep.into_iter() {
-        println!("{:?}: Lenght", road_accident_data.len());
+        //println!("{:?}: Lenght", road_accident_data.len());
         for i in road_accident_data.iter() {
             
             // `execute` takes ownership of `params` so we pass account name by reference.
@@ -133,11 +187,6 @@ pub fn insert_road_accident_data(pool: Pool, road_accident_data: Vec<roadAcciden
             }).expect("Failed to execute statement when reading from road_accident_data");
         }
     }
-
-
-
-
-
 }
 
 pub fn insert_road_condition_data(pool:Pool, road_condition_data: Vec<RoadCondition>){
@@ -192,6 +241,7 @@ pub fn insert_road_condition_data(pool:Pool, road_condition_data: Vec<RoadCondit
     for mut stmt in insert_stmt_prep.into_iter(){
 
         for i in road_condition_data.iter(){
+
             let mut swe_ref = i.SWEREF99TM.clone();
             let mut swe_ref_string:Vec<&str> = swe_ref.split("(").collect();
             let mut swe_ref_string_2:Vec<&str> = swe_ref_string[1].split(")").collect();
@@ -205,15 +255,8 @@ pub fn insert_road_condition_data(pool:Pool, road_condition_data: Vec<RoadCondit
                 }).expect("Failed to execute statement when inserting Road Condition Geometry");
                 //println!("Sweref: {:?}", e);
             }
-            
-           
-            
-
-        
-    
         }
     }
-
 }
 
 pub fn insert_traffic_flow_data(pool:Pool, traffic_flow_data: Vec<TrafficFlowData>){
@@ -225,8 +268,6 @@ pub fn insert_traffic_flow_data(pool:Pool, traffic_flow_data: Vec<TrafficFlowDat
                  VALUES (:speed, :county, :swe, :wg, 
                         :period, :mside, :mtime, 
                         :modtime, :rid, :sid, :slane, :vfr, :vt);";
-      
-    
     
     for mut stmt in pool.prepare(insert_stmt).into_iter() {
         //println!("{:?}:","Loop deapth: 1");
@@ -484,7 +525,6 @@ pub fn create_mysql_tables(pool: Pool) {
         )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;", ()).expect("Failed to create table: traffic_flow");
 
     pool.prep_exec(r"CREATE TABLE IF NOT EXISTS `db`.`road_geometry` (
-        `road_geometry_id` INT NOT NULL AUTO_INCREMENT,
         `County` VARCHAR(45) NULL,
         `Deleted` VARCHAR(45) NULL,
         `Direction.Code` VARCHAR(45) NULL,
@@ -494,7 +534,7 @@ pub fn create_mysql_tables(pool: Pool) {
         `RoadMainNumber` VARCHAR(45) NULL,
         `RoadSubNumber` VARCHAR(45) NULL,
         `TimeStamp` VARCHAR(45) NULL,
-        PRIMARY KEY (`road_geometry_id`));",());
+        PRIMARY KEY (`RoadMainNumber`, `RoadSubNumber`));",());
 
 
     pool.prep_exec(r"CREATE TABLE IF NOT EXISTS`db`.`road_data` (
@@ -533,14 +573,38 @@ pub fn create_mysql_tables(pool: Pool) {
         PRIMARY KEY (`road_data_id`));
       ",());
 
-    pool.prep_exec(r"CREATE TABLE `db`.`road_geometry_geometry` (
-        `id` INT NOT NULL AUTO_INCREMENT,
-        `Geometry.SWEREF99TM3D` VARCHAR(45) NULL,
-        `Geometry.WGS843D` VARCHAR(45) NULL,
+    pool.prep_exec(r"CREATE TABLE IF NOT EXISTS`db`.`road_geometry_geometry` (
+        `Longitude` VARCHAR(45) NULL,
+        `Latitude` VARCHAR(45) NULL,
+        `RH2000_Altitude` VARCHAR(45) NULL,
+        `WGS` VARCHAR(45) NULL,
         `RoadMainNumber` VARCHAR(45) NULL,
         `RoadSubNumber` VARCHAR(45) NULL,
-        PRIMARY KEY (`id`));",());
+        PRIMARY KEY (`RoadMainNumber`, `RoadSubNumber`));",());
+
+
+
+    let mut result =  pool.prep_exec(r"SELECT COUNT(1) IndexIsThere FROM INFORMATION_SCHEMA.STATISTICS 
+        WHERE table_schema=DATABASE() AND table_name='road_geometry_geometry' 
+        AND index_name='road_id';",()).unwrap();
+
+    let val = match result.next().unwrap().unwrap()[0] {
+        mysql::Value::Int(i) => i,
+        _ => 0,
+    };
+
+    if (val == 2){
+        pool.prep_exec(r"ALTER TABLE `db`.`road_geometry_geometry` 
+        ADD CONSTRAINT `raod_id`
+          FOREIGN KEY (`RoadMainNumber` , `RoadSubNumber`)
+          REFERENCES `db`.`road_geometry` (`RoadMainNumber` , `RoadSubNumber`)
+          ON DELETE NO ACTION
+          ON UPDATE NO ACTION;",());
+    }
+   
 
 }
+
+    
 
 

@@ -86,14 +86,14 @@ pub struct TrafficFlowData {
     _secret: (),
 }
 
-#[derive)(Debug)]
+#[derive(Debug)]
 pub struct RoadGeometry{
     pub county: String,
     pub deleted: String,
     pub direction_code: String,
     pub direction_value: String,
-    pub SWEREF99TM: String,
-    pub WGS84: String,
+    pub SWEREF99TM3D: String,
+    pub WGS843D: String,
     pub length: String,
     pub modified_time: String,
     pub road_main_number: String,
@@ -133,8 +133,6 @@ pub struct RoadCondition{
 
 //parse_changeid will find the changeid of an XML-File 
 //and return the text value as a string
-
-
 pub fn parse_road_geometry(xmlfile: &str)-> Vec<RoadGeometry>{
 
     let mut xml = Reader::from_file(xmlfile).expect("Failed to open File");
@@ -145,15 +143,15 @@ pub fn parse_road_geometry(xmlfile: &str)-> Vec<RoadGeometry>{
 
     loop{
         match xml.read_event(&mut buf){
-            Ok(Event:Start(ref e)) => match e.name(){
+            Ok(Event::Start(ref e)) => match e.name(){
                 b"RoadGeometry" => {
                     let Road_Geometry = RoadGeometry{
                         county : String::new(),
                         deleted : String::new(),
                         direction_code : String::new(),
                         direction_value : String::new(),
-                        SWEREF99TM : String::new(),
-                        WGS84 : String::new(),
+                        SWEREF99TM3D : String::new(),
+                        WGS843D : String::new(),
                         length : String::new(),
                         modified_time : String::new(),
                         road_main_number : String::new(),
@@ -184,17 +182,46 @@ pub fn parse_road_geometry(xmlfile: &str)-> Vec<RoadGeometry>{
 
                 b"Lenght" => {
                     let Road_Geometry = RoadGeometry_data.last_mut().unwrap();
-                    Road_Geometry..length = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                    Road_Geometry.length = xml.read_text(e.name(),&mut Vec::new()).unwrap();
                 }
                 b"SWEREF99TM3D" => {
                     let Road_Geometry = RoadGeometry_data.last_mut().unwrap();
                     Road_Geometry.SWEREF99TM3D = xml.read_text(e.name(),&mut Vec::new()).unwrap();
                 }
-            }
+                b"WGS843D" => {
+                    let Road_Geometry = RoadGeometry_data.last_mut().unwrap();
+                    Road_Geometry.WGS843D = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                }
+                
+                b"ModifiedTime" => {
+                    let Road_Geometry = RoadGeometry_data.last_mut().unwrap();
+                    Road_Geometry.modified_time = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                }
 
+                b"RoadMainNumber" => {
+                    let Road_Geometry = RoadGeometry_data.last_mut().unwrap();
+                    Road_Geometry.road_main_number = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                }
+
+                b"RoadSubNumber" => {
+                    let Road_Geometry = RoadGeometry_data.last_mut().unwrap();
+                    Road_Geometry.road_sub_number = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                }
+
+                b"TimeStamp" => {
+                    let Road_Geometry = RoadGeometry_data.last_mut().unwrap();
+                    Road_Geometry.time_stamp = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                }
+                _ => (), 
+            }
+            Ok(Event::Eof) => break,
+            Err(e) => panic!("Error at pos {}: {:?}", xml.buffer_position(), e),
+            _ => (),
         }
+        buf.clear();
 
     }
+    RoadGeometry_data
 
 }
 
@@ -909,9 +936,7 @@ pub fn parse_weather(xmlfile: &str) -> Vec<WeatherData> {
         }
         buf.clear();
     }
-
     // Vec<WeatherData>
     weather_data
-    
 }
 
