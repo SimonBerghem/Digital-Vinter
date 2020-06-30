@@ -63,55 +63,35 @@ pub fn insert_road_accident_row(pool: Pool, accident_row: Vec<roadAccidentData>)
 //men vad den gör är att mata in kordinaterna för en väg
 pub fn insert_road_geometry(pool: Pool, road_geometry_data: Vec<RoadGeometry>){
 
-    let mut insert_stmt_geometry = r"INSERT INTO `db`.`road_geometry_geometry` 
-        (`RoadMainNumber`, `RoadSubNumber`, `Longitude`, `Latitude`, `RH2000_Altitude`) 
-        VALUES (:road_main_number, :road_sub_number, :long, :lat, :alt);
-        ";
+    let mut insert_stmt_geometry = r"INSERT IGNORE INTO `db`.`roads_listed`
+        (`road_main_number`, `road_sub_number`)
+        VALUES (:road_main_number, :road_sub_number);";
 
-    let mut insert_stmt_prep =  pool.prepare(insert_stmt_geometry);
-    println!("SQL: {:?} ",insert_stmt_prep);
-    for mut stmt in pool.prepare(insert_stmt_geometry).into_iter() { 
+    let mut insert_stmt_prep = pool.prepare(insert_stmt_geometry);
+    //println!("SQL: {:?}", insert_stmt_prep);
 
-        for i in road_geometry_data.iter() {
-
-            //String manupulation to separate the values, 
-            //Anledningen till varför du inte kan kedja funktioner som ett vanligt språk, är för att det är rust.
-            //Framtida utvecklare får gärna snygga till koden.
-            let mut swe_ref = i.SWEREF99TM3D.clone();
-            let mut swe_ref_string:Vec<&str> = swe_ref.split("(").collect();
-            let mut swe_ref_string_2:Vec<&str> = swe_ref_string[1].split(")").collect();
-            let mut swe_ref_string_3:Vec<&str> = swe_ref_string_2[0].split(", ").collect();
-            
-            for e in swe_ref_string_3.into_iter(){
-                let mut long_lat_alt:Vec<&str> = e.split(" ").collect();
-                println!("Swe ref:  {:?}",e);
-                //println!("id: {:?} . swe: {:?}",i.id.clone(), e.clone());
-                stmt.execute(params!{
-                    "road_main_number" => i.road_main_number.clone(),
-                    "road_sub_number" => i.road_sub_number.clone(),
-                    "lat" => long_lat_alt[0],
-                    "alt" => long_lat_alt[1],
-                    "long" => long_lat_alt[2],
-                }).expect("Failed to execute statement when inserting Road DATA Geometry cordinates");
-                //println!("Sweref: {:?}", e);
-            }
-
-
+    for mut stmt in pool.prepare(insert_stmt_geometry).into_iter(){
+        for i in road_geometry_data.iter(){
+            stmt.execute(params!{
+                "road_main_number" => i.road_main_number.clone(),
+                "road_sub_number" => i.road_sub_number.clone(),
+            }).expect("Failed to insert into roads_listed");
         }
     }
-    insert_stmt_geometry = r"INSERT INTO `db`.`road_geometry` 
+
+    insert_stmt_geometry = r"INSERT IGNORE INTO `db`.`road_geometry` 
         (`County`, `Deleted`, `Direction.Code`, 
         `Direction.Value`, `Length`, `ModifiedTime`, `RoadMainNumber`, 
         `RoadSubNumber`, `TimeStamp`) 
         VALUES (:county, :deleted, :direction_code, :direction_value, :length, 
             :modified_time, :road_main_number, :road_sub_number, :time_stamp);";
 
+    let mut insert_stmt_prep =  pool.prepare(insert_stmt_geometry);
+    //println!("SQL: {:?} ",insert_stmt_prep);
     for mut stmt in pool.prepare(insert_stmt_geometry).into_iter(){
-
-
         for i in road_geometry_data.iter(){
             stmt.execute(params!{
-                "counyt" => i.county.clone(),
+                "county" => i.county.clone(),
                 "deleted" => i.deleted.clone(),
                 "direction_code" => i.direction_code.clone(),
                 "direction_value" => i.direction_value.clone(),
@@ -124,6 +104,55 @@ pub fn insert_road_geometry(pool: Pool, road_geometry_data: Vec<RoadGeometry>){
             }).expect("Failed to insert road data geometry");
         }
     }
+
+    insert_stmt_geometry = r"INSERT IGNORE INTO `db`.`road_geometry_geometry` 
+        (`RoadMainNumber`, `RoadSubNumber`, `Longitude`, `Latitude`, `RH2000_Altitude`) 
+        VALUES (:road_main_number, :road_sub_number, :long, :lat, :alt);
+        ";
+
+    let mut insert_stmt_prep =  pool.prepare(insert_stmt_geometry);
+    //println!("SQL: {:?} ",insert_stmt_prep);
+    for mut stmt in pool.prepare(insert_stmt_geometry).into_iter() { 
+
+        for i in road_geometry_data.iter() {
+
+            //String manupulation to separate the values, 
+            //Anledningen till varför du inte kan kedja funktioner som ett vanligt språk, är för att det är rust.
+            //Framtida utvecklare får gärna snygga till koden.
+            let mut swe_ref = i.WGS843D.clone();
+            let mut swe_ref_string:Vec<&str> = swe_ref.split("(").collect();
+            let mut swe_ref_string_2:Vec<&str> = swe_ref_string[1].split(")").collect();
+            let mut swe_ref_string_3:Vec<&str> = swe_ref_string_2[0].split(", ").collect();
+            
+            for e in swe_ref_string_3.into_iter(){
+                let mut long_lat_alt:Vec<&str> = e.split(" ").collect();
+                //println!("WG:  {:?}",e);
+                //println!("id: {:?} . swe: {:?}",i.id.clone(), e.clone());
+                //println!("SIZE: {:?}",long_lat_alt.capacity());
+                if(long_lat_alt.capacity()==4){
+
+                    stmt.execute(params!{
+                    
+                        "road_main_number" => i.road_main_number.clone(),
+                        "road_sub_number" => i.road_sub_number.clone(),
+                        "long" => long_lat_alt[0],
+                        "lat" => long_lat_alt[1],
+                        "alt" => long_lat_alt[2],
+                    }).expect("Failed to execute statement when inserting Road DATA Geometry cordinates");
+
+                }
+                else{
+                    stmt.execute(params!{
+                        "road_main_number" => i.road_main_number.clone(),
+                        "road_sub_number" => i.road_sub_number.clone(),
+                        "long" => long_lat_alt[0],
+                        "lat" => long_lat_alt[1],
+                        "alt" => "NULL",
+                    }).expect("Failed to execute statement when inserting Road DATA Geometry cordinates");
+                }   
+            }
+        }
+    } 
 }
 // Insert the data to MYSQL, TABLE assumed to exist
 pub fn insert_station_data(pool: Pool, station_data: Vec<StationData>) {

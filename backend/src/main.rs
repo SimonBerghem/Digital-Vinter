@@ -63,6 +63,12 @@ fn main() {
     Designa vidare som du anser bäst.
     */
 
+    thread::spawn(move || loop{
+        thread::sleep(Duration::from_secs(30));
+        println!("Hearbeat");
+
+    });
+
     let mut changeid = "0";
     thread::spawn(move || loop {
         let fetch_thread = thread::spawn(move ||{
@@ -75,7 +81,8 @@ fn main() {
         let changeid = parse_xml::parse_changeid("Road_Geometry.xml");
         let road_geometry_data = parse_xml::parse_road_geometry("Road_Geometry.xml");
         database::insert_road_geometry(road_geometry_pool.clone(),road_geometry_data);
-        println!("{:?}", changeid);
+        println!("{:?}",changeid);
+        println!("{:?}: Road_Geometry fetched from DATEX II", Local::now().naive_local());
     });
 
     //Accident Data
