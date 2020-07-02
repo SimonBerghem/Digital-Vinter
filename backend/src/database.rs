@@ -59,6 +59,9 @@ pub fn insert_road_accident_row(pool: Pool, accident_row: Vec<roadAccidentData>)
     }
    
 }
+//pub fn insert_road_data(pool: Pool, road_data_data: Vec<RoadData>)
+
+
 //Det är ett dåligt namn med det är det trafikverket kallar det så då fick det bli så, 
 //men vad den gör är att mata in kordinaterna för en väg
 pub fn insert_road_geometry(pool: Pool, road_geometry_data: Vec<RoadGeometry>){
@@ -78,7 +81,6 @@ pub fn insert_road_geometry(pool: Pool, road_geometry_data: Vec<RoadGeometry>){
             }).expect("Failed to insert into roads_listed");
         }
     }
-
     insert_stmt_geometry = r"INSERT IGNORE INTO `db`.`road_geometry` 
         (`County`, `Deleted`, `Direction.Code`, 
         `Direction.Value`, `Length`, `ModifiedTime`, `RoadMainNumber`, 

@@ -102,6 +102,41 @@ pub struct RoadGeometry{
     _secret: (),
 }
 
+pub struct RoadData{
+    pub aadt: String,
+    pub aadt_heavy_vehicles: String,
+    pub aadt_measurement_method_code: String,
+    pub aadt_measurement_method_value: String,
+    pub aadt_measurement_year: String,
+    pub bearing_capacity_code: String,
+    pub bearing_capacity_value: String,
+    pub county: String,
+    pub deleted: String,
+    pub direction_code: String,
+    pub direction_value: String,
+    pub end_continuous_length: String,
+    pub lane_description: String,
+    pub length: String,
+    pub modified_time: String,
+    pub road_category_code: String,
+    pub road_category_value: String,
+    pub road_main_number: String,
+    pub road_sub_number: String,
+    pub road_owner_code: String,
+    pub road_owner_value: String,
+    pub road_type_code: String,
+    pub road_type_value: String,
+    pub road_width: String,
+    pub speed_limit: String,
+    pub start_continuous_length: String,
+    pub time_stamp: String,
+    pub wear_layer: String,
+    pub winter_2003_code: String,
+    pub winter_2003_value: String,
+    _secret: (),
+
+}
+
 //NYTT RoadCondition
 pub struct RoadCondition{
     pub cause: String,
@@ -129,6 +164,15 @@ pub struct RoadCondition{
 
 }
 
+/*
+pub fn parse_road_data(xmlfile: &str)-> Vec<RoadData>{
+
+    let mut xml = Reader::from_file(xmlfile).expect("Failed to open File");
+    
+    xml.trim_text(true);
+
+    //let RoadData_data = Vec<>;
+}*/
 
 
 //parse_changeid will find the changeid of an XML-File 

@@ -1,5 +1,6 @@
 use std::io;
 use std::fs::File;
+use std::io::prelude::*;
 //NYTT FOR Post Requests
 use reqwest::ClientBuilder;
 use reqwest::header::USER_AGENT;
@@ -11,7 +12,7 @@ use quick_xml::events::Event;
 
 // Get the XML file from datex using basic auth
 //Borde inte vara unwrap, det krachar programmet, fixa med '?' opperatorn hur den nu fungerar. TODO
-pub fn fetch_xml(url: &str, user: &str, pass: &str, file_name: &str) {
+pub fn fetch_xml(url: &str, user: &str, pass: &str, file_name: &str){
    
     let client = reqwest::blocking::Client::new();
     
@@ -19,7 +20,6 @@ pub fn fetch_xml(url: &str, user: &str, pass: &str, file_name: &str) {
         .basic_auth(user, Some(pass))
         .send()
         .expect("Connection failed to Datex");
-    assert!(response.status().is_success());
 
 
     let mut file = File::create(file_name)
@@ -161,17 +161,16 @@ pub fn get_road_geometry(changeid:&str){
 
 //Takes a https post body as a string and a file name. 
 //A post request with the body is sent to DATEX II and creates a local XML file  with the data returned from Datex II.
-pub fn get_from_post(body:&'static str, file_name:&str){
+pub fn get_from_post(body:&'static str, file_name:&str) -> reqwest::Result<()> {
     let client = reqwest::blocking::Client::new();
   
       let mut res = client.post("https://api.trafikinfo.trafikverket.se/v2/data.xml").header(USER_AGENT,"DATAEXLTU20").header(CONTENT_TYPE,"text/xml")
       .body(body)
-      .send()
-      .unwrap();
+      .send()?;
 
       let mut file = File::create(file_name)
         .expect("Error creating file");
-    io::copy(&mut res, &mut file)
-        .expect("Failed to read response to file");
+    io::copy(&mut res, &mut file).expect("Failed to read response to file");
+    Ok(())
 
 }
