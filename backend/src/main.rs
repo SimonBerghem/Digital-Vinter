@@ -45,15 +45,26 @@ fn main() {
 
     //database::insert_road_accident_data(road_accident_pool.clone(), roadAccident_data);
 
-    fetch::fetch_xml(auth::URL_S, auth::USER_DATEX, auth::PASS_DATEX, "station_data_cache.xml");
+    let response = fetch::fetch_xml(auth::URL_S, auth::USER_DATEX, auth::PASS_DATEX, "station_data_cache.xml");
+
+    let res = match response {
+        Ok(res) => true,
+        Err(e) => false,
+
+    };
+    
     //println!("{:?}: First fetch, station file fetched from DATEX II", Local::now().naive_local());
     // First insert
    
-    let station_data = parse_xml::parse_station("station_data_cache.xml");
-    //println!("{:?}: StationData", station_data[0]);
-    
-    database::insert_station_data(station_pool.clone(), station_data);
+    if res{
+       let station_data =  parse_xml::parse_station("station_data_cache.xml");
+       database::insert_station_data(station_pool.clone(), station_data);
+    } 
+    else{
+        println!("{:?}: Station Data fetched fail, Trafikverkets server prob is trash",Local::now().naive_local())
+    }
 
+    
 
     /* Hej framtida utveklare, ifall du undrar varför alla kall är trådade så
     är svaret att en tidigare utvecklare resonerade: "Varför inte", den tidigare
@@ -71,18 +82,30 @@ fn main() {
 
     let mut changeid = "0";
     thread::spawn(move || loop {
+        let mut res = true;
         let fetch_thread = thread::spawn(move ||{
-            fetch::get_road_geometry(changeid);
-
+            let mut result = fetch::get_road_geometry(changeid);
+            let res = match result{
+                Ok(res) => true,
+                Err(e) => false,
+            };
         });
 
+    
         fetch_thread.join().unwrap();
+        println!("DATA FETCHED {:?} ", res);
+        if res {
+            let changeid = parse_xml::parse_changeid("Road_Geometry.xml");
+            let road_geometry_data = parse_xml::parse_road_geometry("Road_Geometry.xml");
+            database::insert_road_geometry(road_geometry_pool.clone(),road_geometry_data);
+            println!("{:?}",changeid);
+            //println!("{:?}: Road_Geometry fetched from DATEX II", Local::now().naive_local());
+        }else{
+            println!("{:?}: Fail to fetch Road Geometry from DATEX",Local::now().naive_local());
+        }
+        
 
-        let changeid = parse_xml::parse_changeid("Road_Geometry.xml");
-        let road_geometry_data = parse_xml::parse_road_geometry("Road_Geometry.xml");
-        database::insert_road_geometry(road_geometry_pool.clone(),road_geometry_data);
-        println!("{:?}",changeid);
-        println!("{:?}: Road_Geometry fetched from DATEX II", Local::now().naive_local());
+        
     });
 
     //Accident Data

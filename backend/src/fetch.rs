@@ -12,21 +12,21 @@ use quick_xml::events::Event;
 
 // Get the XML file from datex using basic auth
 //Borde inte vara unwrap, det krachar programmet, fixa med '?' opperatorn hur den nu fungerar. TODO
-pub fn fetch_xml(url: &str, user: &str, pass: &str, file_name: &str){
+pub fn fetch_xml(url: &str, user: &str, pass: &str, file_name: &str) -> reqwest::Result<()>{
    
     let client = reqwest::blocking::Client::new();
     
     let mut response = client.get(url)
         .basic_auth(user, Some(pass))
-        .send()
-        .expect("Connection failed to Datex");
-
+        .send()?;
 
     let mut file = File::create(file_name)
         .expect("Error creating file, station_data");
     io::copy(&mut response, &mut file)
         .expect("Failed to read response to file");
-    
+
+
+    Ok(())
 }
 
 
@@ -81,11 +81,11 @@ pub fn get_traffic_flow_data(){
 
     let file_name = "TrafficFlow.xml";
 
-    get_from_post(body,file_name);
+    let f = get_from_post(body,file_name);
 
 
 }
- pub fn get_road_condition_data(){
+ pub fn get_road_condition_data() -> reqwest::Result<()>{
 
     let body = "
     <REQUEST>
@@ -118,10 +118,10 @@ pub fn get_traffic_flow_data(){
 
     let file_name = "RoadCondition.xml";
 
-    get_from_post(body,file_name);
+    get_from_post(body,file_name)
  }
 
-pub fn get_road_geometry(changeid:&str){
+pub fn get_road_geometry(changeid:&str)-> reqwest::Result<()>{
 
     let mut body = format!("<REQUEST>
     <LOGIN authenticationkey=\"d8b542b2dafe40f999f223c7aff04046\" />
@@ -144,13 +144,15 @@ pub fn get_road_geometry(changeid:&str){
     let client = reqwest::blocking::Client::new();
     let mut res = client.post("https://api.trafikinfo.trafikverket.se/v2/data.xml").header(USER_AGENT,"DATAEXLTU20").header(CONTENT_TYPE,"text/xml")
       .body(body)
-      .send().unwrap();
+      .send()?;
 
     
     let mut file = File::create("Road_Geometry.xml")
         .expect("Error creating file");
     io::copy(&mut res, &mut file)
         .expect("Failed to read response to file");
+
+    Ok(())
 /*
 
     let mut file = File::create("Road_Geometry.xml").expect("Error creating file, Road_Geometry.xml ");
