@@ -164,15 +164,322 @@ pub struct RoadCondition{
 
 }
 
-/*
+
 pub fn parse_road_data(xmlfile: &str)-> Vec<RoadData>{
 
     let mut xml = Reader::from_file(xmlfile).expect("Failed to open File");
     
     xml.trim_text(true);
 
-    //let RoadData_data = Vec<>;
-}*/
+    let mut RoadData_data = Vec::new();
+    let mut buf = Vec::new();
+    loop{
+        match xml.read_event(&mut buf){
+            Ok(Event::Start(ref e)) => match e.name(){
+                b"RoadData" => {
+                    let Road_Data = RoadData{
+                        aadt: String::new(),
+                        aadt_heavy_vehicles: String::new(),
+                        aadt_measurement_method_code: String::new(),
+                        aadt_measurement_method_value: String::new(),
+                        aadt_measurement_year: String::new(),
+                        bearing_capacity_code: String::new(),
+                        bearing_capacity_value: String::new(),
+                        county: String::new(),
+                        deleted: String::new(),
+                        direction_code: String::new(),
+                        direction_value: String::new(),
+                        end_continuous_length: String::new(),
+                        lane_description: String::new(),
+                        length: String::new(),
+                        modified_time: String::new(),
+                        road_category_code: String::new(),
+                        road_category_value: String::new(),
+                        road_main_number: String::new(),
+                        road_sub_number: String::new(),
+                        road_owner_code: String::new(),
+                        road_owner_value: String::new(),
+                        road_type_code: String::new(),
+                        road_type_value: String::new(),
+                        road_width: String::new(),
+                        speed_limit: String::new(),
+                        start_continuous_length: String::new(),
+                        time_stamp: String::new(),
+                        wear_layer: String::new(),
+                        winter_2003_code: String::new(),
+                        winter_2003_value: String::new(),
+                        _secret: (),
+                        
+                    };
+                    RoadData_data.push(Road_Data);
+                    let Road_Data = RoadData_data.last_mut().unwrap();
+                }
+                    b"AADT" =>{
+                        let Road_Data = RoadData_data.last_mut().unwrap();
+                        Road_Data.aadt = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                    }
+                    b"AADTHeavyVehicles" =>{
+                        let Road_Data = RoadData_data.last_mut().unwrap();
+                        Road_Data.aadt_heavy_vehicles = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                    }
+
+                    //Checks if ADDT measuerment methods exists, if they do the next code and value is its. 
+                    b"AADTMeasurementMethod" =>{
+                        let xml_txt = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        let mut reader_txt = Reader::from_str(&xml_txt);
+                        let mut temp_buf = Vec::new();
+
+                        loop{
+                            match reader_txt.read_event(&mut temp_buf){
+                                Ok(Event::Start(ref i)) => match i.name(){
+                                    b"Code" => {
+                                        let Road_Data = RoadData_data.last_mut().unwrap();
+                                        Road_Data.aadt_measurement_method_code = xml.read_text(i.name(),&mut Vec::new()).unwrap();
+                   
+                                    }
+
+                                    b"Value" => {
+                                        let Road_Data = RoadData_data.last_mut().unwrap();
+                                        Road_Data.aadt_measurement_method_code = xml.read_text(i.name(),&mut Vec::new()).unwrap();
+                                    }
+                                    _ => (),
+                                }
+                                Ok(Event::Eof) => break,
+                                Err(i) => panic!("Error at pos {}: {:?}", xml.buffer_position(), e),
+                                _ => (),
+                            }
+                            temp_buf.clear();
+                        }
+                    }
+
+                    b"ADDTMeasurementYear" =>{
+                        let Road_Data = RoadData_data.last_mut().unwrap();
+                        Road_Data.aadt_measurement_year = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                    }
+
+                    b"BearingCapacity" =>{
+                        let xml_txt = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        let mut reader_txt = Reader::from_str(&xml_txt);
+                        let mut temp_buf = Vec::new();
+
+                        loop{
+                            match reader_txt.read_event(&mut temp_buf){
+                                Ok(Event::Start(ref i)) => match i.name(){
+                                    b"Code" => {
+                                        let Road_Data = RoadData_data.last_mut().unwrap();
+                                        Road_Data.bearing_capacity_code = xml.read_text(i.name(),&mut Vec::new()).unwrap();
+
+                                    }
+                                    b"Value" => {
+                                        let Road_Data = RoadData_data.last_mut().unwrap();
+                                        Road_Data.bearing_capacity_value = xml.read_text(i.name(),&mut Vec::new()).unwrap();
+
+                                    }
+                                    _ => (),
+                                }
+                                Ok(Event::Eof) => break,
+                                Err(i) => panic!("Error at pos {}: {:?}", xml.buffer_position(), e),
+                                _ => (),
+                            }
+                            temp_buf.clear();
+                        }
+                    }
+
+                    b"County" =>{
+                        let Road_Data = RoadData_data.last_mut().unwrap();
+                        Road_Data.county = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                    }
+                    b"Deleted" =>{
+                        let Road_Data = RoadData_data.last_mut().unwrap();
+                        Road_Data.deleted = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                    }
+                    b"Direction" =>{
+                        let xml_txt = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        let mut reader_txt = Reader::from_str(&xml_txt);
+                        let mut temp_buf = Vec::new();
+
+                        loop{
+                            match reader_txt.read_event(&mut temp_buf){
+                                Ok(Event::Start(ref i)) => match i.name(){
+                                    b"Code" => {
+                                        let Road_Data = RoadData_data.last_mut().unwrap();
+                                        Road_Data.direction_code = xml.read_text(i.name(),&mut Vec::new()).unwrap();
+
+                                    }
+                                    b"Value" => {
+                                        let Road_Data = RoadData_data.last_mut().unwrap();
+                                        Road_Data.direction_value = xml.read_text(i.name(),&mut Vec::new()).unwrap();
+
+                                    }
+                                    _ => (),
+                                }
+                                Ok(Event::Eof) => break,
+                                Err(i) => panic!("Error at pos {}: {:?}", xml.buffer_position(), e),
+                                _ => (),
+                            }
+                            temp_buf.clear();
+                        }
+                    }
+                    b"EndContinuousLength" =>{
+                        let Road_Data = RoadData_data.last_mut().unwrap();
+                        Road_Data.end_continuous_length = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                    }
+                    b"LaneDescription"  =>{
+                        let Road_Data = RoadData_data.last_mut().unwrap();
+                        Road_Data.lane_description = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                    }
+                    b"Lenght" => {
+                        let Road_Data = RoadData_data.last_mut().unwrap();
+                        Road_Data.length = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                    }
+                    b"ModifiedTime" => {
+                        let Road_Data = RoadData_data.last_mut().unwrap();
+                        Road_Data.modified_time = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                    
+                    }
+                    b"RoadCategory" =>{
+                        let xml_txt = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        let mut reader_txt = Reader::from_str(&xml_txt);
+                        let mut temp_buf = Vec::new();
+
+                        loop{
+                            match reader_txt.read_event(&mut temp_buf){
+                                Ok(Event::Start(ref i)) => match i.name(){
+                                    b"Code" => {
+                                        let Road_Data = RoadData_data.last_mut().unwrap();
+                                        Road_Data.road_category_code = xml.read_text(i.name(),&mut Vec::new()).unwrap();
+
+                                    }
+                                    b"Value" => {
+                                        let Road_Data = RoadData_data.last_mut().unwrap();
+                                        Road_Data.road_category_value = xml.read_text(i.name(),&mut Vec::new()).unwrap();
+
+                                    }
+                                    _ => (),
+                                }
+                                Ok(Event::Eof) => break,
+                                Err(i) => panic!("Error at pos {}: {:?}", xml.buffer_position(), e),
+                                _ => (),
+                            }
+                            temp_buf.clear();
+                        }
+                    }
+
+                    b"RoadMainNumber" =>{
+                        let Road_Data = RoadData_data.last_mut().unwrap();
+                        Road_Data.road_main_number = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                    }
+                    b"RoadSubNumber" =>{
+                        let Road_Data = RoadData_data.last_mut().unwrap();
+                        Road_Data.road_sub_number = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                    
+                    }
+                    b"RoadOwner" =>{
+                        let xml_txt = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        let mut reader_txt = Reader::from_str(&xml_txt);
+                        let mut temp_buf = Vec::new();
+
+                        loop{
+                            match reader_txt.read_event(&mut temp_buf){
+                                Ok(Event::Start(ref i)) => match i.name(){
+                                    b"Code" => {
+                                        let Road_Data = RoadData_data.last_mut().unwrap();
+                                        Road_Data.road_owner_code = xml.read_text(i.name(),&mut Vec::new()).unwrap();
+
+                                    }
+                                    b"Value" => {
+                                        let Road_Data = RoadData_data.last_mut().unwrap();
+                                        Road_Data.road_owner_value = xml.read_text(i.name(),&mut Vec::new()).unwrap();
+
+                                    }
+                                    _ => (),
+                                }
+                                Ok(Event::Eof) => break,
+                                Err(i) => panic!("Error at pos {}: {:?}", xml.buffer_position(), e),
+                                _ => (),
+                            }
+                            temp_buf.clear();
+                        }
+                    }
+
+                    b"RoadType" =>{
+                        let xml_txt = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        let mut reader_txt = Reader::from_str(&xml_txt);
+                        let mut temp_buf = Vec::new();
+
+                        loop{
+                            match reader_txt.read_event(&mut temp_buf){
+                                Ok(Event::Start(ref i)) => match i.name(){
+                                    b"Code" => {
+                                        let Road_Data = RoadData_data.last_mut().unwrap();
+                                        Road_Data.road_type_code = xml.read_text(i.name(),&mut Vec::new()).unwrap();
+
+                                    }
+                                    b"Value" => {
+                                        let Road_Data = RoadData_data.last_mut().unwrap();
+                                        Road_Data.road_type_value = xml.read_text(i.name(),&mut Vec::new()).unwrap();
+
+                                    }
+                                    _ => (),
+                                }
+                                Ok(Event::Eof) => break,
+                                Err(i) => panic!("Error at pos {}: {:?}", xml.buffer_position(), e),
+                                _ => (),
+                            }
+                            temp_buf.clear();
+                        }
+                    }
+                    b"RoadWidth"=>{
+                        let Road_Data = RoadData_data.last_mut().unwrap();
+                        Road_Data.road_width = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                    }
+                    b"SpeedLimit" =>{
+                        let Road_Data = RoadData_data.last_mut().unwrap();
+                        Road_Data.speed_limit = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                    
+                    }
+                    b"TimeStamp" => {
+                        let Road_Data = RoadData_data.last_mut().unwrap();
+                        Road_Data.time_stamp = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                    }
+                    b"Winter2003" =>{
+                        let xml_txt = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        let mut reader_txt = Reader::from_str(&xml_txt);
+                        let mut temp_buf = Vec::new();
+
+                        loop{
+                            match reader_txt.read_event(&mut temp_buf){
+                                Ok(Event::Start(ref i)) => match i.name(){
+                                    b"Code" => {
+                                        let Road_Data = RoadData_data.last_mut().unwrap();
+                                        Road_Data.winter_2003_code = xml.read_text(i.name(),&mut Vec::new()).unwrap();
+
+                                    }
+                                    b"Value" => {
+                                        let Road_Data = RoadData_data.last_mut().unwrap();
+                                        Road_Data.winter_2003_value = xml.read_text(i.name(),&mut Vec::new()).unwrap();
+
+                                    }
+                                    _ => (),
+                                }
+                                Ok(Event::Eof) => break,
+                                Err(i) => panic!("Error at pos {}: {:?}", xml.buffer_position(), e),
+                                _ => (),
+                            }
+                            temp_buf.clear();
+                        }
+                    }
+                _ =>(),
+            }
+            Ok(Event::Eof) => break,
+            Err(e) => panic!("Error at pos {}: {:?}", xml.buffer_position(), e),
+            _ => (),
+        }
+        buf.clear();
+    }
+    RoadData_data
+
+}
 
 
 //parse_changeid will find the changeid of an XML-File 
@@ -263,10 +570,8 @@ pub fn parse_road_geometry(xmlfile: &str)-> Vec<RoadGeometry>{
             _ => (),
         }
         buf.clear();
-
     }
     RoadGeometry_data
-
 }
 
 pub fn parse_changeid(xmlfile: &str)-> Vec<ChangeId> {
