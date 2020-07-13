@@ -73,6 +73,29 @@ fn main() {
 
     Designa vidare som du anser bäst.
     */
+    let mut changeid_data
+    thread::spawn(move || loop{
+        let mut res = true;
+        let fetch_thread = thread::spawn(move || {
+            let mut result = fetch::get_road_data(changeid_data);
+            let res = match result{
+                OK(res) => true,
+                Err(e) = false,
+            }
+
+
+        });
+        fetch_thread.join().unwrap();
+        if res {
+            let changeid_data = parse_xml::parse_changeid("Road_Data.xml");
+            let road_data_data = parse_xml::parse_road_data("Road_Data.xml");
+            
+            database::
+
+
+        }
+    })
+
 
     thread::spawn(move || loop{
         thread::sleep(Duration::from_secs(30));
@@ -80,32 +103,30 @@ fn main() {
 
     });
 
-    let mut changeid = "0";
+    let mut changeid_geometry = "0";
     thread::spawn(move || loop {
         let mut res = true;
         let fetch_thread = thread::spawn(move ||{
-            let mut result = fetch::get_road_geometry(changeid);
+            let mut result = fetch::get_road_geometry(changeid_geometry);
             let res = match result{
                 Ok(res) => true,
                 Err(e) => false,
             };
         });
 
-    
+    //13.00, '57.5435199402273'
         fetch_thread.join().unwrap();
         println!("DATA FETCHED {:?} ", res);
         if res {
-            let changeid = parse_xml::parse_changeid("Road_Geometry.xml");
+            let changeid_geometry = parse_xml::parse_changeid("Road_Geometry.xml");
             let road_geometry_data = parse_xml::parse_road_geometry("Road_Geometry.xml");
             database::insert_road_geometry(road_geometry_pool.clone(),road_geometry_data);
-            println!("{:?}",changeid);
+            println!("{:?}",changeid_geometry);
             //println!("{:?}: Road_Geometry fetched from DATEX II", Local::now().naive_local());
         }else{
             println!("{:?}: Fail to fetch Road Geometry from DATEX",Local::now().naive_local());
         }
-        
-
-        
+     
     });
 
     //Accident Data

@@ -10,12 +10,37 @@ use crate::parse_xml::{StationData, WeatherData, CameraData, roadAccidentData, T
 
 
 
+//pub fn get_friction_data
+
 pub fn insert_friction_data(mut conn: PooledConn, url: &str) {
     //conn.query(r"LOAD DATA LOCAL INFILE ".to_owned() + "'" + url + "'" + " INTO TABLE friction_data LINES TERMINATED BY '\r\n' IGNORE 1 LINES SET `lat`= REPLACE(`lat`, ',', '.'), `lon`=REPLACE(`lon`, ',', '.'), `MeasurementValue`=REPLACE(`MeasurementValue`, ',', '.');").unwrap();
     conn.query(r"LOAD DATA LOCAL INFILE '/Users/samuelgraden/Documents/Projectrcm-sommar-2019/backend/e6.txt' INTO TABLE friction_data LINES TERMINATED BY '\r\n' IGNORE 1 LINES (`id`, `MeasureTimeUTC`, `ReportTimeUTC`, `lat`, `lon`, `RoadCondition`, `MeasurementType`, `NumberOfMeasurements`, `MeasurementValue`, `MeasurementConfidence`, `MeasurementsVelocity`, `ReporterOrganisation`, `EquipmentType`) SET `lat`= REPLACE(`lat`, ',', '.'), `lon`=REPLACE(`lon`, ',', '.');)").unwrap();
 
     //LOAD DATA LOCAL INFILE '/home/aron/rcm-sommar-2019/backend/e6.txt' INTO TABLE friction_data LINES TERMINATED BY '\r\n' IGNORE 1 LINES (`id`, `MeasureTimeUTC`, `ReportTimeUTC`, `lat`, `lon`, `RoadCondition`, `MeasurementType`, `NumberOfMeasurements`, `MeasurementValue`, `MeasurementConfidence`, `MeasurementsVelocity`, `ReporterOrganisation`, `EquipmentType`) SET `lat`= REPLACE(`lat`, ',', '.'), `lon`=REPLACE(`lon`, ',', '.');
     //LOAD DATA LOCAL INFILE '/home/aron/rcm-sommar-2019/backend/e6.txt' INTO TABLE friction_data LINES TERMINATED BY '\r\n' IGNORE 1 LINES SET `lat`= REPLACE(`lat`, ',', '.'), `lon`=REPLACE(`lon`, ',', '.'), `MeasurementValue`=REPLACE(`MeasurementValue`, ',', '.');
+
+}
+
+
+
+pub fn insert_road_data(pool: Pool, road_data_data: Vec<>){
+
+    let insert_stmt = r"INSERT INTO `db`.`road_data` 
+    (`AADDT`, `AADTHeavyVehicles`, `AADTMeasurementMethod.Code`, `AADTMeasurementMethod.Value`,
+         `AADTMeasurementYear`, `BearingCapacity.Code`, `BearingCapacity.Value`, `County`, `Deleted`,
+          `Direction.Code`, `Direction.Value`, `EndContinuousLength`, `LaneDescription`, `Length`,
+           `ModifiedTime`, `RoadCategory.Code`, `RoadCategory.Value`, `RoadConstruction2009`,
+            `RoadMainNumber`, `RoadOwner.Code`, `RoadOwner.Value`, `RoadSubNumber`, `RoadType.Code`,
+            `RoadType.Value`, `RoadWidth`, `SpeedLimit`, `StartContinuousLength`, `TimeStamp`, `WearLayer`, 
+            `Winter2003.Code`, `Winter2003.Value`) 
+            VALUES (`:aaddt`, `:aadt_heavy_vehicles`, `:aadt_measurement_method_code`, `:aadt_measurement_method_value`,
+                `:aadt_measurement_year`, `:bearing_capacity_code`, `:bearing_capacity_value`, `:county`, `:deleted`,
+                 `:direction_code`, `:direction_value`, `:end_continuous_lenght`, `:lane_description`, `Length`,
+                  `ModifiedTime`, `RoadCategory.Code`, `RoadCategory.Value`, `RoadConstruction2009`,
+                   `RoadMainNumber`, `RoadOwner.Code`, `RoadOwner.Value`, `RoadSubNumber`, `RoadType.Code`,
+                   `RoadType.Value`, `RoadWidth`, `SpeedLimit`, `StartContinuousLength`, `TimeStamp`, `WearLayer`, 
+                   `Winter2003.Code`, `Winter2003.Value`);
+    ";
 
 }
 
@@ -59,8 +84,9 @@ pub fn insert_road_accident_row(pool: Pool, accident_row: Vec<roadAccidentData>)
     }
    
 }
-//pub fn insert_road_data(pool: Pool, road_data_data: Vec<RoadData>)
 
+
+//pub fn insert_road_data(pool: Pool, road_data_data: Vec<RoadData>)
 
 //Det är ett dåligt namn med det är det trafikverket kallar det så då fick det bli så, 
 //men vad den gör är att mata in kordinaterna för en väg
@@ -179,9 +205,6 @@ pub fn insert_station_data(pool: Pool, station_data: Vec<StationData>) {
         }
     }
 }
-
-
-
 
 // Insert the Road accident data to MYSQ, TABLE assumed to exist ROAD
 pub fn insert_road_accident_data(pool: Pool, road_accident_data: Vec<roadAccidentData>){
@@ -440,6 +463,7 @@ pub fn create_mysql_tables(pool: Pool) {
                         county_number INT(10) DEFAULT NULL,
                         PRIMARY KEY (id)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;", ()).expect("Failed to create table: station_data");
+    
     pool.prep_exec(r"CREATE TABLE IF NOT EXISTS weather_data (
                     id INT NOT NULL AUTO_INCREMENT,
                     station_id VARCHAR(50) DEFAULT NULL,
@@ -455,6 +479,7 @@ pub fn create_mysql_tables(pool: Pool) {
                     KEY station_id (station_id),
                     FOREIGN KEY (station_id) REFERENCES station_data (id)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;", ()).expect("Failed to create table: weather_data");
+    
     pool.prep_exec(r"create table if not exists friction_data 
     (
         Id                   int         not null
@@ -469,6 +494,7 @@ pub fn create_mysql_tables(pool: Pool) {
         MeasureConfidence    int         null,
         ReporterOrganization varchar(50) null
     )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;", ()).expect("Failed to create table: friction_data");
+    
     //Grabben är lurig fixa så den itne skapar index om det redan finns
     //let mut result =
     //pool.prep_exec("ALTER TABLE aggregated_friction_data ADD INDEX (Time, TimeAggregation, Longitude, Latitude, Radius, MeasureValueMin);",()).expect("Failed to create index: aggregated_friction_data_Time_MULTI_index ");
@@ -482,7 +508,8 @@ pub fn create_mysql_tables(pool: Pool) {
         `WGS84` VARCHAR(45) NULL,
         `SeverityCode` VARCHAR(45) NULL,
         PRIMARY KEY (`Id`, `CreationTime`))ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;;"#,()).expect("Failed to create table: road_accident_data");
-    pool.prep_exec(r"create table if not exists reporter_organizations
+    
+        pool.prep_exec(r"create table if not exists reporter_organizations
     (
         ReporterOrganization varchar(255) not null
             primary key
@@ -638,4 +665,55 @@ pub fn create_mysql_tables(pool: Pool) {
 
     
 
+/*
+DELIMITER $$
+CREATE PROCEDURE LoopDemo()
+BEGIN
+	DECLARE x  INT;
+	DECLARE str  VARCHAR(255);
+	set @diff = 0.01;
+	SET x = 1;
+	SET str =  '';
+        
+	loop_label:  LOOP
+    SET x = (SELECT  COUNT(*) FROM db.friction_data WHERE(RoadSubNumber = 0 AND RoadMainNumber = 0));
+		IF  x = 0 THEN 
+			LEAVE  loop_label;
+		END  IF;
+		SET @long_f = 0;
+        SET @lat_f = 0;
+        SELECT Longitude, Latitude INTO @long_f, @lat_f From db.friction_data WHERE(RoadMainNumber = 0) Limit 1;
+        DROP TABLE IF EXISTS small_area;
+        CREATE TEMPORARY TABLE IF NOT exists small_area (SELECT * FROM db.friction_data WHERE(ABS(Longitude - @long_f) < @diff AND ABS(Latitude -@lat_f)< @diff));
+        DROP TABLE IF EXISTS large_large;
+        CREATE TEMPORARY TABLE large_area (SELECT * FROM db.road_geometry_geometry WHERE(ABS(Longitude - @long_f) < @diff*2 AND ABS(Latitude -@lat_f)< @diff*2));
+		SET @it =0;	
+        loop_2_lable: loop
+			SET @long_i = 0;
+			SET @lat_i = 0;
+            SET @id_f = NULL;
+			SELECT Longitude, Latitude,Id INTO @long_i, @Lat_i, @id_f FROM small_area LIMIT @it,1;
+			DROP TABLE IF EXISTS diff_tb;
+			/*ss*/
+			CREATE TEMPORARY TABLE diff_tb SELECT (SQRT(POW(Latitude-@long_i,2)+ POW(Longitude-@lat_i,2)) ) as diff,RoadMainNumber as RoadMainNumber,RoadSubNumber as RoadSubNumber FROM large_area;
+			CREATE TEMPORARY TABLE diff_temp_tb SELECT * FROM diff_tb;
+            SELECT MIN(diff) FROM diff_tb;
 
+            SET @RM = NULL;
+            SET @RS = NULL;
+            
+            SELECT RoadMainNumber, RoadSubNumber INTO @RM, @RS FROM diff_temp_tb WHERE diff = (SELECT MIN(diff) FROM diff_tb) limit 1;
+        
+			UPDATE db.friction_data SET RoadMainNumber = @RM, RoadSubNumber=@RS where Id = @id_f;
+        SET @i = i +1;
+        end loop;
+	
+	END LOOP;
+	SELECT str;
+END$$
+
+DELIMITER ;
+
+
+
+*/

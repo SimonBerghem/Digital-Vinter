@@ -22,7 +22,7 @@ pub const NAME_DB: &'static str = "db";
 //pub const ADDR_DB: &'static str = "rcm-db.chzfmtvm6lcl.us-east-1.rds.amazonaws.com";
 //pub const NAME_DB: &'static str = "db";
 
+/*road_geometry_geometry_id, RoadMainNumber, RoadSubNumber, WGS, Longitude, Latitude, RH2000_Altitude;*/
 
-
-
+//id, County, Deleted, Direction.Code, Direction.Value, Length, ModifiedTime, RoadMainNumber, RoadSubNumber, TimeStamp
 

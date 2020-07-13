@@ -121,6 +121,58 @@ pub fn get_traffic_flow_data(){
     get_from_post(body,file_name)
  }
 
+pub fn get_road_data(changeid:&str)-> reqwest::Result<()>{
+    let mut body = fomrat!("<REQUEST>
+    <LOGIN authenticationkey=\"d8b542b2dafe40f999f223c7aff04046\" />
+    <QUERY objecttype=\"RoadData\" schemaversion=\"1\" changeid=\"{:?}\">
+        <INCLUDE>AADT</INCLUDE>
+        <INCLUDE>AADTHeavyVehicles</INCLUDE>
+        <INCLUDE>AADTMeasurementMethod.Code</INCLUDE>
+        <INCLUDE>AADTMeasurementMethod.Value</INCLUDE>
+        <INCLUDE>AADTMeasurementYear</INCLUDE>
+        <INCLUDE>BearingCapacity.Code</INCLUDE>
+        <INCLUDE>BearingCapacity.Value</INCLUDE>
+        <INCLUDE>County</INCLUDE>
+        <INCLUDE>Deleted</INCLUDE>
+        <INCLUDE>Direction.Code</INCLUDE>
+        <INCLUDE>Direction.Value</INCLUDE>
+        <INCLUDE>EndContinuousLength</INCLUDE>
+        <INCLUDE>LaneDescription</INCLUDE>
+        <INCLUDE>Length</INCLUDE>
+        <INCLUDE>ModifiedTime</INCLUDE>
+        <INCLUDE>RoadCategory.Code</INCLUDE>
+        <INCLUDE>RoadCategory.Value</INCLUDE>
+        <INCLUDE>RoadMainNumber</INCLUDE>
+        <INCLUDE>RoadSubNumber</INCLUDE>
+        <INCLUDE>RoadOwner.Code</INCLUDE>
+        <INCLUDE>RoadOwner.Value</INCLUDE>
+        <INCLUDE>RoadType.Code</INCLUDE>
+        <INCLUDE>RoadType.Value</INCLUDE>
+        <INCLUDE>RoadWidth</INCLUDE>
+        <INCLUDE>SpeedLimit</INCLUDE>
+        <INCLUDE>StartContinuousLength</INCLUDE>
+        <INCLUDE>TimeStamp</INCLUDE>
+        <INCLUDE>WearLayer</INCLUDE>
+        <INCLUDE>Winter2003.Code</INCLUDE>
+        <INCLUDE>Winter2003.Value</INCLUDE>
+    </QUERY>
+</REQUEST>",changeid)
+
+
+let client = reqwest::blocking::Client::new();
+let mut res = client.post("https://api.trafikinfo.trafikverket.se/v2/data.xml").header(USER_AGENT,"DATAEXLTU20").header(CONTENT_TYPE,"text/xml")
+  .body(body)
+  .send()?;
+
+
+let mut file = File::create("Road_Data.xml")
+    .expect("Error creating file");
+io::copy(&mut res, &mut file)
+    .expect("Failed to read response to file");
+
+Ok(())
+
+}
 pub fn get_road_geometry(changeid:&str)-> reqwest::Result<()>{
 
     let mut body = format!("<REQUEST>
