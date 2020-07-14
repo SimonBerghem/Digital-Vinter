@@ -5,7 +5,7 @@ use mysql::OptsBuilder;
 use mysql::chrono::{DateTime, FixedOffset};
 // use mysql::from_row;
 
-use crate::parse_xml::{StationData, WeatherData, CameraData, roadAccidentData, TrafficFlowData, RoadCondition, RoadGeometry};
+use crate::parse_xml::{StationData, WeatherData, CameraData, roadAccidentData, TrafficFlowData, RoadCondition, RoadGeometry, RoadData};
 
 
 
@@ -23,24 +23,62 @@ pub fn insert_friction_data(mut conn: PooledConn, url: &str) {
 
 
 
-pub fn insert_road_data(pool: Pool, road_data_data: Vec<>){
+pub fn insert_road_data(pool: Pool, road_data_data: Vec<RoadData>){
 
     let insert_stmt = r"INSERT INTO `db`.`road_data` 
     (`AADDT`, `AADTHeavyVehicles`, `AADTMeasurementMethod.Code`, `AADTMeasurementMethod.Value`,
          `AADTMeasurementYear`, `BearingCapacity.Code`, `BearingCapacity.Value`, `County`, `Deleted`,
           `Direction.Code`, `Direction.Value`, `EndContinuousLength`, `LaneDescription`, `Length`,
-           `ModifiedTime`, `RoadCategory.Code`, `RoadCategory.Value`, `RoadConstruction2009`,
+           `ModifiedTime`, `RoadCategory.Code`, `RoadCategory.Value`, 
             `RoadMainNumber`, `RoadOwner.Code`, `RoadOwner.Value`, `RoadSubNumber`, `RoadType.Code`,
             `RoadType.Value`, `RoadWidth`, `SpeedLimit`, `StartContinuousLength`, `TimeStamp`, `WearLayer`, 
             `Winter2003.Code`, `Winter2003.Value`) 
             VALUES (`:aaddt`, `:aadt_heavy_vehicles`, `:aadt_measurement_method_code`, `:aadt_measurement_method_value`,
                 `:aadt_measurement_year`, `:bearing_capacity_code`, `:bearing_capacity_value`, `:county`, `:deleted`,
-                 `:direction_code`, `:direction_value`, `:end_continuous_lenght`, `:lane_description`, `Length`,
-                  `ModifiedTime`, `RoadCategory.Code`, `RoadCategory.Value`, `RoadConstruction2009`,
-                   `RoadMainNumber`, `RoadOwner.Code`, `RoadOwner.Value`, `RoadSubNumber`, `RoadType.Code`,
-                   `RoadType.Value`, `RoadWidth`, `SpeedLimit`, `StartContinuousLength`, `TimeStamp`, `WearLayer`, 
-                   `Winter2003.Code`, `Winter2003.Value`);
-    ";
+                 `:direction_code`, `:direction_value`, `:end_continuous_length`, `:lane_description`, `:length`,
+                  `:modified_time`, `:road_category_code`, `:road_category_value`,
+                   `:road_main_number`, `:road_owner_code`, `:road_owner_value`, `:road_sub_number`, `:road_type_code`,
+                   `:road_type_value`, `:road_width`, `:speed_limit`, `:start_continuous_length`, `:time_stamp`, `:wear_layer`, 
+                   `:winter_2003_code`, `:winter_2003_value`);";
+
+    for mut stmt in pool.prepare(insert_stmt).into_iter(){
+
+        for i in road_data_data.iter(){
+            stmt.execute(params!{
+                "aaddt" => i.aadt.clone(),
+                "aadt_heavy_vehicles" => i.aadt_heavy_vehicles.clone(),
+                "aadt_measurement_method_code" => i.aadt_measurement_method_code.clone(),
+                "aadt_measurement_method_value" => i.aadt_measurement_method_value.clone(),
+                "aadt_measurement_year" => i.aadt_measurement_year.clone(),
+                "bearing_capacity_code" => i.bearing_capacity_code.clone(),
+                "bearing_capacity_value" => i.bearing_capacity_value.clone(),
+                "county" => i.county.clone(),
+                "deleted" => i.deleted.clone(),
+                "direction_code" => i.direction_code.clone(),
+                "direction_value" => i.direction_value.clone(),
+                "end_continuous_length" => i.end_continuous_length.clone(),
+                "lane_description" => i.lane_description.clone(),
+                "length" => i.length.clone(),
+                "modified_time" => i.modified_time.clone(),
+                "road_category_code" => i.road_category_code.clone(),
+                "road_category_value" => i.road_category_value.clone(),
+                "road_main_number" => i.road_main_number.clone(),
+                "road_owner_code" => i.road_owner_code.clone(),
+                "road_owner_value" => i.road_owner_value.clone(),
+                "road_sub_number" => i.road_sub_number.clone(),
+                "road_type_code" => i.road_type_code.clone(),
+                "road_type_value" => i.road_type_value.clone(),
+                "road_width" => i.road_type_value.clone(),
+                "speed_limit" => i.speed_limit.clone(),
+                "start_continuous_length" => i.start_continuous_length.clone(),
+                "time_stamp" => i.time_stamp.clone(),
+                "wear_layer" => i.wear_layer.clone(),
+                "winter_2003_code" => i.winter_2003_code.clone(),
+                "winter_2003_value" => i.winter_2003_value.clone(),
+                
+            }).expect("Failed to insert Road Data");
+        }
+    }
 
 }
 

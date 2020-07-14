@@ -64,7 +64,6 @@ pub struct roadAccidentData {
 pub struct ChangeId {
     pub change_id: String,
     _secret: (),
-
 }
 //NYTT TrafficFlow
 #[derive(Debug)]
@@ -173,10 +172,12 @@ pub fn parse_road_data(xmlfile: &str)-> Vec<RoadData>{
 
     let mut RoadData_data = Vec::new();
     let mut buf = Vec::new();
+    let mut parentTag = "";
     loop{
         match xml.read_event(&mut buf){
             Ok(Event::Start(ref e)) => match e.name(){
                 b"RoadData" => {
+                    
                     let Road_Data = RoadData{
                         aadt: String::new(),
                         aadt_heavy_vehicles: String::new(),
@@ -212,19 +213,24 @@ pub fn parse_road_data(xmlfile: &str)-> Vec<RoadData>{
                         
                     };
                     RoadData_data.push(Road_Data);
+                    
                     let Road_Data = RoadData_data.last_mut().unwrap();
+                    
                 }
                     b"AADT" =>{
+                        println!("Parse Road Data 1.5");
                         let Road_Data = RoadData_data.last_mut().unwrap();
                         Road_Data.aadt = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        println!("Parse Road Data 1.5");
                     }
                     b"AADTHeavyVehicles" =>{
                         let Road_Data = RoadData_data.last_mut().unwrap();
                         Road_Data.aadt_heavy_vehicles = xml.read_text(e.name(),&mut Vec::new()).unwrap();
                     }
-
+                    
                     //Checks if ADDT measuerment methods exists, if they do the next code and value is its. 
                     b"AADTMeasurementMethod" =>{
+                        println!("Parse Road Data 2");
                         let xml_txt = xml.read_text(e.name(),&mut Vec::new()).unwrap();
                         let mut reader_txt = Reader::from_str(&xml_txt);
                         let mut temp_buf = Vec::new();
@@ -251,7 +257,6 @@ pub fn parse_road_data(xmlfile: &str)-> Vec<RoadData>{
                             temp_buf.clear();
                         }
                     }
-
                     b"ADDTMeasurementYear" =>{
                         let Road_Data = RoadData_data.last_mut().unwrap();
                         Road_Data.aadt_measurement_year = xml.read_text(e.name(),&mut Vec::new()).unwrap();
@@ -291,10 +296,17 @@ pub fn parse_road_data(xmlfile: &str)-> Vec<RoadData>{
                     }
                     b"Deleted" =>{
                         let Road_Data = RoadData_data.last_mut().unwrap();
+                        //println!("Parse Road Data 1.5{:?}", e.name());
                         Road_Data.deleted = xml.read_text(e.name(),&mut Vec::new()).unwrap();
                     }
                     b"Direction" =>{
+
+                        let parentTag = "Direction";
+                        /*
+                        let Road_Data = RoadData_data.last_mut().unwrap();
+                        
                         let xml_txt = xml.read_text(e.name(),&mut Vec::new()).unwrap();
+                        println!("Parse Road Data 1.5");
                         let mut reader_txt = Reader::from_str(&xml_txt);
                         let mut temp_buf = Vec::new();
 
@@ -319,6 +331,7 @@ pub fn parse_road_data(xmlfile: &str)-> Vec<RoadData>{
                             }
                             temp_buf.clear();
                         }
+                        */
                     }
                     b"EndContinuousLength" =>{
                         let Road_Data = RoadData_data.last_mut().unwrap();
@@ -469,6 +482,7 @@ pub fn parse_road_data(xmlfile: &str)-> Vec<RoadData>{
                             temp_buf.clear();
                         }
                     }
+
                 _ =>(),
             }
             Ok(Event::Eof) => break,
@@ -477,6 +491,7 @@ pub fn parse_road_data(xmlfile: &str)-> Vec<RoadData>{
         }
         buf.clear();
     }
+    println!("Parse Road Data 1");
     RoadData_data
 
 }

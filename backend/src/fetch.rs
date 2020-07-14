@@ -59,8 +59,7 @@ pub fn get_situation_data(){
 
 pub fn get_traffic_flow_data(){
 
-    let body = "
-    <REQUEST>
+    let body = "<REQUEST>
     <LOGIN authenticationkey=\"d8b542b2dafe40f999f223c7aff04046\" />
     <QUERY objecttype=\"TrafficFlow\" schemaversion=\"1.4\" includedeletedobjects=\"true\">
     <INCLUDE>AverageVehicleSpeed</INCLUDE>
@@ -122,9 +121,9 @@ pub fn get_traffic_flow_data(){
  }
 
 pub fn get_road_data(changeid:&str)-> reqwest::Result<()>{
-    let mut body = fomrat!("<REQUEST>
-    <LOGIN authenticationkey=\"d8b542b2dafe40f999f223c7aff04046\" />
-    <QUERY objecttype=\"RoadData\" schemaversion=\"1\" changeid=\"{:?}\">
+    let mut body = format!("<REQUEST>
+    <LOGIN authenticationkey=\"d8b542b2dafe40f999f223c7aff04046\"/>
+    <QUERY objecttype=\"RoadData\" schemaversion=\"1\" changeid={:?}>
         <INCLUDE>AADT</INCLUDE>
         <INCLUDE>AADTHeavyVehicles</INCLUDE>
         <INCLUDE>AADTMeasurementMethod.Code</INCLUDE>
@@ -156,7 +155,7 @@ pub fn get_road_data(changeid:&str)-> reqwest::Result<()>{
         <INCLUDE>Winter2003.Code</INCLUDE>
         <INCLUDE>Winter2003.Value</INCLUDE>
     </QUERY>
-</REQUEST>",changeid)
+</REQUEST>",changeid);
 
 
 let client = reqwest::blocking::Client::new();

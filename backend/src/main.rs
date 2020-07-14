@@ -41,6 +41,7 @@ fn main() {
     let traffic_flow_pool = pool.clone();
     let road_condition_pool = pool.clone();
     let road_geometry_pool = pool.clone();
+    let road_data_pool = pool.clone();
 
 
     //database::insert_road_accident_data(road_accident_pool.clone(), roadAccident_data);
@@ -73,28 +74,33 @@ fn main() {
 
     Designa vidare som du anser bäst.
     */
-    let mut changeid_data
+    let mut changeid_data = "0";
     thread::spawn(move || loop{
         let mut res = true;
         let fetch_thread = thread::spawn(move || {
             let mut result = fetch::get_road_data(changeid_data);
             let res = match result{
-                OK(res) => true,
-                Err(e) = false,
-            }
+                Ok(res) => true,
+                Err(e) => false,
+            };
 
 
         });
         fetch_thread.join().unwrap();
         if res {
+            println!("Road Data1");
             let changeid_data = parse_xml::parse_changeid("Road_Data.xml");
+            println!("Road Data2");
             let road_data_data = parse_xml::parse_road_data("Road_Data.xml");
-            
-            database::
-
-
+            println!("Road Data3");
+            database::insert_road_data(road_data_pool.clone(), road_data_data);
+            println!("Road Data4");
+           
+        }else{
+            println!("{:?}: Fail to fetch Road Data from DATEX",Local::now().naive_local());
         }
-    })
+        
+    });
 
 
     thread::spawn(move || loop{
@@ -116,7 +122,7 @@ fn main() {
 
     //13.00, '57.5435199402273'
         fetch_thread.join().unwrap();
-        println!("DATA FETCHED {:?} ", res);
+        //println!("DATA FETCHED {:?} ", res);
         if res {
             let changeid_geometry = parse_xml::parse_changeid("Road_Geometry.xml");
             let road_geometry_data = parse_xml::parse_road_geometry("Road_Geometry.xml");
