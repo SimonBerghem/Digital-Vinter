@@ -93,6 +93,7 @@ fn main() {
             println!("Road Data2");
             let road_data_data = parse_xml::parse_road_data("Road_Data.xml");
             println!("Road Data3");
+            //panic!("kaos mannos");
             database::insert_road_data(road_data_pool.clone(), road_data_data);
             println!("Road Data4");
            

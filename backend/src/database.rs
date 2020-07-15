@@ -25,25 +25,28 @@ pub fn insert_friction_data(mut conn: PooledConn, url: &str) {
 
 pub fn insert_road_data(pool: Pool, road_data_data: Vec<RoadData>){
 
-    let insert_stmt = r"INSERT INTO `db`.`road_data` 
-    (`AADDT`, `AADTHeavyVehicles`, `AADTMeasurementMethod.Code`, `AADTMeasurementMethod.Value`,
+    let mut insert_stmt = r"INSERT IGNORE INTO `db`.`road_data` 
+                (`AADDT`, `AADTHeavyVehicles`, `AADTMeasurementMethod.Code`, `AADTMeasurementMethod.Value`,
          `AADTMeasurementYear`, `BearingCapacity.Code`, `BearingCapacity.Value`, `County`, `Deleted`,
           `Direction.Code`, `Direction.Value`, `EndContinuousLength`, `LaneDescription`, `Length`,
            `ModifiedTime`, `RoadCategory.Code`, `RoadCategory.Value`, 
             `RoadMainNumber`, `RoadOwner.Code`, `RoadOwner.Value`, `RoadSubNumber`, `RoadType.Code`,
             `RoadType.Value`, `RoadWidth`, `SpeedLimit`, `StartContinuousLength`, `TimeStamp`, `WearLayer`, 
             `Winter2003.Code`, `Winter2003.Value`) 
-            VALUES (`:aaddt`, `:aadt_heavy_vehicles`, `:aadt_measurement_method_code`, `:aadt_measurement_method_value`,
-                `:aadt_measurement_year`, `:bearing_capacity_code`, `:bearing_capacity_value`, `:county`, `:deleted`,
-                 `:direction_code`, `:direction_value`, `:end_continuous_length`, `:lane_description`, `:length`,
-                  `:modified_time`, `:road_category_code`, `:road_category_value`,
-                   `:road_main_number`, `:road_owner_code`, `:road_owner_value`, `:road_sub_number`, `:road_type_code`,
-                   `:road_type_value`, `:road_width`, `:speed_limit`, `:start_continuous_length`, `:time_stamp`, `:wear_layer`, 
-                   `:winter_2003_code`, `:winter_2003_value`);";
-
+            VALUES (:aaddt, :aadt_heavy_vehicles, :aadt_measurement_method_code, :aadt_measurement_method_value,
+                :aadt_measurement_year, :bearing_capacity_code, :bearing_capacity_value, :county, :deleted,
+                 :direction_code, :direction_value, :end_continuous_length, :lane_description, :length,
+                  :modified_time, :road_category_code, :road_category_value,
+                   :road_main_number, :road_owner_code, :road_owner_value, :road_sub_number, :road_type_code,
+                   :road_type_value, :road_width, :speed_limit, :start_continuous_length, :time_stamp, :wear_layer, 
+                   :winter_2003_code, :winter_2003_value);";
+    let mut insert_stmt_prep = pool.prepare(insert_stmt);
+    //println!("{:?}",insert_stmt_prep);
     for mut stmt in pool.prepare(insert_stmt).into_iter(){
 
         for i in road_data_data.iter(){
+           let mut modified_time = i.modified_time.clone();
+           let mut modified_time_1:Vec<&str> = modified_time.split(".").collect();
             stmt.execute(params!{
                 "aaddt" => i.aadt.clone(),
                 "aadt_heavy_vehicles" => i.aadt_heavy_vehicles.clone(),
@@ -59,7 +62,7 @@ pub fn insert_road_data(pool: Pool, road_data_data: Vec<RoadData>){
                 "end_continuous_length" => i.end_continuous_length.clone(),
                 "lane_description" => i.lane_description.clone(),
                 "length" => i.length.clone(),
-                "modified_time" => i.modified_time.clone(),
+                "modified_time" => modified_time_1[0],
                 "road_category_code" => i.road_category_code.clone(),
                 "road_category_value" => i.road_category_value.clone(),
                 "road_main_number" => i.road_main_number.clone(),
