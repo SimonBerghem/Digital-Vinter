@@ -438,6 +438,12 @@ pub fn get_opts(user: &str, pass: &str, addr: &str, database: &str) -> Opts {
 // Create the tables, only for new db!
 pub fn create_mysql_tables(pool: Pool) {
 
+    pool.prep_exec(r"CREATE TABLE `roads_listed` (
+        `road_main_number` int(11) NOT NULL,
+        `road_sub_number` int(11) NOT NULL,
+        PRIMARY KEY (`road_main_number`,`road_sub_number`)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;",()).expect("Failed to create road listed table");
+
     pool.prep_exec(r"CREATE TABLE IF NOT EXISTS`db`.`road_condition_data` (
         `cause` VARCHAR(45) NULL,
         `condition_code` VARCHAR(45) NULL,
@@ -461,12 +467,19 @@ pub fn create_mysql_tables(pool: Pool) {
         PRIMARY KEY (`id`, `start_time`));
       ", ()).expect("Failed to create table: Road Condition");
 
-    pool.prep_exec(r"CREATE TABLE IF NOT EXISTS `db`.`road_condition_geometry` (
-        `id` INT(11) NOT NULL AUTO_INCREMENT,
-        `road_condition_id` VARCHAR(45) NULL,
-        `SWEREF99TM` VARCHAR(45) NULL,
-        `WGS84` VARCHAR(45) NULL,
-        PRIMARY KEY (`id`));
+    pool.prep_exec(r"CREATE TABLE IF NOT EXISTS `road_geometry_geometry` (
+        `road_geometry_geometry_id` int(11) NOT NULL AUTO_INCREMENT,
+        `RoadMainNumber` int(11) NOT NULL,
+        `RoadSubNumber` int(11) NOT NULL,
+        `WGS` bigint(45) DEFAULT NULL,
+        `Longitude` double DEFAULT NULL,
+        `Latitude` double DEFAULT NULL,
+        `RH2000_Altitude` double DEFAULT NULL,
+        PRIMARY KEY (`road_geometry_geometry_id`,`RoadMainNumber`,`RoadSubNumber`),
+        KEY `List_Geometry_Gemetry_idx` (`RoadMainNumber`,`RoadSubNumber`),
+        KEY `Geometry` (`Longitude`,`Latitude`),
+        CONSTRAINT `List_Geometry_Gemetry` FOREIGN KEY (`RoadMainNumber`, `RoadSubNumber`) REFERENCES `roads_listed` (`road_main_number`, `road_sub_number`)
+      ) ENGINE=InnoDB AUTO_INCREMENT=640852 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
       ", ()).expect("Failed to create table Road Condition Geometry");
     
     //This checks for en certain index, 1 == exists, 0 == does not exists.  
@@ -623,53 +636,58 @@ pub fn create_mysql_tables(pool: Pool) {
         PRIMARY KEY (`MeasurementTime`, `SiteId`, `VehicleType`)
         )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;", ()).expect("Failed to create table: traffic_flow");
 
-    pool.prep_exec(r"CREATE TABLE IF NOT EXISTS `db`.`road_geometry` (
-        `County` VARCHAR(45) NULL,
-        `Deleted` VARCHAR(45) NULL,
-        `Direction.Code` VARCHAR(45) NULL,
-        `Direction.Value` VARCHAR(45) NULL,
-        `Length` VARCHAR(45) NULL,
-        `ModifiedTime` VARCHAR(45) NULL,
-        `RoadMainNumber` VARCHAR(45) NULL,
-        `RoadSubNumber` VARCHAR(45) NULL,
-        `TimeStamp` VARCHAR(45) NULL,
-        PRIMARY KEY (`RoadMainNumber`, `RoadSubNumber`));",());
+    pool.prep_exec(r"CCREATE TABLE IF NOT EXISTS`road_geometry` (
+        `id` int(11) NOT NULL AUTO_INCREMENT,
+        `County` varchar(45) DEFAULT NULL,
+        `Deleted` varchar(45) DEFAULT NULL,
+        `Direction.Value` varchar(45) DEFAULT NULL,
+        `Length` varchar(45) DEFAULT NULL,
+        `RoadMainNumber` int(11) NOT NULL,
+        `RoadSubNumber` int(11) NOT NULL,
+        `TimeStamp` datetime DEFAULT NULL,
+        PRIMARY KEY (`id`,`RoadMainNumber`,`RoadSubNumber`),
+        KEY `Road_Listed_Geometry_idx` (`RoadMainNumber`,`RoadSubNumber`),
+        CONSTRAINT `Road_Listed_Geometry` FOREIGN KEY (`RoadMainNumber`, `RoadSubNumber`) REFERENCES `roads_listed` (`road_main_number`, `road_sub_number`)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;",()).expect("Failed to create Road Geometry Table");
 
 
-    pool.prep_exec(r"CREATE TABLE IF NOT EXISTS`db`.`road_data` (
-        `road_data_id` INT NOT NULL AUTO_INCREMENT,
-        `AADDT` VARCHAR(45) NULL,
-        `AADTHeavyVehicles` VARCHAR(45) NULL,
-        `AADTMeasurementMethod.Code` VARCHAR(45) NULL,
-        `AADTMeasurementMethod.Value` VARCHAR(45) NULL,
-        `AADTMeasurementYear` VARCHAR(45) NULL,
-        `BearingCapacity.Code` VARCHAR(45) NULL,
-        `BearingCapacity.Value` VARCHAR(45) NULL,
-        `County` VARCHAR(45) NULL,
-        `Deleted` VARCHAR(45) NULL,
-        `Direction.Code` VARCHAR(45) NULL,
-        `Direction.Value` VARCHAR(45) NULL,
-        `EndContinuousLength` VARCHAR(45) NULL,
-        `LaneDescription` VARCHAR(45) NULL,
-        `Length` VARCHAR(45) NULL,
-        `ModifiedTime` VARCHAR(45) NULL,
-        `RoadCategory.Code` VARCHAR(45) NULL,
-        `RoadCategory.Value` VARCHAR(45) NULL,
-        `RoadConstruction2009` VARCHAR(45) NULL,
-        `RoadMainNumber` VARCHAR(45) NULL,
-        `RoadOwner.Code` VARCHAR(45) NULL,
-        `RoadOwner.Value` VARCHAR(45) NULL,
-        `RoadSubNumber` VARCHAR(45) NULL,
-        `RoadType.Code` VARCHAR(45) NULL,
-        `RoadType.Value` VARCHAR(45) NULL,
-        `RoadWidth` VARCHAR(45) NULL,
-        `SpeedLimit` VARCHAR(45) NULL,
-        `StartContinuousLength` VARCHAR(45) NULL,
-        `TimeStamp` VARCHAR(45) NULL,
-        `WearLayer` VARCHAR(45) NULL,
-        `Winter2003.Code` VARCHAR(45) NULL,
-        `Winter2003.Value` VARCHAR(45) NULL,
-        PRIMARY KEY (`road_data_id`));
+    pool.prep_exec(r"CREATE TABLE IF NOT EXISTS`road_data` (
+        `road_data_id` int(11) NOT NULL AUTO_INCREMENT,
+        `AADDT` varchar(45) DEFAULT NULL,
+        `AADTHeavyVehicles` varchar(45) DEFAULT NULL,
+        `AADTMeasurementMethod.Code` varchar(45) DEFAULT NULL,
+        `AADTMeasurementMethod.Value` varchar(45) DEFAULT NULL,
+        `AADTMeasurementYear` varchar(45) DEFAULT NULL,
+        `BearingCapacity.Code` varchar(45) DEFAULT NULL,
+        `BearingCapacity.Value` varchar(45) DEFAULT NULL,
+        `County` varchar(45) DEFAULT NULL,
+        `Deleted` varchar(45) DEFAULT NULL,
+        `Direction.Code` varchar(45) DEFAULT NULL,
+        `Direction.Value` varchar(45) DEFAULT NULL,
+        `EndContinuousLength` varchar(45) DEFAULT NULL,
+        `LaneDescription` varchar(45) DEFAULT NULL,
+        `Length` varchar(45) DEFAULT NULL,
+        `ModifiedTime` datetime DEFAULT NULL,
+        `RoadCategory.Code` varchar(45) DEFAULT NULL,
+        `RoadCategory.Value` varchar(45) DEFAULT NULL,
+        `RoadConstruction2009` varchar(45) DEFAULT NULL,
+        `RoadMainNumber` int(11) NOT NULL,
+        `RoadOwner.Code` varchar(45) DEFAULT NULL,
+        `RoadOwner.Value` varchar(45) DEFAULT NULL,
+        `RoadSubNumber` int(11) NOT NULL,
+        `RoadType.Code` varchar(45) DEFAULT NULL,
+        `RoadType.Value` varchar(45) DEFAULT NULL,
+        `RoadWidth` varchar(45) DEFAULT NULL,
+        `SpeedLimit` varchar(45) DEFAULT NULL,
+        `StartContinuousLength` varchar(45) DEFAULT NULL,
+        `TimeStamp` varchar(45) DEFAULT NULL,
+        `WearLayer` varchar(45) DEFAULT NULL,
+        `Winter2003.Code` varchar(45) DEFAULT NULL,
+        `Winter2003.Value` varchar(45) DEFAULT NULL,
+        PRIMARY KEY (`road_data_id`,`RoadMainNumber`,`RoadSubNumber`),
+        KEY `Road_Listed_Data_idx` (`RoadMainNumber`,`RoadSubNumber`),
+        CONSTRAINT `Road_Listed_Data` FOREIGN KEY (`RoadMainNumber`, `RoadSubNumber`) REFERENCES `roads_listed` (`road_main_number`, `road_sub_number`)
+      ) ENGINE=InnoDB AUTO_INCREMENT=16047 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
       ",());
 
     pool.prep_exec(r"CREATE TABLE IF NOT EXISTS`db`.`road_geometry_geometry` (
