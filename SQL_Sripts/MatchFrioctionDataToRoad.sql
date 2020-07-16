@@ -37,9 +37,17 @@ BEGIN
             SELECT RoadMainNumber, RoadSubNumber INTO @RM, @RS FROM diff_temp_tb WHERE diff = (SELECT MIN(diff) FROM diff_tb) limit 1;
         
 			UPDATE db.friction_data SET RoadMainNumber = @RM, RoadSubNumber=@RS where Id = @id_f;
+            SET SQL_SAFE_UPDATES = 0;
             UPDATE small_area SET RoadMainNumber = @RM, RoadSubNumber=@RS where Id = @id_f;
-        end loop;
-	
+            SET SQL_SAFE_UPDATES = 1;
+            SET @done = 1;
+            SELECT COUNT(*) INTO @done FROM small_area Where RoadMainNumber > 1;
+            IF @done = 0 THEN
+				LEAVE loop_2_lable;
+			END IF;
+            
+			END loop;
+				
 	END LOOP;
 	SELECT str;
 END$$
