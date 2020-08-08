@@ -244,8 +244,10 @@ var layerGroups = window.opener.layerGroups;
 //Hide the elements at start, We show later after graph load
 hide1("hidebut");
 hide1("province");
+
 hide1("frictionbuttoncanvas");
 hide1("frictionbuttoncanvascurrent");
+
 if(stationsarrayid.length<=0){
   for(var i =4;i<=12;i++){
     hidebyid("prov"+i);
@@ -267,10 +269,14 @@ if(boundsrect.length<=0 && boundscircle <=0){
   hidebyid("prov13");
   hidebyid("type13");
 }
+
+/*
 if(frictionarrayid.length<=0){
   hidebyid("prov14");
   hidebyid("type14");
-}
+  
+}*/
+
 document.getElementById("myRange1").max = Math.floor(Date.now() / 1000);
 document.getElementById("myRange2").max = Math.floor(Date.now() / 1000);
 

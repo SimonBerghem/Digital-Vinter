@@ -5,11 +5,79 @@ var async = require("async");
 
 /* Functions in the DB class that is usable by other files */
 module.exports = {
+
     /*
     ALL FUNCTIONS SHOULD RETURN SOMETHING
     If status, see specific one at
     https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
     */
+
+
+/**
+ * SELECT CAST(ObservationTimeUTC as DATE) as time_measured, CAST(MeasureValue as Double) as friction , NumberOfMeasurements FROM friction_data a 
+            WHERE (
+                      acos(sin(a.latitude * 0.0175) * sin(57.55173111 * 0.0175) 
+                           + cos(a.latitude * 0.0175) * cos(57.55173111 * 0.0175) *    
+                             cos((12.05319023 * 0.0175) - (a.longitude * 0.0175))
+                          ) * 6371 <= 2 AND ObservationTimeUTC IS NOT NULL
+                  )ORDER BY ObservationTimeUTC ASC;
+ */
+
+
+    //Test Function, this should use aggregated data in the future.
+
+
+    getStationFromName:function(req, res, next, station_name){
+
+        authorization.getConnection(function(err, conn){
+            if (err) throw err
+
+            
+            
+            const sql =`SELECT lat, lon FROM db.station_data WHERE name = ?`;
+            
+            conn.query(sql, [station_name],function (err, results) {
+                // send data back to client
+                console.log(results)
+                res.send(results);
+                conn.release();
+
+                if (err) throw err
+            });
+        });
+
+    },
+
+    getFrictionFromStation : function(req, res, next,lon, lat){
+
+
+
+        authorization.getConnection(function(err, conn){
+            if (err) throw err
+
+            
+            
+            const sql =`SELECT CAST(ObservationTimeUTC as DATE) as time_measured, CAST(MeasureValue as Double) as friction , NumberOfMeasurements FROM friction_data a 
+            WHERE (
+                      acos(sin(a.latitude * 0.0175) * sin( ? * 0.0175) 
+                           + cos(a.latitude * 0.0175) * cos( ? * 0.0175) *    
+                             cos(( ? * 0.0175) - (a.longitude * 0.0175))
+                          ) * 6371 <= 2 AND ObservationTimeUTC IS NOT NULL
+                  )ORDER BY ObservationTimeUTC ASC;`
+
+            ;
+            var variablesql = [lat, lat ,lon];
+            conn.query(sql,variablesql, function (err, results) {
+                // send data back to client
+                
+                console.log(results)
+                res.send(results);
+                conn.release();
+
+                if (err) throw err
+            });
+        });
+    },
 
 
     // GET FRICTION DATA

@@ -1,3 +1,5 @@
+
+
 //A bunch of arrays which holds the data generated from generatedataforbar to be used in as current graphdata
 var currentdaggpunkt = [];
 var currentdatawind = [];
@@ -6,6 +8,33 @@ var currentroadtemp = [];
 var currentairhum = [];
 var currentairtempprov = [];
 var currentroadtempprov = [];
+var frictiondata_station = [];
+
+//Test
+
+async function getStationCordiFromName(station_name){
+
+}
+
+async function getFrictionFromStationData(station_name){
+	console.log("getFriction")
+	lon = null;
+	lat = null;
+	await $.getJSON("/api/getStationFromName",{station_name},function(data){
+		lon = data[0]["lon"];
+		lat = data[0]["lat"];
+		
+	});
+
+	console.log(lon,lat)
+	await $.getJSON("/api/getFrictionFromStation",{lon,lat},function(data){
+		frictiondata_station = data;
+		currentfrictiongraph();
+	});
+
+	
+}
+
 /**
  * Generats variables for the stations used as data for the current bar graphs. 
  * @param {*} typeofgraph A string which tells which data is sent in
@@ -13,6 +42,7 @@ var currentroadtempprov = [];
  * @param {*} stationame The station name
  */
 function generatedataforbar(typeofgraph,datatempvar,stationame){
+	
     var dataFirst = {
     label: stationame,
     backgroundColor: colornamelist[stationnamelist.indexOf(stationame)],
@@ -40,6 +70,10 @@ function generatedataforbar(typeofgraph,datatempvar,stationame){
 	if (typeofgraph=="current_dagg_temp"){
 		currentdaggpunkt.push(dataFirst);
 	}
+
+	//NYTT
+
+	
 }
 
 //generatedata for current province
@@ -293,7 +327,7 @@ function currenthumgraph(){
 	}
 	var ctx = document.getElementById('myChart7').getContext('2d');
 	chart2 = new Chart(ctx, {
-	    type: 'bar',
+	    type: 'line',
 	    data: {
 		//labels: stations,
 		datasets: currentairhum
@@ -464,45 +498,45 @@ var colornamelist = [];
  * @param {*} datagraf This is the data for the graph
  * @param {*} stationame The station or province name
  */
-function generatedata(value, datagraf, stationame){
-    if(stationnamelist.includes(stationame)){
-	    var dataFirst = {
-	    label: stationame,
-	    data: datagraf,
-	    lineTension: 0.3,
-	    fill: false,
-	    borderColor: colornamelist[stationnamelist.indexOf(stationame)],
-	    backgroundColor: 'transparent',
-	    pointBorderColor: colorforline,
-	    pointBackgroundColor: 'lightgreen',
-	    pointRadius: 1,
-	    pointHoverRadius: 5,
-	    pointHitRadius: 2,
-	    pointBorderWidth: 1,
-	    pointStyle: 'rect'
-  };
-}
-else{
-    var colorforline = '#' + Math.random().toString(16).slice(2, 8).toUpperCase();
-    stationnamelist.push(stationame);
-    colornamelist.push(colorforline);
-	    var dataFirst = {
-	    label: stationame,
-	    data: datagraf,
-	    lineTension: 0.3,
-	    fill: false,
-	    borderColor: colorforline,
-	    backgroundColor: 'transparent',
-	    pointBorderColor: colorforline,
-	    pointBackgroundColor: 'lightgreen',
-	    pointRadius: 1,
-	    pointHoverRadius: 5,
-	    pointHitRadius: 2,
-	    pointBorderWidth: 1,
-	    pointStyle: 'rect'
+	function generatedata(value, datagraf, stationame){
+			if(stationnamelist.includes(stationame)){	
+				var dataFirst = {
+				label: stationame,
+				data: datagraf,
+				lineTension: 0.3,
+				fill: false,
+				borderColor: colornamelist[stationnamelist.indexOf(stationame)],
+				backgroundColor: 'transparent',
+				pointBorderColor: colorforline,
+				pointBackgroundColor: 'lightgreen',
+				pointRadius: 1,
+				pointHoverRadius: 5,
+				pointHitRadius: 2,
+				pointBorderWidth: 1,
+				pointStyle: 'rect'
+		};
+	}
+	else{
+		var colorforline = '#' + Math.random().toString(16).slice(2, 8).toUpperCase();
+		stationnamelist.push(stationame);
+		colornamelist.push(colorforline);
+			var dataFirst = {
+			label: stationame,
+			data: datagraf,
+			lineTension: 0.3,
+			fill: false,
+			borderColor: colorforline,
+			backgroundColor: 'transparent',
+			pointBorderColor: colorforline,
+			pointBackgroundColor: 'lightgreen',
+			pointRadius: 1,
+			pointHoverRadius: 5,
+			pointHitRadius: 2,
+			pointBorderWidth: 1,
+			pointStyle: 'rect'
 
-};
-}
+		};
+	}
 
 	if(value=="roadtemp"){
 		data3graf3.push(dataFirst);
@@ -604,7 +638,7 @@ var chartOptions = {
     },
     title:{
 	display:true,
-	text: "Vägtemperatur",
+	text: "Vägtemperatur-över tid",
   legend: {
     display: true,
     position: 'top',
@@ -631,51 +665,49 @@ var lineChart2 = null;
  * This function will generate air temp graph with the data in arrays generated from generatefuctions
  */
 function airtemp(){
-if(lineChart2 != null){
-lineChart2.destroy();
-}
-var speedCanvas = document.getElementById("myChart1");
-Chart.defaults.global.defaultFontFamily = "Lato";
-Chart.defaults.global.defaultFontSize = 18;
+	if(lineChart2 != null){
+	lineChart2.destroy();
+	}
+	var speedCanvas = document.getElementById("myChart1");
+	Chart.defaults.global.defaultFontFamily = "Lato";
+	Chart.defaults.global.defaultFontSize = 18;
 
 
 
-var speedData = {
-  labels: datagraftimestampair,
-  datasets: datagrafair
-};
+	var speedData = {
+	labels: datagraftimestampair,
+	datasets: datagrafair
+	};
 
-var chartOptions = {
-    scales: {
-        xAxes: [{
-            ticks: {
-                fontSize: 15
-            }
-        }]
-    },
-    title:{
-	display:true,
-	text: "Lufttemperatur",
-  legend: {
-    display: true,
-    position: 'top',
-    labels: {
-      boxWidth: 80,
-      fontColor: 'black',
-    }
-}
+	var chartOptions = {
+		scales: {
+			xAxes: [{
+				ticks: {
+					fontSize: 15
+				}
+			}]
+		},
+		title:{
+		display:true,
+		text: "Luft Temperatur",
+	legend: {
+		display: true,
+		position: 'top',
+		labels: {
+		boxWidth: 80,
+		fontColor: 'black',
+		}
+	}
 
-  }
+	}
+	};
 
-
-};
-
-lineChart2 = new Chart(speedCanvas, {
-  type: 'line',
-  data: speedData,
-  options: chartOptions
-});
-lineChart2.update();
+	lineChart2 = new Chart(speedCanvas, {
+	type: 'line',
+	data: speedData,
+	options: chartOptions
+	});
+	lineChart2.update();
 }
 
 var lineChart3 = null;
@@ -748,6 +780,7 @@ var speedData = {
   datasets: datagrafwindspeed
 };
 
+console.log("datagrafwindspeed",datagrafwindspeed)
 var chartOptions = {
     scales: {
         xAxes: [{
@@ -832,59 +865,123 @@ function currentfrictiongraph(){
 	if(chartFrictionCurrent!=null){
 		chartFrictionCurrent.destroy();
 	}
+	var chartOptions = {
+		scales: {
+			xAxes: [{
+				ticks: {
+					fontSize: 15
+				}
+			}]
+		},
+		title:{
+		display:true,
+		text: "Friktionsvärden",
+	  legend: {
+		display: true,
+		position: 'top',
+		labels: {
+		  boxWidth: 80,
+		  fontColor: 'black'
+		}
+	}
+	  }
+	};
+
+	console.log("datagraftimestampwindspeed", datagraftimestampwindspeed);
+	var station_name = datagrafwindspeed;
+ 
+	
+	//getFrictionFromStationData(station_name)
+	console.log("Frictiondata Station",frictiondata_station)
+	
+	_time_stamp = [];
+	_value = [];
+	for (i = 0; i < frictiondata_station.length; i++){
+		_time_stamp.push(frictiondata_station[i]["time_measured"].substring(2,10))
+		_value.push(frictiondata_station[i]["friction"])
+
+	}
+	console.log("Time Stamp: ", _time_stamp)
+	datagrafwindspeed[0]["data"] = _value
+
+	var speedData = {
+		labels: _time_stamp,
+		datasets: datagrafwindspeed
+	  };
+
 	var ctx = document.getElementById('myChartCurrentFriction').getContext('2d');
 	chartFrictionCurrent = new Chart(ctx, {
-	    type: 'bar',
-	    data: {
-		//labels: stations,
-		datasets: currentdatafriction
-	    },
+		type: 'line',
+		data: speedData,
+		options: chartOptions
 
-	    options: {
-			title:{
-	display:true,
-	text: "Nuvarande vägmätningar"}
-	}
 	});
+
+	chartFrictionCurrent.update();
 }
 
 
-var datafrictiongraf = [];
-var datagrafrictiontimestamp = [];	
+var datafrictiongraf = [0.3,0.3,0.4];
+var datagrafrictiontimestamp = ["2020-07-02 08:50:02","2020-07-01 08:50:02","2020-06-30 08:50:02"];	
 /**
  * Collects data and send to generate function
  * @param {*} frictiondata frictiondata 
  */
 function datamultieplegraffriction(frictiondata){
 	var datagraffriction = [];
+
 	for(var i = 0; i < frictiondata.length; i++){
 		datagraffriction.push(frictiondata[i].MeasurementValue);
 		datagrafrictiontimestamp.push(frictiondata[i].MeasureTimeUTC.slice(2,10)+" "+frictiondata[i].MeasureTimeUTC.slice(11,16));
 	}
+
 	checktruefalse=false;
 	generatedataFriction(datagraffriction)
 }
 
 function generatedataFriction(datagraf){
-		var colorforline = '#' + Math.random().toString(16).slice(2, 8).toUpperCase();
-		var dataFirst = {
-			label: "Friktionsvärde",
-			data: datagraf,
-			lineTension: 0.3,
-			fill: false,
-			borderColor: colorforline,
-			backgroundColor: 'transparent',
-			pointBorderColor: colorforline,
-			pointBackgroundColor: 'lightgreen',
-			pointRadius: 1,
-			pointHoverRadius: 5,
-			pointHitRadius: 2,
-			pointBorderWidth: 1,
-			pointStyle: 'rect'
-		};
 
-		datafrictiongraf.push(dataFirst);
 
+	var colorforline = '#' + Math.random().toString(16).slice(2, 8).toUpperCase();
+
+		
+	var speedCanvas = document.getElementById("myChart2");
+	Chart.defaults.global.defaultFontFamily = "Lato";
+	Chart.defaults.global.defaultFontSize = 18;
+	console.log(datagrafwindspeed);
+	var speedData = {
+	labels: datagraftimestamp,
+	datasets: datagrafwindspeed
+  	};
+  
+  var chartOptions = {
+	  scales: {
+		  xAxes: [{
+			  ticks: {
+				  fontSize: 15
+			  }
+		  }]
+	  },
+	  title:{
+	  display:true,
+	  text: "Vägtemperatur-över tid",
+	legend: {
+	  display: true,
+	  position: 'top',
+	  labels: {
+		boxWidth: 80,
+		fontColor: 'black'
+	  }
+  }
+	}
+  };
+  
+  lineChart1 = new Chart(speedCanvas, {
+	type: 'line',
+	data: speedData,
+	options: chartOptions
+  });
+  lineChart1.update();
 }
 
 
@@ -894,6 +991,7 @@ var lineChartfriction1 = null;
  * This function will generate air temp graph with the data in arrays generated from generatefuctions
  */
 function frictiondata(){
+	console.log("Friction");
 if(lineChartfriction1 != null){
 	lineChartfriction1.destroy();
 }

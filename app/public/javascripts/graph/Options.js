@@ -37,18 +37,18 @@ $(function () {
  });
 
 //hide elements functions
-function hide1(classvar){
-  var appBanners = document.getElementsByClassName(classvar), i;
-for (var i = 0; i < appBanners.length; i ++) {
-    appBanners[i].style.display = 'none';
-}
+  function hide1(classvar){
+    var appBanners = document.getElementsByClassName(classvar), i;
+  for (var i = 0; i < appBanners.length; i ++) {
+      appBanners[i].style.display = 'none';
+  }
 }
 
-function show1(classvar){
-  var appBanners = document.getElementsByClassName(classvar), i;
-for (var i = 0; i < appBanners.length; i ++) {
-    appBanners[i].style.display = 'block';
-}
+  function show1(classvar){
+    var appBanners = document.getElementsByClassName(classvar), i;
+  for (var i = 0; i < appBanners.length; i ++) {
+      appBanners[i].style.display = 'block';
+  }
 }
 
 function hidebyid(id){

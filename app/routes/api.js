@@ -12,9 +12,21 @@ var friction = require('../database/getFrictionData');
 var camera = require('../database/getCameraData');
 var uploadFrictionData = require('../database/uploadFrictionData');
 var accident = require('../database/getAccidentData');
+var roadData = require('../database/getRoadData');
 
 const upload = multer({dest:'uploads/'});
 const unlinkAsync = promisify(fs.unlink)
+
+
+router.get('/getRoadData',function(req,res, next){
+    try{
+        longitude = req['query']['longitude'];
+        latitude = req['query']['latitude'];
+        roadData.getRoadData(req, res, next, longitude,latitude)
+    }catch(error){
+        console.log(error)
+    }
+});
 
 /*
 
@@ -36,6 +48,20 @@ router.get('/getCameraData', function(req, res, next) {
     camera.getCameraData(req,res,next);
 });
 
+/**
+ * GETFRICTION FROM STATION
+ */
+router.get('/getStationFromName',function(req,res,next){
+    station_name = req["query"]['station_name'];
+    friction.getStationFromName(req,res,next,station_name);
+
+})
+
+router.get('/getFrictionFromStation',function(req,res,next){
+    lon = req["query"]['lon'];
+    lat = req["query"]['lat'];
+    friction.getFrictionFromStation(req,res,next,lon, lat);
+});
 
 /* GET DISTINCT REPORTER ORG FROM FRICTION_DATA */
 router.get('/getDistinctReporterorgFriction', function(req, res, next) {

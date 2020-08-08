@@ -7,6 +7,10 @@
  * @param {*} stoptime Stop time to know which intervall to get data from
  */
 async function rungraphs(starttime, stoptime){
+
+
+   
+
     var a = new Date(starttime.substring(0,10)+"T"+starttime.substring(11,)+"Z");
     var b = new Date(stoptime.substring(0,10)+"T"+stoptime.substring(11,)+"Z");
     if(+a < +b){
@@ -48,6 +52,7 @@ async function rungraphs(starttime, stoptime){
     }
 
     if(stationsarrayid.length>0){
+      console.log("Standard");
       //functions to draw graphs
       await roadtemp();
 
@@ -67,7 +72,9 @@ async function rungraphs(starttime, stoptime){
 
       await daggpunktfunc();
       await currentdaggpunktfunc();
-      show1("hidebut");
+      await generatedataFriction()
+      
+      //show1("hidebut");
     }
 
     if(chosenintcounties.length>0){
@@ -82,11 +89,18 @@ async function rungraphs(starttime, stoptime){
       await frictiondata();
       show1("frictionbuttoncanvas");
     }
+    await frictiondata();
+    //show1("frictionbuttoncanvas");
     if(frictionarrayid.length >0){
       await currentfrictiongraph();
-      show1("frictionbuttoncanvascurrent");
+      //show1("frictionbuttoncanvascurrent");
     }
+    //Nytt
+    console.log("Friction Test");
+    //await currentfrictiongraph();
+    //show1("frictionbuttoncanvascurrent");
 
+    getFrictionFromStationData(stationname);
   }
 }
 
