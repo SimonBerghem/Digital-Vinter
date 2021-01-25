@@ -119,10 +119,10 @@ pub fn parse_cameras(xmlfile: &str) -> Vec<CameraData> {
                     camera.id = xml.read_text(e.name(), &mut Vec::new()).expect("Failed to read camera id");
 
                 }
-                // _ => {}
-            // }
-            // Ok(Event::Start(ref e)) => {
-                // match (state, e.name()) {
+                 _ => {}
+            }
+            Ok(Event::Start(ref e)) => {
+                match (state, e.name()) {
                     (State::Root, b"cctvCameraRecordVersionTime") => {
                         let camera = camera_data.last_mut().expect("Failed to get pointer, cctvCameraRecordVersionTime");
                         camera.time = xml.read_text(e.name(), &mut Vec::new()).expect("Failed to read cctvCameraRecordVersionTime");
@@ -165,7 +165,7 @@ pub fn parse_cameras(xmlfile: &str) -> Vec<CameraData> {
                     }
                     _ => (), // There are several other `Event`s we do not consider here
 
-                // }
+                }
             }
             Ok(Event::End(ref e)) => {
                 match (state, e.name()) {
