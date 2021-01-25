@@ -119,7 +119,7 @@ pub fn parse_cameras(xmlfile: &str) -> Vec<CameraData> {
                     camera.id = xml.read_text(e.name(), &mut Vec::new()).expect("Failed to read camera id");
 
                 }
-            //     _ => {}
+                // _ => {}
             // }
             // Ok(Event::Start(ref e)) => {
                 // match (state, e.name()) {
