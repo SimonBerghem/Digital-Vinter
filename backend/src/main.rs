@@ -38,8 +38,9 @@ fn main() {
     let camera_pool = pool.clone();
     let road_accident_pool = pool.clone();
     let traffic_flow_pool = pool.clone();
+    let update_parse_pool = pool.clone();
 
-
+    database::update_parse_accident(update_parse_pool.clone());
     //database::insert_road_accident_data(road_accident_pool.clone(), roadAccident_data);
 
     fetch::fetch_xml(auth::URL_S, auth::USER_DATEX, auth::PASS_DATEX, "station_data_cache.xml");
