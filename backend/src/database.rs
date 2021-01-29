@@ -3,7 +3,7 @@ use mysql::prelude::*;
 use mysql::{Pool, Opts, PooledConn};
 use mysql::OptsBuilder;
 use mysql::chrono::{DateTime, FixedOffset};
-// use mysql::from_row;
+use mysql::from_row;
 
 use crate::parse_xml::{StationData, WeatherData, CameraData, roadAccidentData, TrafficFlowData};
 
@@ -304,6 +304,32 @@ pub fn create_mysql_tables(pool: Pool) {
         PRIMARY KEY (`MeasurementTime`, `SiteId`, `VehicleType`)
         )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;", ()).expect("Failed to create table: traffic_flow");
 
+}
+
+//Used to change the time format of the accident data in the SQL database
+pub fn update_parse_accident(pool: Pool) {
+
+    #[derive(Debug)]
+    struct Accidentdata {
+        CreationTime: String,
+        EndTime: String,
+    }
+
+    let current_data: Vec<Accidentdata> =
+    pool.prep_exec("SELECT CreationTime, EndTime FROM db.test", ())
+    .map(|result| { // In this closure we will map `QueryResult` to `Vec<Payment>`
+        // `QueryResult` is iterator over `MyResult<row, err>` so first call to `map`
+        // will map each `MyResult` to contained `row` (no proper error handling)
+        // and second call to `map` will map each `row` to `Payment`
+        result.map(|x| x.unwrap()).map(|row| {
+            let (CreationTime, EndTime) = mysql::from_row(row);
+            Accidentdata {
+                CreationTime: CreationTime,
+                EndTime: EndTime,
+            }
+        }).collect() // Collect payments so now `QueryResult` is mapped to `Vec<Payment>`
+    }).unwrap();
+    println!("{:?}", current_data);
 }
 
 
