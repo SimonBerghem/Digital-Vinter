@@ -42,7 +42,7 @@ fn main() {
 
     thread::spawn(move || loop {
         database::update_parse_accident(update_parse_pool.clone());
-        thread::sleep(Duration::from_secs(2))
+        thread::sleep(Duration::from_secs(2));
         database::update_parse_accident_rename(update_parse_pool.clone());
         thread::sleep(Duration::from_secs(900));
     });
