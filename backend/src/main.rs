@@ -40,7 +40,12 @@ fn main() {
     let traffic_flow_pool = pool.clone();
     let update_parse_pool = pool.clone();
 
-    database::update_parse_accident(update_parse_pool.clone());
+    thread::spawn(move || loop {
+        database::update_parse_accident(update_parse_pool.clone());
+        thread::sleep(Duration::from_secs(2))
+        database::update_parse_accident_rename(update_parse_pool.clone());
+        thread::sleep(Duration::from_secs(900));
+    });
     //database::insert_road_accident_data(road_accident_pool.clone(), roadAccident_data);
 
     fetch::fetch_xml(auth::URL_S, auth::USER_DATEX, auth::PASS_DATEX, "station_data_cache.xml");
