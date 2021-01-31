@@ -40,7 +40,6 @@ fn main() {
     let traffic_flow_pool = pool.clone();
     let update_parse_pool = pool.clone();
 
-    database::update_parse_accident(update_parse_pool.clone());
     //database::insert_road_accident_data(road_accident_pool.clone(), roadAccident_data);
 
     fetch::fetch_xml(auth::URL_S, auth::USER_DATEX, auth::PASS_DATEX, "station_data_cache.xml");
@@ -202,6 +201,17 @@ let res = cl.post("http://httpbin.org/post").body("the exact body that is sent")
  println!("Status: {}", res.status());
 }
 
+//Thread for updating timeformat for accidentdata in SQL
+    
+    // thread::spawn(move || loop {
+    //     database::update_parse_accident(update_parse_pool.clone());
+    //     println!("{:?}: Update complete",Local::now().naive_local());
+    //     thread::sleep(Duration::from_secs(20));
+        
+    //     database::update_parse_accident_rename(update_parse_pool.clone());
+    //     println!("{:?}: Rename complete",Local::now().naive_local());
+    //     thread::sleep(Duration::from_secs(900));
+    // });
 
 // fn testParse(){
 
