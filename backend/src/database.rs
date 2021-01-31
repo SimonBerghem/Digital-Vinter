@@ -45,7 +45,7 @@ pub fn insert_road_accident_row(pool: Pool, accident_row: Vec<roadAccidentData>)
     for i in accident_row.iter(){
         let query = format!(r#"INSERT IGNORE INTO road_accident_data (Id, CreationTime, EndTime, IconId, SWEREF99TM, WGS84, SeverityCode) VALUES('{}', '{}', '{}', '{}', '{}', '{}', '{}')
         ON DUPLICATE KEY UPDATE CreationTime='{}', EndTime='{}',IconId='{}', SWEREF99TM='{}', WGS84='{}', SeverityCode='{}';"#,
-        i.RoadAccident_id, i.RoadAccident_CreationTime, i.RoadAccident_EndTime, i.RoadAccident_icon_id,i.RoadAccident_Geometry_SWEREF99TM, i.RoadAccident_Geometry_WGS84, i.RoadAccident_SeverityCode,
+        i.RoadAccident_id, DateTime::<FixedOffset>::parse_from_rfc3339(&i.RoadAccident_CreationTime.clone()).unwrap().naive_utc(), DateTime::<FixedOffset>::parse_from_rfc3339(&i.RoadAccident_EndTime.clone()).unwrap().naive_utc(), i.RoadAccident_icon_id,i.RoadAccident_Geometry_SWEREF99TM, i.RoadAccident_Geometry_WGS84, i.RoadAccident_SeverityCode,
         i.RoadAccident_CreationTime, i.RoadAccident_EndTime, i.RoadAccident_icon_id,i.RoadAccident_Geometry_SWEREF99TM, i.RoadAccident_Geometry_WGS84, i.RoadAccident_SeverityCode);
         
        pool.prep_exec(query,()).expect("Failed to insert Road Accident Data, Pls contact support");
@@ -316,48 +316,45 @@ pub fn update_parse_accident(pool: Pool) {
     }
 
     let current_data: Vec<Accidentdata> =
-    pool.prep_exec("SELECT CreationTime, EndTime FROM db.test", ())
-    .map(|result| { // In this closure we will map `QueryResult` to `Vec<Payment>`
+    pool.prep_exec("SELECT CreationTime, EndTime FROM db.road_accident_data", ())
+    .map(|result| { // In this closure we will map `QueryResult` to `Vec<Accidentdata>`
         // `QueryResult` is iterator over `MyResult<row, err>` so first call to `map`
         // will map each `MyResult` to contained `row` (no proper error handling)
-        // and second call to `map` will map each `row` to `Payment`
+        // and second call to `map` will map each `row` to `Accidentdata`
         result.map(|x| x.unwrap()).map(|row| {
             let (CreationTime, EndTime) = mysql::from_row(row);
             Accidentdata {
                 CreationTime: CreationTime,
                 EndTime: EndTime,
             }
-        }).collect() // Collect payments so now `QueryResult` is mapped to `Vec<Payment>`
+        }).collect() // Collect payments so now `QueryResult` is mapped to `Vec<Accidentdata>`
     }).unwrap();
-    println!("{:?}", current_data);
+    //println!("{:?}", current_data);
 
-    pool.prep_exec("ALTER TABLE test ADD new_CreationTime varchar(45);", ());
-    pool.prep_exec("ALTER TABLE test ADD PRIMARY KEY (CreationTime);", ());
+    pool.prep_exec("ALTER TABLE db.road_accident_data ADD new_CreationTime varchar(45);", ()).expect("Failed to create new_CreationTime column");
+    pool.prep_exec("ALTER TABLE db.road_accident_data ADD new_EndTime varchar(45);", ()).expect("Failed to create new_EndTime column");
     
-
-    let insert_stmt = r"INSERT IGNORE INTO weather_data 
-                        (station_id, timestamp, air_temperature, road_temperature, precipitation_type, precipitation_millimetres, air_humidity, wind_speed, wind_direction) 
-                        VALUES (:station_id, NULLIF(:timestamp, NULL), NULLIF(:air_temperature, ''), NULLIF(:road_temperature, ''),
-                        NULLIF(:precipitation_type, '') ,NULLIF(:precipitation_millimetres, ''),
-                        NULLIF(:air_humidity, ''), NULLIF(:wind_speed, ''), NULLIF(:wind_direction, ''));";
     
-    for mut stmt in pool.prepare(insert_stmt).into_iter() { 
-        for i in weather_data.iter() {
-            // `execute` takes ownership of `params` so we pass account name by reference.
-            stmt.execute(params!{
-                "station_id" => i.station_id.clone(),
-                "timestamp" => DateTime::<FixedOffset>::parse_from_rfc3339(&i.timestamp.clone()).unwrap().naive_utc(),
-                "air_temperature" => i.air_temperature.clone(),
-                "road_temperature" => i.road_temperature.clone(),
-                "precipitation_type" => i.precipitation_type.clone(),
-                "precipitation_millimetres" => i.precipitation_millimetres.clone(),
-                "air_humidity" => i.air_humidity.clone(),
-                "wind_speed" => i.wind_speed.clone(),
-                "wind_direction" => i.wind_direction.clone(),
+    for i in current_data.iter(){
+        let update_query = format!(r#"UPDATE db.road_accident_data SET new_CreationTime ='{}', new_EndTime ='{}' WHERE CreationTime = '{}';"#,
+        DateTime::<FixedOffset>::parse_from_rfc3339(&i.CreationTime.clone()).unwrap().naive_utc(), DateTime::<FixedOffset>::parse_from_rfc3339(&i.EndTime.clone()).unwrap().naive_utc(), i.CreationTime);
+        
+        pool.prep_exec(update_query,()).expect("Failed to update RoadAccident Data, Pls contact support");
 
-            }).expect("Failed to execute statement when reading from weather_data");
-        }
     }
+    //pool.prep_exec("ALTER TABLE db.road_accident_data DROP PRIMARY KEY;", ());
+
+    pool.prep_exec("ALTER TABLE db.road_accident_data DROP column EndTime;", ());
+    pool.prep_exec("ALTER TABLE db.road_accident_data DROP column CreationTime;", ());
+
+    
+}
+
+pub fn update_parse_accident_rename(pool:Pool) {
+    pool.prep_exec("ALTER TABLE db.road_accident_data RENAME COLUMN new_EndTime TO EndTime;", ());
+    pool.prep_exec("ALTER TABLE db.road_accident_data RENAME COLUMN new_CreationTime TO CreationTime;", ());
+
+    pool.prep_exec("ALTER TABLE db.road_accident_data ADD PRIMARY KEY (Id, CreationTime);", ());
 }
 
 
