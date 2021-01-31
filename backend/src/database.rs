@@ -335,11 +335,11 @@ pub fn update_parse_accident(pool: Pool) {
     pool.prep_exec("ALTER TABLE test ADD new_EndTime varchar(45);", ()).expect("Failed to create new_EndTime column");
     
     
-    for i in accident_row.iter(){
+    for i in current_data.iter(){
         let update_query = format!(r#"UPDATE db.test SET new_CreationTime ='{}' new_EndTime ='{}' WHERE CreationTime = '{}';"#,
         DateTime::<FixedOffset>::parse_from_rfc3339(&i.CreationTime.clone()).unwrap().naive_utc(), DateTime::<FixedOffset>::parse_from_rfc3339(&i.EndTime.clone()).unwrap().naive_utc(), i.CreationTime);
         
-       pool.prep_exec(query,()).expect("Failed to update RoadAccident Data, Pls contact support");
+       pool.prep_exec(update_query,()).expect("Failed to update RoadAccident Data, Pls contact support");
 
     }
 
