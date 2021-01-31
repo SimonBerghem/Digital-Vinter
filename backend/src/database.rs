@@ -343,8 +343,12 @@ pub fn update_parse_accident(pool: Pool) {
         pool.prep_exec(update_query,()).expect("Failed to update RoadAccident Data, Pls contact support");
 
     }
+    pool.prep_exec("ALTER TABLE db.test DROP PRIMARY KEY;", ());
 
-    pool.prep_exec("ALTER TABLE test ADD PRIMARY KEY (CreationTime);", ());
+    pool.prep_exec("ALTER TABLE db.test DROP column EndTime;", ());
+    pool.prep_exec("ALTER TABLE db.test DROP column CreationTime;", ());
+
+    pool.prep_exec("ALTER TABLE db.test ADD PRIMARY KEY (CreationTime);", ());
 }
 
 
