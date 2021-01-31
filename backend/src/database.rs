@@ -46,8 +46,8 @@ pub fn insert_road_accident_row(pool: Pool, accident_row: Vec<roadAccidentData>)
         let query = format!(r#"INSERT IGNORE INTO road_accident_data (Id, CreationTime, EndTime, IconId, SWEREF99TM, WGS84, SeverityCode) VALUES('{}', '{}', '{}', '{}', '{}', '{}', '{}')
         ON DUPLICATE KEY UPDATE CreationTime='{}', EndTime='{}',IconId='{}', SWEREF99TM='{}', WGS84='{}', SeverityCode='{}';"#,
         i.RoadAccident_id, DateTime::<FixedOffset>::parse_from_rfc3339(&i.RoadAccident_CreationTime.clone()).unwrap().naive_utc(), DateTime::<FixedOffset>::parse_from_rfc3339(&i.RoadAccident_EndTime.clone()).unwrap().naive_utc(), i.RoadAccident_icon_id,i.RoadAccident_Geometry_SWEREF99TM, i.RoadAccident_Geometry_WGS84, i.RoadAccident_SeverityCode,
-        i.RoadAccident_CreationTime, i.RoadAccident_EndTime, i.RoadAccident_icon_id,i.RoadAccident_Geometry_SWEREF99TM, i.RoadAccident_Geometry_WGS84, i.RoadAccident_SeverityCode);
-        println!("{:?} ", query);
+        DateTime::<FixedOffset>::parse_from_rfc3339(&i.RoadAccident_CreationTime.clone()).unwrap().naive_utc(), DateTime::<FixedOffset>::parse_from_rfc3339(&i.RoadAccident_EndTime.clone()).unwrap().naive_utc(), i.RoadAccident_icon_id,i.RoadAccident_Geometry_SWEREF99TM, i.RoadAccident_Geometry_WGS84, i.RoadAccident_SeverityCode);
+
         pool.prep_exec(query,()).expect("Failed to insert Road Accident Data, Pls contact support");
 
     }
