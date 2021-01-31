@@ -45,7 +45,7 @@ pub fn insert_road_accident_row(pool: Pool, accident_row: Vec<roadAccidentData>)
     for i in accident_row.iter(){
         let query = format!(r#"INSERT IGNORE INTO road_accident_data (Id, CreationTime, EndTime, IconId, SWEREF99TM, WGS84, SeverityCode) VALUES('{}', '{}', '{}', '{}', '{}', '{}', '{}')
         ON DUPLICATE KEY UPDATE CreationTime='{}', EndTime='{}',IconId='{}', SWEREF99TM='{}', WGS84='{}', SeverityCode='{}';"#,
-        i.RoadAccident_id, i.RoadAccident_CreationTime, i.RoadAccident_EndTime, i.RoadAccident_icon_id,i.RoadAccident_Geometry_SWEREF99TM, i.RoadAccident_Geometry_WGS84, i.RoadAccident_SeverityCode,
+        i.RoadAccident_id, DateTime::<FixedOffset>::parse_from_rfc3339(&i.RoadAccident_CreationTime.clone()).unwrap().naive_utc(), DateTime::<FixedOffset>::parse_from_rfc3339(&i.RoadAccident_EndTime.clone()).unwrap().naive_utc(), i.RoadAccident_icon_id,i.RoadAccident_Geometry_SWEREF99TM, i.RoadAccident_Geometry_WGS84, i.RoadAccident_SeverityCode,
         i.RoadAccident_CreationTime, i.RoadAccident_EndTime, i.RoadAccident_icon_id,i.RoadAccident_Geometry_SWEREF99TM, i.RoadAccident_Geometry_WGS84, i.RoadAccident_SeverityCode);
         
        pool.prep_exec(query,()).expect("Failed to insert Road Accident Data, Pls contact support");
@@ -316,7 +316,7 @@ pub fn update_parse_accident(pool: Pool) {
     }
 
     let current_data: Vec<Accidentdata> =
-    pool.prep_exec("SELECT CreationTime, EndTime FROM db.test", ())
+    pool.prep_exec("SELECT CreationTime, EndTime FROM db.road_accident_data", ())
     .map(|result| { // In this closure we will map `QueryResult` to `Vec<Accidentdata>`
         // `QueryResult` is iterator over `MyResult<row, err>` so first call to `map`
         // will map each `MyResult` to contained `row` (no proper error handling)
@@ -331,31 +331,31 @@ pub fn update_parse_accident(pool: Pool) {
     }).unwrap();
     //println!("{:?}", current_data);
 
-    pool.prep_exec("ALTER TABLE test ADD new_CreationTime varchar(45);", ()).expect("Failed to create new_CreationTime column");
-    pool.prep_exec("ALTER TABLE test ADD new_EndTime varchar(45);", ()).expect("Failed to create new_EndTime column");
+    pool.prep_exec("ALTER TABLE db.road_accident_data ADD new_CreationTime varchar(45);", ()).expect("Failed to create new_CreationTime column");
+    pool.prep_exec("ALTER TABLE db.road_accident_data ADD new_EndTime varchar(45);", ()).expect("Failed to create new_EndTime column");
     
     
     for i in current_data.iter(){
-        let update_query = format!(r#"UPDATE db.test SET new_CreationTime ='{}', new_EndTime ='{}' WHERE CreationTime = '{}';"#,
+        let update_query = format!(r#"UPDATE db.road_accident_data SET new_CreationTime ='{}', new_EndTime ='{}' WHERE CreationTime = '{}';"#,
         DateTime::<FixedOffset>::parse_from_rfc3339(&i.CreationTime.clone()).unwrap().naive_utc(), DateTime::<FixedOffset>::parse_from_rfc3339(&i.EndTime.clone()).unwrap().naive_utc(), i.CreationTime);
         
 
         pool.prep_exec(update_query,()).expect("Failed to update RoadAccident Data, Pls contact support");
 
     }
-    pool.prep_exec("ALTER TABLE db.test DROP PRIMARY KEY;", ());
+    pool.prep_exec("ALTER TABLE db.road_accident_data DROP PRIMARY KEY;", ());
 
-    pool.prep_exec("ALTER TABLE db.test DROP column EndTime;", ());
-    pool.prep_exec("ALTER TABLE db.test DROP column CreationTime;", ());
+    pool.prep_exec("ALTER TABLE db.road_accident_data DROP column EndTime;", ());
+    pool.prep_exec("ALTER TABLE db.road_accident_data DROP column CreationTime;", ());
 
     
 }
 
 pub fn update_parse_accident_rename(pool:Pool) {
-    pool.prep_exec("ALTER TABLE db.test RENAME COLUMN new_EndTime TO EndTime;", ());
-    pool.prep_exec("ALTER TABLE db.test RENAME COLUMN new_CreationTime TO CreationTime;", ());
+    pool.prep_exec("ALTER TABLE db.road_accident_data RENAME COLUMN new_EndTime TO EndTime;", ());
+    pool.prep_exec("ALTER TABLE db.road_accident_data RENAME COLUMN new_CreationTime TO CreationTime;", ());
 
-    pool.prep_exec("ALTER TABLE db.test ADD PRIMARY KEY (CreationTime);", ());
+    pool.prep_exec("ALTER TABLE db.road_accident_data ADD PRIMARY KEY (Id, CreationTime);", ());
 }
 
 
