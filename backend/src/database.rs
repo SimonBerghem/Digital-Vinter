@@ -339,7 +339,7 @@ pub fn update_parse_accident(pool: Pool) {
         let update_query = format!(r#"UPDATE db.road_accident_data SET new_CreationTime ='{}', new_EndTime ='{}' WHERE CreationTime = '{}';"#,
         DateTime::<FixedOffset>::parse_from_rfc3339(&i.CreationTime.clone()).unwrap().naive_utc(), DateTime::<FixedOffset>::parse_from_rfc3339(&i.EndTime.clone()).unwrap().naive_utc(), i.CreationTime);
         
-
+        println!("{:?}", update_query);
         pool.prep_exec(update_query,()).expect("Failed to update RoadAccident Data, Pls contact support");
 
     }
