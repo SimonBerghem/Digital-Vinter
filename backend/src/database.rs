@@ -347,6 +347,10 @@ pub fn update_parse_accident(pool: Pool) {
 
     pool.prep_exec("ALTER TABLE db.test DROP column EndTime;", ());
     pool.prep_exec("ALTER TABLE db.test DROP column CreationTime;", ());
+    pool.sleep(100);
+    
+    pool.prep_exec("ALTER TABLE db.test RENAME COLUMN new_EndTime TO EndTime;", ());
+    pool.prep_exec("ALTER TABLE db.test RENAME COLUMN new_CreationTime TO CreationTime;", ());
 
     pool.prep_exec("ALTER TABLE db.test ADD PRIMARY KEY (CreationTime);", ());
 }
