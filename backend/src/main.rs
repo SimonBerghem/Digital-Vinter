@@ -42,8 +42,11 @@ fn main() {
 
     thread::spawn(move || loop {
         database::update_parse_accident(update_parse_pool.clone());
-        thread::sleep(Duration::from_secs(2));
+        println!("{:?}: Update complete",Local::now().naive_local());
+        thread::sleep(Duration::from_secs(20));
+        
         database::update_parse_accident_rename(update_parse_pool.clone());
+        println!("{:?}: Rename complete",Local::now().naive_local());
         thread::sleep(Duration::from_secs(900));
     });
     //database::insert_road_accident_data(road_accident_pool.clone(), roadAccident_data);
