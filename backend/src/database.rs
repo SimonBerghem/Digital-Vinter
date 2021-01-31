@@ -317,47 +317,33 @@ pub fn update_parse_accident(pool: Pool) {
 
     let current_data: Vec<Accidentdata> =
     pool.prep_exec("SELECT CreationTime, EndTime FROM db.test", ())
-    .map(|result| { // In this closure we will map `QueryResult` to `Vec<Payment>`
+    .map(|result| { // In this closure we will map `QueryResult` to `Vec<Accidentdata>`
         // `QueryResult` is iterator over `MyResult<row, err>` so first call to `map`
         // will map each `MyResult` to contained `row` (no proper error handling)
-        // and second call to `map` will map each `row` to `Payment`
+        // and second call to `map` will map each `row` to `Accidentdata`
         result.map(|x| x.unwrap()).map(|row| {
             let (CreationTime, EndTime) = mysql::from_row(row);
             Accidentdata {
                 CreationTime: CreationTime,
                 EndTime: EndTime,
             }
-        }).collect() // Collect payments so now `QueryResult` is mapped to `Vec<Payment>`
+        }).collect() // Collect payments so now `QueryResult` is mapped to `Vec<Accidentdata>`
     }).unwrap();
     //println!("{:?}", current_data);
 
-    pool.prep_exec("ALTER TABLE test ADD new_CreationTime varchar(45);", ());
+    pool.prep_exec("ALTER TABLE test ADD new_CreationTime varchar(45);", ()).expect("Failed to create new_CreationTime column");
+    pool.prep_exec("ALTER TABLE test ADD new_EndTime varchar(45);", ()).expect("Failed to create new_EndTime column");
+    
+    
+    for i in accident_row.iter(){
+        let update_query = format!(r#"UPDATE db.test SET new_CreationTime ='{}' new_EndTime ='{}' WHERE CreationTime = '{}';"#,
+        DateTime::<FixedOffset>::parse_from_rfc3339(&i.CreationTime.clone()).unwrap().naive_utc(), DateTime::<FixedOffset>::parse_from_rfc3339(&i.EndTime.clone()).unwrap().naive_utc(), i.CreationTime);
+        
+       pool.prep_exec(query,()).expect("Failed to update RoadAccident Data, Pls contact support");
+
+    }
+
     pool.prep_exec("ALTER TABLE test ADD PRIMARY KEY (CreationTime);", ());
-    
-
-    // let insert_stmt = r"INSERT IGNORE INTO weather_data 
-    //                     (station_id, timestamp, air_temperature, road_temperature, precipitation_type, precipitation_millimetres, air_humidity, wind_speed, wind_direction) 
-    //                     VALUES (:station_id, NULLIF(:timestamp, NULL), NULLIF(:air_temperature, ''), NULLIF(:road_temperature, ''),
-    //                     NULLIF(:precipitation_type, '') ,NULLIF(:precipitation_millimetres, ''),
-    //                     NULLIF(:air_humidity, ''), NULLIF(:wind_speed, ''), NULLIF(:wind_direction, ''));";
-    
-    // for mut stmt in pool.prepare(insert_stmt).into_iter() { 
-    //     for i in weather_data.iter() {
-    //         // `execute` takes ownership of `params` so we pass account name by reference.
-    //         stmt.execute(params!{
-    //             "station_id" => i.station_id.clone(),
-    //             "timestamp" => DateTime::<FixedOffset>::parse_from_rfc3339(&i.timestamp.clone()).unwrap().naive_utc(),
-    //             "air_temperature" => i.air_temperature.clone(),
-    //             "road_temperature" => i.road_temperature.clone(),
-    //             "precipitation_type" => i.precipitation_type.clone(),
-    //             "precipitation_millimetres" => i.precipitation_millimetres.clone(),
-    //             "air_humidity" => i.air_humidity.clone(),
-    //             "wind_speed" => i.wind_speed.clone(),
-    //             "wind_direction" => i.wind_direction.clone(),
-
-    //         }).expect("Failed to execute statement when reading from weather_data");
-    //     }
-    // }
 }
 
 
