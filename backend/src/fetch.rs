@@ -59,6 +59,7 @@ pub fn get_situation_data(){
           <INCLUDE>Deviation.SeverityCode</INCLUDE>
           <INCLUDE>Deviation.CreationTime</INCLUDE>
           <INCLUDE>Deviation.EndTime</INCLUDE>
+	  <INCLUDE>Deviation.CountyNo</INCLUDE>
       </QUERY>
   </REQUEST>")
       .send()

@@ -20,7 +20,7 @@ var obj = {
     '#daggpunkt': ["#type12"],
     '#friction_data': ["#type13"],
     '#current_friction_data': ["#type14"]
-  };
+};
 
 //Press the checkboxes to show or hide the graphs/buttons
 //uses the above obj list to create jquery click functions

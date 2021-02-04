@@ -54,6 +54,7 @@ pub struct roadAccidentData {
     pub RoadAccident_SeverityCode: String,
     pub RoadAccident_EndTime: String,
     pub RoadAccident_CreationTime: String,
+    pub RoadAccident_CountyNo : String,
     _secret: (),
 
 }
@@ -210,15 +211,17 @@ pub fn parse_roadAccident(xmlfile: &str) -> Vec<roadAccidentData>{
                         RoadAccident_SeverityCode : String::new(),
                         RoadAccident_EndTime : String::new(),
                         RoadAccident_CreationTime : String::new(),
+			RoadAccident_CountyNo : String::new(),
                         _secret: (),
 
 
                     };
                     RoadAccident_data.push(RoadAccident);
                     let RoadAccident = RoadAccident_data.last_mut().unwrap();
-                    
                 }
                 b"CreationTime" => {
+                    println!("{:?}:", RoadAccident_data.last_mut().unwrap());
+		    println!("{:?}:", "------------------------------------");
                     let RoadAccident = RoadAccident_data.last_mut().unwrap();
                     RoadAccident.RoadAccident_CreationTime = xml.read_text(e.name(), &mut Vec::new()).unwrap();
 
@@ -253,6 +256,10 @@ pub fn parse_roadAccident(xmlfile: &str) -> Vec<roadAccidentData>{
                     RoadAccident.RoadAccident_SeverityCode = xml.read_text(e.name(), &mut Vec::new()).unwrap();
 
                 }
+		b"CountyNo" => {
+		    let RoadAccident = RoadAccident_data.last_mut().unwrap();
+		    RoadAccident.RoadAccident_CountyNo = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+		}
                 _ => (), //Resten av Cases
 
 

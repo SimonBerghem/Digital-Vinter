@@ -6,6 +6,7 @@ var currentroadtemp = [];
 var currentairhum = [];
 var currentairtempprov = [];
 var currentroadtempprov = [];
+var accidentcorrelations =[];
 /**
  * Generats variables for the stations used as data for the current bar graphs. 
  * @param {*} typeofgraph A string which tells which data is sent in
@@ -40,44 +41,124 @@ function generatedataforbar(typeofgraph,datatempvar,stationame){
 	if (typeofgraph=="current_dagg_temp"){
 		currentdaggpunkt.push(dataFirst);
 	}
+	if (typeofgraph=="current_accident_correlation"){
+		accidentcorrelations.push(dataFirst);
+	}
 }
-
-//generatedata for current province
+//test-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+//generatedata test graph for accident data
 /**
  * Collects data and send to generate function
- * @param {*} temp Latest average air temp from province
- * @param {*} id  id/name from province
+ * @param {*} weatherdata This is the current air temp sent in
+ * @param {*} station_name station name
  */
-function databarchartcurrentprovair(temp,id){
-	var typeofgraph = "current_air_temp_county";
-	var stationame = id;
-	var datatempvar= temp;
+function databarchartcurrent(weatherdata,station_name){
+	var typeofgraph = "current_accident_correlation";
+	var stationame = station_name;
+	var datatempvar= weatherdata[0].road_temperature;
+	//var datatempvar= weatherdata.air_temperature;
 	generatedataforbar(typeofgraph,datatempvar,stationame);
 }
-var chart10 = null;
+
+var chart15 = null;
 /**
  * This function will generate graph with current average air temp for province with the data in arrays generated from generatefuctions
  */
-function currentairtempgraphprov(){
-	if(chart10!=null){
-		chart10.destroy();
+function currentaccidentcorrelation(){
+	if(chart15!=null){
+		chart15.destroy();
 	}
-	var ctx = document.getElementById('myChart9').getContext('2d');
-	chart10 = new Chart(ctx, {
-	    type: 'bar',
-	    data: {
-		//labels: stations,
-		datasets: currentairtempprov
-	    },
-
+	var ctx = document.getElementById('myaccidentcorrelation').getContext('2d');
+	chart = new Chart(ctx, {
+	    type: 'bubble',
+	data: {
+	   //labels: stations,
+	   datasets: accidentcorrelations
+	},
 	
-	    options: {
-			title:{
-	display:true,
-	text: "Nuvarande medeltemperatur luft län"}
-	}
+	options: {
+		title:{
+			display:true,
+			text: "Olyckskorrelation"}
+		}
 	});
 }
+
+var datagrafacci = [];
+var datagraftimesacci = [];	
+var checktruefalseacci=true;
+/**
+ ** Collects data and send to generate function
+ ** @param {*} weatherdata  Humidity data
+ ** @param {*} station_name station name
+ **/
+function datamultieplegrafaccidentcorrelation(weatherdata,station_name){
+		var datagrafacci = [];
+		var valuegraph = "accidentcorrelation"
+		var stationame = station_name;
+		for(var i = 0; i < weatherdata.length; i++){
+					datagrafacci.push(weatherdata[i].air_humidity);
+					if(checktruefalseacci){
+								datagraftimesacci.push(weatherdata[i].timestamp.slice(2,10)+" "+weatherdata[i].timestamp.slice(12,16));
+							}
+				}
+		checktruefalseacci=false;
+		generatedata(valuegraph,datagrafacci,stationame)
+}
+
+var lineChart6 = null;
+//function to create accident bubble graph
+/**
+* This function will generate windspeed graph with the data in arrays generated from generatefuctions
+ */
+function accidentcorr(){
+	if(lineChart6 != null){
+		lineChart6.destroy();
+ 	}
+	var speedCanvas = document.getElementById("myaccidentcorrelation");
+	Chart.defaults.global.defaultFontFamily = "Lato";
+	Chart.defaults.global.defaultFontSize = 18;
+
+
+
+	var speedData = {
+		labels: datagraftimesacci,
+		datasets: datagrafacci
+	};
+
+	var chartOptions = {
+		scales: {
+        		xAxes: [{
+                		ticks: {
+                        		fontSize: 15
+	                        }
+	                }]
+	     	},
+	        title:{
+	        	display:true,
+        	        text: "AccidentCorrelation",
+                	legend: {
+                		display: true,
+                        	position: 'top',
+                        	labels: {
+                        		boxWidth: 80,
+                                	fontColor: 'black'
+                     		}
+          		}
+   		}
+	};
+
+	lineChart6 = new Chart(speedCanvas, {
+		type: 'line',
+                data: speedData,
+                options: chartOptions
+    	});
+        lineChart6.update();
+}
+                                                                          		                                      
+//test--------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 //generatedataforcurrprov
 /**
  * Collects data and send to generate function
@@ -518,7 +599,9 @@ else{
 	}
 	if (value=="avgprovairtemp"){
 		datagraftempprov.push(dataFirst);
-		
+	}
+	if (value=="accidentcorrelation"){
+		datagrafacci.push(dataFirst);
 	}
 }
 
@@ -958,8 +1041,10 @@ function cleararrays(){
 	datagraftimestamphum = [];	
 	datagrafair = [];
 	datagraftimestampair = [];
+	datagraftimesacci= [];
 	data3graf3 = [];
 	datagraftimestamp = [];	
+	datagragacci=[];
  	currentroadtemp = [];
 	currentairhum = [];	
 	currentdatawind = [];
@@ -967,6 +1052,7 @@ function cleararrays(){
 	checktruefalseair=true;
 	checktruefalsehum=true;
 	checktruefalsewind=true;
+	checktruefalseacci=true;
 	datagraftempprov = [];
     datagraftimestamptempprov = [];	
 	datagraftimestamptempprovnotsliced = [];

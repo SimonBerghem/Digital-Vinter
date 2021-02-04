@@ -91,7 +91,12 @@
   <input type="checkbox" checked="checked" id="current_friction_data">
   <span class="checkmark"></span>
   <a id="jumper" href="#type14">Hoppa</a>
-</label> 
+</label>
+<label id="prov15" class="container">Accident correlation
+  <input type="checkbox" checked="checked" id="accident_correlation">
+  <span class="checkmark"></span>
+  <a id="jumper" href="#type15">Hoppa</a>
+</label>
 </div>
     </div>
   </li>
@@ -195,7 +200,12 @@
   <button class ="frictionbuttoncanvascurrent" id="Canvashidebutton" type="button" onclick="hideelements('type14','current_friction_data')">X</button> 
    <canvas id="myChartCurrentFriction"></canvas>
  </div>
- 
+ <div id="type15">
+  <button class ="bubblechartaccident" id="Canvashidebutton" type="button" onclick="hideelements('type15','accident_correlation')">X</button>
+   <canvas id="myaccidentcorrelation"></canvas>
+ </div>	 
+
+
  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
  <script src="javascripts/map/stations.js"></script>
  <script src="javascripts/map/countyNames.js"></script>
@@ -209,7 +219,7 @@
 
 //If new chart canvas is added, add chart ID into the array. Used in RunGraphs to clear.
 //Possible change is to maybe go through the page with JavaScript to find all the canvasid instead of manually inserting
-var canvaschartidarray = ['myChart1','myChart2','myChart3','myChart4','myChart5','myChart6','myChart7','myChart8','myChart9','myChart10','myChart11','myChart12','myChartFriction','myChartCurrentFriction'];
+var canvaschartidarray = ['myChart1','myChart2','myChart3','myChart4','myChart5','myChart6','myChart7','myChart8','myChart9','myChart10','myChart11','myChart12','myChartFriction','myChartCurrentFriction','myaccidentcorrelation'];
 
 //Get stations from map
 var stationsarrayid = [];
@@ -246,6 +256,7 @@ hide1("hidebut");
 hide1("province");
 hide1("frictionbuttoncanvas");
 hide1("frictionbuttoncanvascurrent");
+hide1("bubblechartaccident");
 if(stationsarrayid.length<=0){
   for(var i =4;i<=12;i++){
     hidebyid("prov"+i);
@@ -254,6 +265,9 @@ if(stationsarrayid.length<=0){
     hidebyid("type"+y);
   }
   hidebyid("type12");
+ 
+ 
+  
 }
 if(chosenCounties.length<=0){
   hidebyid("prov1");
@@ -262,6 +276,7 @@ if(chosenCounties.length<=0){
   hidebyid("type9");
   hidebyid("type10");
   hidebyid("type11");
+  
 }
 if(boundsrect.length<=0 && boundscircle <=0){
   hidebyid("prov13");

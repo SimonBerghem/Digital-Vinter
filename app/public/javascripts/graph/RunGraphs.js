@@ -67,6 +67,9 @@ async function rungraphs(starttime, stoptime){
 
       await daggpunktfunc();
       await currentdaggpunktfunc();
+      //Test----------------------------------------------------------------------------------
+      await currentaccidentcorrelation();
+      //--------------------------------------------------------------------------------------
       show1("hidebut");
     }
 

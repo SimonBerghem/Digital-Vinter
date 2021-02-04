@@ -43,10 +43,10 @@ pub fn insert_camera_data(pool: Pool, camera_data: Vec<CameraData>) {
 pub fn insert_road_accident_row(pool: Pool, accident_row: Vec<roadAccidentData>){
     println!("{:?} Warning! SQL-Injection Vurnable","§");
     for i in accident_row.iter(){
-        let query = format!(r#"INSERT IGNORE INTO road_accident_data (Id, CreationTime, EndTime, IconId, SWEREF99TM, WGS84, SeverityCode) VALUES('{}', '{}', '{}', '{}', '{}', '{}', '{}')
-        ON DUPLICATE KEY UPDATE CreationTime='{}', EndTime='{}',IconId='{}', SWEREF99TM='{}', WGS84='{}', SeverityCode='{}';"#,
-        i.RoadAccident_id, DateTime::<FixedOffset>::parse_from_rfc3339(&i.RoadAccident_CreationTime.clone()).unwrap().naive_utc(), DateTime::<FixedOffset>::parse_from_rfc3339(&i.RoadAccident_EndTime.clone()).unwrap().naive_utc(), i.RoadAccident_icon_id,i.RoadAccident_Geometry_SWEREF99TM, i.RoadAccident_Geometry_WGS84, i.RoadAccident_SeverityCode,
-        DateTime::<FixedOffset>::parse_from_rfc3339(&i.RoadAccident_CreationTime.clone()).unwrap().naive_utc(), DateTime::<FixedOffset>::parse_from_rfc3339(&i.RoadAccident_EndTime.clone()).unwrap().naive_utc(), i.RoadAccident_icon_id,i.RoadAccident_Geometry_SWEREF99TM, i.RoadAccident_Geometry_WGS84, i.RoadAccident_SeverityCode);
+        let query = format!(r#"INSERT IGNORE INTO road_accident_data (Id, CreationTime, EndTime, IconId, SWEREF99TM, WGS84, SeverityCode, CountyNo) VALUES('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')
+        ON DUPLICATE KEY UPDATE CreationTime='{}', EndTime='{}',IconId='{}', SWEREF99TM='{}', WGS84='{}', SeverityCode='{}', CountyNo='{}';"#,
+        i.RoadAccident_id, DateTime::<FixedOffset>::parse_from_rfc3339(&i.RoadAccident_CreationTime.clone()).unwrap().naive_utc(), DateTime::<FixedOffset>::parse_from_rfc3339(&i.RoadAccident_EndTime.clone()).unwrap().naive_utc(), i.RoadAccident_icon_id,i.RoadAccident_Geometry_SWEREF99TM, i.RoadAccident_Geometry_WGS84, i.RoadAccident_SeverityCode, i.RoadAccident_CountyNo,
+        DateTime::<FixedOffset>::parse_from_rfc3339(&i.RoadAccident_CreationTime.clone()).unwrap().naive_utc(), DateTime::<FixedOffset>::parse_from_rfc3339(&i.RoadAccident_EndTime.clone()).unwrap().naive_utc(), i.RoadAccident_icon_id,i.RoadAccident_Geometry_SWEREF99TM, i.RoadAccident_Geometry_WGS84, i.RoadAccident_SeverityCode, i.RoadAccident_CountyNo);
 
         pool.prep_exec(query,()).expect("Failed to insert Road Accident Data, Pls contact support");
 
