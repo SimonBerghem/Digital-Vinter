@@ -490,7 +490,7 @@ pub fn parse_station(xmlfile: &str) -> Vec<StationData> {
 }
 
 // Parse xml file and return station_data vector
-pub fn parse_station2(xmlfile: &str) -> Vec<StationData> {
+pub fn parse_station2(xmlfile: &str) -> Vec<StationData2> {
 
     let mut xml = Reader::from_file(xmlfile).expect("Failed to open file!");
     xml.trim_text(true); //remove whitespaces
@@ -507,13 +507,12 @@ pub fn parse_station2(xmlfile: &str) -> Vec<StationData> {
             Ok(Event::Start(ref e)) => match e.name() {
                     b"WeatherStation" => {
                         let station = StationData2 {
-
-                            pub id: String::new(),
-                            pub name:  String::new(),
-                            pub road_number: String::new(),
-                            pub county_number: String::new(),
-                            pub Geometry_SWEREF99TM: String::new(),
-                            pub Geometry_WGS84: String::new(),
+                            id: String::new(),
+                            name:  String::new(),
+                            road_number: String::new(),
+                            county_number: String::new(),
+                            Geometry_SWEREF99TM: String::new(),
+                            Geometry_WGS84: String::new(),
                             _secret: (), 
                         };
                         station_data.push(station);
