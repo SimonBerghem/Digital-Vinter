@@ -5,7 +5,7 @@ use mysql::OptsBuilder;
 use mysql::chrono::{DateTime, FixedOffset};
 use mysql::from_row;
 
-use crate::parse_xml::{StationData, WeatherData, CameraData, roadAccidentData, TrafficFlowData};
+use crate::parse_xml::{StationData, WeatherData, CameraData, roadAccidentData, TrafficFlowData, StationData2};
 
 pub fn insert_friction_data(mut conn: PooledConn, url: &str) {
     //conn.query(r"LOAD DATA LOCAL INFILE ".to_owned() + "'" + url + "'" + " INTO TABLE friction_data LINES TERMINATED BY '\r\n' IGNORE 1 LINES SET `lat`= REPLACE(`lat`, ',', '.'), `lon`=REPLACE(`lon`, ',', '.'), `MeasurementValue`=REPLACE(`MeasurementValue`, ',', '.');").unwrap();
@@ -79,7 +79,7 @@ pub fn insert_station_data(pool: Pool, station_data: Vec<StationData>) {
 }
 
 //Skrev en egen för att något dampade med den andra, denna är nog inte SQL-injection safe, den tar inte hänsyn till om Trafikverket updaterar sin data
-pub fn insert_station_data2(pool: Pool, station_row: Vec<roadAccidentData>){
+pub fn insert_station_data2(pool: Pool, station_row: Vec<StationData2>){
     println!("{:?} Warning! SQL-Injection Vurnable","§");
     for i in station_row.iter(){
         let query = format!(r#"INSERT IGNORE INTO station_data2 (Id, Name, SWEREF99TM, WGS84, RoadNumber, CountyNo) VALUES('{}', '{}', '{}', '{}', '{}', '{}')

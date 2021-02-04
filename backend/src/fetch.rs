@@ -30,8 +30,8 @@ pub fn get_station_data(){
     let client = reqwest::blocking::Client::new();
     let mut res = client.post("https://api.trafikinfo.trafikverket.se/v2/data.xml").header(USER_AGENT,"DATAEXLTU20").header(CONTENT_TYPE,"text/xml").body("
     <REQUEST>
-        <LOGIN authenticationkey="d8b542b2dafe40f999f223c7aff04046" />
-        <QUERY objecttype="WeatherStation" schemaversion="1" includedeletedobjects="true">
+        <LOGIN authenticationkey=\"d8b542b2dafe40f999f223c7aff04046\" />
+        <QUERY objecttype=\"WeatherStation\" schemaversion=\"1\" includedeletedobjects=\"true\">
             <INCLUDE>CountyNo</INCLUDE>
             <INCLUDE>Id</INCLUDE>
             <INCLUDE>Geometry.WGS84</INCLUDE>
