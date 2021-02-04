@@ -78,6 +78,19 @@ pub struct TrafficFlowData {
     _secret: (),
 }
 
+//NYTT StationData2
+#[derive(Debug)]
+pub struct StationData2 {
+
+    pub id: String,
+    pub name:  String,
+    pub road_number: String,
+    pub county_number: String,
+    pub Geometry_SWEREF99TM: String,
+    pub Geometry_WGS84: String,
+    _secret: (), // Disliked the use of pub, will prevent from use of struct elsewere then in this module
+}
+
 
 pub fn parse_cameras(xmlfile: &str) -> Vec<CameraData> {
 
@@ -211,7 +224,7 @@ pub fn parse_roadAccident(xmlfile: &str) -> Vec<roadAccidentData>{
                         RoadAccident_SeverityCode : String::new(),
                         RoadAccident_EndTime : String::new(),
                         RoadAccident_CreationTime : String::new(),
-			RoadAccident_CountyNo : String::new(),
+			            RoadAccident_CountyNo : String::new(),
                         _secret: (),
 
 
@@ -220,8 +233,6 @@ pub fn parse_roadAccident(xmlfile: &str) -> Vec<roadAccidentData>{
                     let RoadAccident = RoadAccident_data.last_mut().unwrap();
                 }
                 b"CreationTime" => {
-                    println!("{:?}:", RoadAccident_data.last_mut().unwrap());
-		    println!("{:?}:", "------------------------------------");
                     let RoadAccident = RoadAccident_data.last_mut().unwrap();
                     RoadAccident.RoadAccident_CreationTime = xml.read_text(e.name(), &mut Vec::new()).unwrap();
 
@@ -477,6 +488,78 @@ pub fn parse_station(xmlfile: &str) -> Vec<StationData> {
     station_data
 
 }
+
+// Parse xml file and return station_data vector
+pub fn parse_station2(xmlfile: &str) -> Vec<StationData> {
+
+    let mut xml = Reader::from_file(xmlfile).expect("Failed to open file!");
+    xml.trim_text(true); //remove whitespaces
+    
+    let mut lat_stored = false;
+    let mut long_stored = false;
+
+    let mut station_data = Vec::new();
+    let mut buf = Vec::new();
+
+    loop {
+        
+        match xml.read_event(&mut buf) {
+            Ok(Event::Start(ref e)) => match e.name() {
+                    b"WeatherStation" => {
+                        let station = StationData2 {
+
+                            pub id: String::new(),
+                            pub name:  String::new(),
+                            pub road_number: String::new(),
+                            pub county_number: String::new(),
+                            pub Geometry_SWEREF99TM: String::new(),
+                            pub Geometry_WGS84: String::new(),
+                            _secret: (), 
+                        };
+                        station_data.push(station);
+                        let station = station_data.last_mut().unwrap();
+                        
+                    }
+                    b"CountyNo" => {
+                        let station = station_data.last_mut().unwrap();
+                        station.county_number = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+                    }                                     
+                    b"Geometry_SWEREF99TM" => {
+                        let station = station_data.last_mut().unwrap();
+                        station.Geometry_SWEREF99TM = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+                    }
+                    b"Geometry_WGS84" => {
+                        let station = station_data.last_mut().unwrap();
+                        station.Geometry_WGS84 = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+                    }
+                    b"Id" => {
+                        let station = station_data.last_mut().unwrap();
+                        station.id = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+                    }
+                    b"Name" => {
+                        let station = station_data.last_mut().unwrap();
+                        station.name = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+                    }
+                    b"RoadNumberNumeric" => {
+                        let station = station_data.last_mut().unwrap();
+                        station.road_number = xml.read_text(e.name(), &mut Vec::new()).unwrap();
+                    }
+                           
+                    _ => (), // There are several other `Event`s we do not consider here
+
+            }
+            Ok(Event::Eof) => break,  
+            Err(e) => panic!("Error at pos {}: {:?}", xml.buffer_position(), e),
+
+            _ => (),
+        }
+        buf.clear();
+    }
+    // Vec<StationData>
+    station_data
+
+}
+
 
 
 pub fn parse_weather(xmlfile: &str) -> Vec<WeatherData> {

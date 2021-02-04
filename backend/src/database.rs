@@ -77,6 +77,22 @@ pub fn insert_station_data(pool: Pool, station_data: Vec<StationData>) {
         }
     }
 }
+
+//Skrev en egen för att något dampade med den andra, denna är nog inte SQL-injection safe, den tar inte hänsyn till om Trafikverket updaterar sin data
+pub fn insert_station_data2(pool: Pool, station_row: Vec<roadAccidentData>){
+    println!("{:?} Warning! SQL-Injection Vurnable","§");
+    for i in station_row.iter(){
+        let query = format!(r#"INSERT IGNORE INTO station_data2 (Id, Name, SWEREF99TM, WGS84, RoadNumber, CountyNo) VALUES('{}', '{}', '{}', '{}', '{}', '{}')
+        ON DUPLICATE KEY UPDATE  Name='{}', SWEREF99TM='{}', WGS84='{}', RoadNumber='{}', CountyNo='{}';"#,
+        i.id, i.name, i.Geometry_SWEREF99TM, i.Geometry_WGS84, i.road_number, i.county_number,
+        i.name, i.Geometry_SWEREF99TM, i.Geometry_WGS84, i.road_number, i.county_number);
+
+        pool.prep_exec(query,()).expect("Failed to insert Road Accident Data, Pls contact support");
+
+    }
+   
+}
+
 // Insert the data to MYSQ, TABLE assumed to exist ROAD
 pub fn insert_road_accident_data(pool: Pool, road_accident_data: Vec<roadAccidentData>){
 

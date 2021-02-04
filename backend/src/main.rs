@@ -42,14 +42,15 @@ fn main() {
 
     //database::insert_road_accident_data(road_accident_pool.clone(), roadAccident_data);
 
-    fetch::fetch_xml(auth::URL_S, auth::USER_DATEX, auth::PASS_DATEX, "station_data_cache.xml");
+    //fetch::fetch_xml(auth::URL_S, auth::USER_DATEX, auth::PASS_DATEX, "station_data_cache.xml");
+    fetch::get_station_data();
     //println!("{:?}: First fetch, station file fetched from DATEX II", Local::now().naive_local());
     // First insert
    
-    let station_data = parse_xml::parse_station("station_data_cache.xml");
+    let station_data = parse_xml::parse_station2("station_data_cache.xml");
     //println!("{:?}: StationData", station_data[0]);
     
-    database::insert_station_data(station_pool.clone(), station_data);
+    database::insert_station_data2(station_pool.clone(), station_data);
     //Accident Data
     thread::spawn(move || loop {
         let fetch_thread = thread::spawn(|| {
