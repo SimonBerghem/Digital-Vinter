@@ -2,7 +2,7 @@
  * JSON object used to convert county code to county name.
  */
 const countyNames = {
-    "2": "Stockholms län",
+    "1": "Stockholms län",
     "3": "Uppsala län",
     "4": "Södermanlands län",
     "5": "Ötergötlands län",

@@ -52,28 +52,29 @@ function generatedataforbar(typeofgraph,datatempvar,stationame){
  * @param {*} weatherdata This is the current air temp sent in
  * @param {*} station_name station name
  */
-function databarchartcurrent(weatherdata,station_name){
+function databarchartsaccidents(weatherdata,station_name){
 	var typeofgraph = "current_accident_correlation";
 	var stationame = station_name;
-	var datatempvar= weatherdata[0].road_temperature;
+	var datatempvar= weatherdata[0].air_temperature;
 	//var datatempvar= weatherdata.air_temperature;
 	generatedataforbar(typeofgraph,datatempvar,stationame);
 }
 
-var chart15 = null;
+var chart14 = null;
 /**
  * This function will generate graph with current average air temp for province with the data in arrays generated from generatefuctions
  */
 function currentaccidentcorrelation(){
-	if(chart15!=null){
-		chart15.destroy();
+/*
+	if(chart14!=null){
+		chart14.destroy();
 	}
 	var ctx = document.getElementById('myaccidentcorrelation').getContext('2d');
-	chart = new Chart(ctx, {
-	    type: 'bubble',
+	chart14 = new Chart(ctx, {
+	    type: 'bar',
 	data: {
 	   //labels: stations,
-	   datasets: accidentcorrelations
+		datasets: datagrafacci
 	},
 	
 	options: {
@@ -82,29 +83,52 @@ function currentaccidentcorrelation(){
 			text: "Olyckskorrelation"}
 		}
 	});
+*/
 }
+
 
 var datagrafacci = [];
 var datagraftimesacci = [];	
+var databubblesize = [];
 var checktruefalseacci=true;
 /**
  ** Collects data and send to generate function
  ** @param {*} weatherdata  Humidity data
  ** @param {*} station_name station name
- **/
+ *
+ * The for loop determains the data points which should be
+ * ploted on the graph.
+ * *
+ * */
 function datamultieplegrafaccidentcorrelation(weatherdata,station_name){
 		var datagrafacci = [];
+		var databubblesize = [];
 		var valuegraph = "accidentcorrelation"
 		var stationame = station_name;
+		/*for(var i = 0; i < accidentdata.length; i++){
+			
+		}*/
 		for(var i = 0; i < weatherdata.length; i++){
 					datagrafacci.push(weatherdata[i].air_humidity);
+					databubblesize.push(5);
 					if(checktruefalseacci){
-								datagraftimesacci.push(weatherdata[i].timestamp.slice(2,10)+" "+weatherdata[i].timestamp.slice(12,16));
+								datagraftimesacci.push(weatherdata[i].air_temperature);/**weatherdata[i].timestamp.slice(1,10)+" "+weatherdata[i].timestamp.slice(12,16));**/
 							}
 				}
 		checktruefalseacci=false;
-		generatedata(valuegraph,datagrafacci,stationame)
+		generatebubbledata(valuegraph,datagrafacci,stationame)
 }
+
+
+
+/************************************************
+ *The job of accidentcorr function is 		*
+ *to create the data with the values and	*
+ *the designated color setting determained	*
+ *earlyer and saved in datagrafacci.		*
+ *						*
+ * 						*
+ ************************************************/
 
 var lineChart6 = null;
 //function to create accident bubble graph
@@ -122,17 +146,20 @@ function accidentcorr(){
 
 
 	var speedData = {
-		labels: datagraftimesacci,
-		datasets: datagrafacci
+		x: datagraftimesacci,
+		y: datagrafacci,
+		r: 5
 	};
 
 	var chartOptions = {
 		scales: {
         		xAxes: [{
                 		ticks: {
-                        		fontSize: 15
+                        		fontSize: 15,
+					autoSkip:true
 	                        }
 	                }]
+			
 	     	},
 	        title:{
 	        	display:true,
@@ -149,13 +176,63 @@ function accidentcorr(){
 	};
 
 	lineChart6 = new Chart(speedCanvas, {
-		type: 'line',
+		type: 'bubble',
                 data: speedData,
                 options: chartOptions
     	});
         lineChart6.update();
 }
-                                                                          		                                      
+
+
+/****************************************************************
+ * The function belows job is to make the graph look		*
+ * the way we want it to. So we send in the values		*
+ * which the grapgh should have and give determain		*
+ * what color/form things should be desplayes as.		*
+ *								*
+ * Then we send this on to the next function so that is is	*
+ * printed							*
+ *								*
+ *In values: 							*	
+ * 	- value: which graph should this be printed on		*
+ * 	- datagraf: the data points on the graph		*
+ * 	- stationame: the names of the stations in question 	*
+ *								*
+ *								*	
+ ****************************************************************/
+
+var stationnamelist = [];
+var colornamelist = [];
+/**
+ * Generats variables for the stations used as data for the graphs. 
+ * @param {*} value This specify which graph to generate data for like "roadtemp"
+ * @param {*} datagraf This is the data for the graph
+ * @param {*} stationame The station or province name
+ */
+function generatebubbledata(value, datagraf, stationame){
+	if(stationnamelist.includes(stationame)){
+		var dataFirst = {
+			label: stationame,
+			data: datagraf,
+			lineTension: 0,
+			fill: false,
+			borderColor: colornamelist[stationnamelist.indexOf(stationame)],
+			backgroundColor: 'transparent',
+			pointBorderColor: 'black',
+			pointBackgroundColor: colornamelist[stationnamelist.indexOf(stationame)], //Picks thc color which the orbs are.
+			pointRadius: 10,  // Decide the size of the data points
+			pointHoverRadius: 1, //Don't know if we need it---------------------------------------------------- ----------------------
+		//	pointHitRadius: 2,   //Don't think i need this, but time will only tell -----------------------------------------------
+
+			pointBorderWidth: 0, //decide how far away from the bubble the boarder is placed.
+			pointStyle: 'circle' //don't know if this needs to be point or not -----------------------------------------------------
+		};
+	}
+
+	if (value=="accidentcorrelation"){
+		datagrafacci.push(dataFirst);
+	}
+}                                                                 		                                      
 //test--------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -600,9 +677,6 @@ else{
 	if (value=="avgprovairtemp"){
 		datagraftempprov.push(dataFirst);
 	}
-	if (value=="accidentcorrelation"){
-		datagrafacci.push(dataFirst);
-	}
 }
 
 
@@ -1037,6 +1111,7 @@ function cleararrays(){
 	datagraftimestampwindspeed = [];
 	currentairtempprov = [];
 	currentroadtempprov = [];
+	accidentcorrelations = [];
 	datagrafhum = [];
 	datagraftimestamphum = [];	
 	datagrafair = [];
@@ -1044,7 +1119,7 @@ function cleararrays(){
 	datagraftimesacci= [];
 	data3graf3 = [];
 	datagraftimestamp = [];	
-	datagragacci=[];
+	datagrafacci=[];
  	currentroadtemp = [];
 	currentairhum = [];	
 	currentdatawind = [];

@@ -19,7 +19,8 @@ var obj = {
     '#overtime_road_prov': ["#type11"],
     '#daggpunkt': ["#type12"],
     '#friction_data': ["#type13"],
-    '#current_friction_data': ["#type14"]
+    '#current_friction_data': ["#type14"],
+    '#accident_correlation':["#type15"]
 };
 
 //Press the checkboxes to show or hide the graphs/buttons

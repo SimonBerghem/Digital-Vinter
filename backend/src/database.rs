@@ -6,6 +6,7 @@ use mysql::chrono::{DateTime, FixedOffset};
 use mysql::from_row;
 
 use crate::parse_xml::{StationData, WeatherData, CameraData, roadAccidentData, TrafficFlowData, StationData2};
+//use crate::parse_xml::{StationData2, WeatherData, CameraData, roadAccidentData, TrafficFlowData};
 
 pub fn insert_friction_data(mut conn: PooledConn, url: &str) {
     //conn.query(r"LOAD DATA LOCAL INFILE ".to_owned() + "'" + url + "'" + " INTO TABLE friction_data LINES TERMINATED BY '\r\n' IGNORE 1 LINES SET `lat`= REPLACE(`lat`, ',', '.'), `lon`=REPLACE(`lon`, ',', '.'), `MeasurementValue`=REPLACE(`MeasurementValue`, ',', '.');").unwrap();
@@ -82,8 +83,8 @@ pub fn insert_station_data(pool: Pool, station_data: Vec<StationData>) {
 pub fn insert_station_data2(pool: Pool, station_row: Vec<StationData2>){
     println!("{:?} Warning! SQL-Injection Vurnable","§");
     for i in station_row.iter(){
-        let query = format!(r#"INSERT IGNORE INTO station_data2 (Id, Name, SWEREF99TM, WGS84, RoadNumber, CountyNo) VALUES('{}', '{}', '{}', '{}', '{}', '{}')
-        ON DUPLICATE KEY UPDATE  Name='{}', SWEREF99TM='{}', WGS84='{}', RoadNumber='{}', CountyNo='{}';"#,
+        let query = format!(r#"INSERT IGNORE INTO station_data (id, name, SWEREF99TM, WGS84, road_number, county_number) VALUES('{}', '{}', '{}', '{}', '{}', '{}')
+        ON DUPLICATE KEY UPDATE  name='{}', SWEREF99TM='{}', WGS84='{}', road_number='{}', county_number='{}';"#,
         i.id, i.name, i.Geometry_SWEREF99TM, i.Geometry_WGS84, i.road_number, i.county_number,
         i.name, i.Geometry_SWEREF99TM, i.Geometry_WGS84, i.road_number, i.county_number);
 

@@ -4666,7 +4666,7 @@
           "boundary": "administrative",
           "name": "Stockholms län",
           "ref:se:län:bokstav": "AB",
-          "countyCode": "2",
+          "countyCode": "1",
           "type": "multipolygon"
         },
         "geometry": {

@@ -226,8 +226,14 @@ function createAggregatedFrictionLayer(aggregatedFrictionData, notAggregated) {
  * @param {*} layerNumber specifies in what layer group the station belongs to.
  */
 function addStationToLayer(station, layerNumber,cameraArrayData){
+    
+
+    var lon = parseFloat(station.WGS84.split(" ")[1].split("(")[1]);
+    var lat = parseFloat(station.WGS84.split(" ")[2].split(")")[0]);
+
     const id = "marker"+station.id;
-    var marker = L.marker([station.lat, station.lon],{myCustomId: id});
+    
+    var marker = L.marker([lat, lon],{myCustomId: id});
     marker.setIcon(icon);
 
     if(!layerGroups[layerNumber]) {

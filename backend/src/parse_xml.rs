@@ -523,11 +523,11 @@ pub fn parse_station2(xmlfile: &str) -> Vec<StationData2> {
                         let station = station_data.last_mut().unwrap();
                         station.county_number = xml.read_text(e.name(), &mut Vec::new()).unwrap();
                     }                                     
-                    b"Geometry_SWEREF99TM" => {
+                    b"SWEREF99TM" => {
                         let station = station_data.last_mut().unwrap();
                         station.Geometry_SWEREF99TM = xml.read_text(e.name(), &mut Vec::new()).unwrap();
                     }
-                    b"Geometry_WGS84" => {
+                    b"WGS84" => {
                         let station = station_data.last_mut().unwrap();
                         station.Geometry_WGS84 = xml.read_text(e.name(), &mut Vec::new()).unwrap();
                     }
