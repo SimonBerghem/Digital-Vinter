@@ -48,11 +48,10 @@ See [Docs](https://dev.mysql.com/doc/).
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 ## Authors
-* **Pontus Eriksson Jirbratt** - *Graph* - [98pontan](https://github.com/98pontan)
-* **Samuel Gradén** - *Backend* - [samgra-7](https://github.com/samgra-7)
-* **Oskar Havo** - *Frontend* - [OskarHavo](https://github.com/OskarHavo)
-* **Stefan Jonsson** - *Graph* - [hotpucko](https://github.com/hotpucko)
-* **Martin Larsson** - *Fullstack* - [PMMLarsson](https://github.com/PMMLarsson)
+* **Alex Peschel** - *Graph* 
+* **Simon Malmström Berghem** - *Backend* 
+* **Wilmer Thakén** - *Database/Frontend* 
+* **Gustav Rixon** - *Fullstack* 
 
 
 
