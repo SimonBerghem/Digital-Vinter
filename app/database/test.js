@@ -16,6 +16,10 @@ getAccidentId : function(countyNo, fromDate, toDate){
 		console.log(results);
 		console.log(typeof results);
 		console.log(Object.values(results[0]));
+
+		results.forEach(element => getAccidentWeather(element));
+
+
                 conn.release();
 
                 if (err) throw err
