@@ -26,6 +26,7 @@ pub fn fetch_xml(url: &str, user: &str, pass: &str, file_name: &str) {
     
 }
 
+// Get the XML file from superior api https://api.trafikinfo.trafikverket.se/API/Model 
 pub fn get_station_data(){
     let client = reqwest::blocking::Client::new();
     let mut res = client.post("https://api.trafikinfo.trafikverket.se/v2/data.xml").header(USER_AGENT,"DATAEXLTU20").header(CONTENT_TYPE,"text/xml").body("

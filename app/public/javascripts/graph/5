@@ -146,20 +146,18 @@ function accidentcorr(){
 	testacci.push(7);
 	testacci.push(5);
 
-
+	
 	var speedData = {
 		datasets: [{
 			label: 'My First dataset',
 			backgroundColor: 'red',
 			borderColor: 'red',
 			borderWidth: 1,
-			data:[{	
-				x:5,
-				y:2,
-				r:5,
+				data:[{	
+					x: testacci, 
+					y: testacci,
+					r: 5,
 			}]
-				
-				
 		}]
 		
 		
