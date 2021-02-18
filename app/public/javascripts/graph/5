@@ -7,6 +7,7 @@ var currentairhum = [];
 var currentairtempprov = [];
 var currentroadtempprov = [];
 var accidentcorrelations =[];
+var storedstation = [];
 /**
  * Generats variables for the stations used as data for the current bar graphs. 
  * @param {*} typeofgraph A string which tells which data is sent in
@@ -86,11 +87,15 @@ function currentaccidentcorrelation(){
 */
 }
 
-
 var datagrafacci = [];
 var datagraftimesacci = [];	
 var databubblesize = [];
+
+var datagrafacci = [];	
+var datacoordinates = [];
 var checktruefalseacci=true;
+var dataaccipoint = [];
+var storedstation = [];
 /**
  ** Collects data and send to generate function
  ** @param {*} weatherdata  Humidity data
@@ -101,22 +106,19 @@ var checktruefalseacci=true;
  * *
  * */
 function datamultieplegrafaccidentcorrelation(weatherdata,station_name){
-		var datagrafacci = [];
-		var databubblesize = [];
-		var valuegraph = "accidentcorrelation"
-		var stationame = station_name;
-		/*for(var i = 0; i < accidentdata.length; i++){
-			
-		}*/
-		for(var i = 0; i < weatherdata.length; i++){
-					datagrafacci.push(weatherdata[i].air_humidity);
-					databubblesize.push(5);
-					if(checktruefalseacci){
-								datagraftimesacci.push(weatherdata[i].air_temperature);/**weatherdata[i].timestamp.slice(1,10)+" "+weatherdata[i].timestamp.slice(12,16));**/
-							}
-				}
-		checktruefalseacci=false;
-		generatebubbledata(valuegraph,datagrafacci,stationame)
+
+	var datagrafacci = [];
+	var databubblesize = [];
+	var valuegraph = "accidentcorrelation"
+	
+	for(var i = 0; i < weatherdata.length; i++){
+		databubblesize.push({x:weatherdata[i].air_humidity, y:weatherdata[i].air_temperature, r:10});
+	}
+	
+	dataaccipoint.push(databubblesize);
+	storestation.push(station_name);
+		
+		
 }
 
 
@@ -131,39 +133,20 @@ function datamultieplegrafaccidentcorrelation(weatherdata,station_name){
  ************************************************/
 
 var lineChart6 = null;
-var testacci = [];
 //function to create accident bubble graph
 /**
 * This function will generate windspeed graph with the data in arrays generated from generatefuctions
  */
 function accidentcorr(){
+/**
 	if(lineChart6 != null){
 		lineChart6.destroy();
  	}
 	var speedCanvas = document.getElementById("myaccidentcorrelation").getContext('2d');
 	Chart.defaults.global.defaultFontFamily = "Lato";
 	Chart.defaults.global.defaultFontSize = 18;
-	testacci.push(7);
-	testacci.push(5);
-
-	
-	var speedData = {
-		datasets: [{
-			label: 'My First dataset',
-			backgroundColor: 'red',
-			borderColor: 'red',
-			borderWidth: 1,
-				data:[{	
-					x: testacci, 
-					y: testacci,
-					r: 5,
-			}]
-		}]
 		
-		
-	};
-			
-	
+	 
 	var chartOptions = {
 		responsive: true,
 		plugins: {
@@ -177,67 +160,36 @@ function accidentcorr(){
 		}		
 	};
 	
-		
+	 	
 		lineChart6 = new Chart(speedCanvas, {
 			type: 'bubble',
-			data: speedData,
-        	        options: chartOptions
+			data: {
+				datasets:
+				(function (dataaccipoint) {
+					var out = [];
+				        for(var i=0; i<dataaccipoint.length; i++) {
+						
+						out.push({
+							label:'hejsan',
+							data: dataaccipoint[i],
+							borderColor:'red' ,
+							backgroundColor: 'transparent' //colornamelist[stationnamelist.indexOf(stationame)],
+						});
+					}
+					return out;
+				 })(dataaccipoint)
+				,
+			},
+			options: chartOptions
+			
     		});
         	lineChart6.update();
 	
-	
+*/	
 }
 
 
-/****************************************************************
- * The function belows job is to make the graph look		*
- * the way we want it to. So we send in the values		*
- * which the grapgh should have and give determain		*
- * what color/form things should be desplayes as.		*
- *								*
- * Then we send this on to the next function so that is is	*
- * printed							*
- *								*
- *In values: 							*	
- * 	- value: which graph should this be printed on		*
- * 	- datagraf: the data points on the graph		*
- * 	- stationame: the names of the stations in question 	*
- *								*
- *								*	
- ****************************************************************/
-
-var stationnamelist = [];
-var colornamelist = [];
-/**
- * Generats variables for the stations used as data for the graphs. 
- * @param {*} value This specify which graph to generate data for like "roadtemp"
- * @param {*} datagraf This is the data for the graph
- * @param {*} stationame The station or province name
- */
-function generatebubbledata(value, datagraf, stationame){
-	if(stationnamelist.includes(stationame)){
-		var dataFirst = {
-			label: stationame,
-			data: datagraf,
-			lineTension: 0,
-			fill: false,
-			borderColor: colornamelist[stationnamelist.indexOf(stationame)],
-			backgroundColor: 'transparent',
-			pointBorderColor: 'black',
-			pointBackgroundColor: colornamelist[stationnamelist.indexOf(stationame)], //Picks thc color which the orbs are.
-			pointRadius: 10,  // Decide the size of the data points
-			pointHoverRadius: 1, //Don't know if we need it---------------------------------------------------- ----------------------
-		//	pointHitRadius: 2,   //Don't think i need this, but time will only tell -----------------------------------------------
-
-			pointBorderWidth: 0, //decide how far away from the bubble the boarder is placed.
-			pointStyle: 'circle' //don't know if this needs to be point or not -----------------------------------------------------
-		};
-	}
-
-	if (value=="accidentcorrelation"){
-		datagrafacci.push(dataFirst);
-	}
-}                                                                 		                                      
+                                                                 		                                      
 //test--------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 

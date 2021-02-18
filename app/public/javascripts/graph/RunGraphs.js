@@ -41,14 +41,16 @@ async function rungraphs(starttime, stoptime){
     if(stationsarrayid.length>0){
       await getWeatherData(stationsarrayid,starttime,stoptime,stationname);
       await getlatest(stationsarrayid,stationname);
+      await getAccidentWeatherStation(stationsarrayid, stationname);
     }
     if(chosenintcounties.length>0){
       await getAverageTempProvince(chosenintcounties,starttime,stoptime);
       await getLatestAvgCountyWeatherData(chosenCounties);
+      await getAccidentWeather(chosenintcounties, starttime, stoptime);
     }
-
     if(stationsarrayid.length>0){
       //functions to draw graphs
+      
       await roadtemp();
 
       await airtemp();
@@ -68,8 +70,8 @@ async function rungraphs(starttime, stoptime){
       await daggpunktfunc();
       await currentdaggpunktfunc();
       //Test----------------------------------------------------------------------------------
-      await currentaccidentcorrelation();
-
+     	 
+	
       await accidentcorr();
       //--------------------------------------------------------------------------------------
       show1("hidebut");

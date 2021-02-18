@@ -14,7 +14,7 @@ async function getWeatherData(station_id, start_time, stop_time,station_name) {
 				datamultieplegrafair(weatherData[i],station_name[i]);
 				datamultieplegrafhumidity(weatherData[i],station_name[i]);
 				datamultieplegrafwinspeed(weatherData[i],station_name[i]);
-				datamultieplegrafaccidentcorrelation(weatherData[i],station_name[i]);
+				//datamultieplegrafaccidentcorrelation(weatherData[i],station_name[i]);
 		}
 		
     });	
@@ -36,7 +36,7 @@ async function getlatest(station_id,station_name) {
 			databarchartroadcurrent(weatherData[i],station_name[i]);
 			databarcharthumcurrent(weatherData[i],station_name[i]);
 			databarchartwindcurrent(weatherData[i],station_name[i]);
-			databarchartsaccidents(weatherData[i],station_name[i]);
+			
 	}
     });	
 }
