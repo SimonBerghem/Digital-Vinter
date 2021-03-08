@@ -60,4 +60,4 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 [MIT](https://choosealicense.com/licenses/mit/)
 
 ## Acknowledgments
-Continuous work of [https://github.com/dynematic/rcm-sommar-2019](https://github.com/dynematic/rcm-sommar-2019). A tool built by students at Luleå University of Technology.
+Continuous work of [https://github.com/hotpucko/rcm-sommar-2019](https://github.com/dynematic/rcm-sommar-2019). A tool built by students at Luleå University of Technology.
