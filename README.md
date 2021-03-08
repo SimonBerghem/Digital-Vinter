@@ -11,12 +11,12 @@ RCM is a tool for gathering data from [DATEX II](https://datex2.eu/) and present
 
 
 ```
-git clone https://github.com/hotpucko/rcm-sommar-2019.git
+git clone https://github.com/SimonBerghem/Digital-Vinter.git
 ```
 
 ### Webserver
 ```
-cd /rcm-sommar-2019/app/
+cd /Digital-Vinter/app/ or on the server cd /bin/d0020e/Digital_Vinter/app/ 
 npm install
 npm start
 ```
@@ -24,7 +24,7 @@ npm start
 ### RustBackend
 
 ```
-cd /rcm-sommar-2019/backend/
+cd /Digital-Vinter/backend/ or on the server cd /bin/d0020e/Digital_Vinter/backend/
 cargo update
 cargo build
 cargo run
