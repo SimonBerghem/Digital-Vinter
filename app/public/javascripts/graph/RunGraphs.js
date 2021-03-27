@@ -68,21 +68,23 @@ async function rungraphs(starttime, stoptime){
       await currentwindspeedgraph();
 
       await daggpunktfunc();
-      await currentdaggpunktfunc();
-      //Test----------------------------------------------------------------------------------
-     	 
+      await currentdaggpunktfunc();  	 
 	
       await accidentcorr();
-      //--------------------------------------------------------------------------------------
+      
       show1("hidebut");
     }
 
     if(chosenintcounties.length>0){
-      await roadtempprov()
+      await accidentcorrcounty();
+      
+      await roadtempprov();
 
-      await currentairtempgraphprov();
+    //  await currentairtempgraphprov();
 
       await currentroadtempgraphprov();
+
+      
       show1("province");
     }
     if(boundsrect.length >0 || boundscircle.length >0){

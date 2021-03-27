@@ -3,6 +3,10 @@
  * @param {*} station a station data JSON object.
  * @param {*} marker a Leaflet marker representing a specific station.
  */
+var accidentPrecipitation;
+var accidentRoadTemp;
+var accidentHumidity;
+var accidentStation;
 function addPopup(station, marker,cameraArrayData) {
   let cameraurl = "";
   let cameraurlbig ="";
@@ -138,12 +142,33 @@ function popupfriction(friction, circle){
 }
 
 function popupAccident(accident, circle){
+/* Används för att öka mängden info som visas i popups för olyckor, oidentifierat fel någonstans så används ej
+  let str = accident.WGS84;
+  let longitude = parseFloat(str.split(" ")[1].split("(")[1]);
+  let latitude = parseFloat(str.split(" ")[2].split("(")[0]);
+  let countyNum = accident.CountyNo;
+  let accidentTime = accident.CreationTime;
+  await $.getJSON("/api/getAccidentStation",{longitude, latitude, countyNum}, function(accidentStat){
+	console.log(accidentStat);
+	accidentStation = accidentStat[0]["stationID"];
+  });
+  await $.getJSON("/api/getAccidentWeatherStationData",{accidentTime, accidentStation}, function(accidentWeather){
+	console.log(accidentWeather);
+	accidentPrecipitation = accidentWeather[0]["precipitation_type"];
+        accidentRoadTemp = accidentWeather[0]["road_temperature"];
+        accidentHumidity = accidentWeather[0]["air_humidity"];
+  });
+*/
   const popupContent = document.createElement("table-data");
+
   var obj = {
     StartTime : [accident.CreationTime.replace("T", " / ").replace("Z", " "), ""],
     EndTime : [accident.EndTime.replace("T", " / ").replace("Z", " "), ""],
     Severity : [accident.SeverityCode,""],
     AccidentType: [accident.IconId, ""],
+/*    AccidentPrecipitation: [accidentPrecipitation, ""],
+    AccidentRoadtemperature: [accidentRoadTemp, ""],
+    AccidentHumidity: [accidentHumidity, ""],*/
   };
 
   var strings = "";
@@ -154,14 +179,12 @@ function popupAccident(accident, circle){
  });
 
  var htmlvar = '<table id = "marker-data" >' +strings + '</table>'
- strings = ""    
+ strings = ""
 
  popupContent.innerHTML  = htmlvar;
 
  return popupContent;
 }
-
-
 
 /**
  * 

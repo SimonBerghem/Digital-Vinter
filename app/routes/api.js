@@ -31,27 +31,17 @@ router.get('/getAccidentData', function(req, res, next){
     }
 });
 
-/* Get weather data from accident */
 router.get('/getAccidentWeather', function(req, res, next){
     try{
-    accidentID = req["query"]["accidentID"];
-    accident.getAccidentWeather(req, res, next, accident_id);
+    datumStart = req["query"]["start_time"];
+    datumEnd = req["query"]["stop_time"];
+    county = req["query"]["county"];
+    accident.getAccidentWeather(req, res, next, county, datumStart, datumEnd);
     } catch(error) {
 	console.log(error);
     }
 });
 
-/* Get accident ids in a county */
-router.get('/getAccidentId', function(req, res, next){
-    try{
-    datumStart = req["query"]["startTime"];
-    datumEnd = req["query"]["endTime"];
-    county = req["query"]["accidentCounty"];
-    accident.getAccidentId(req, res, next, county, datumStart, datumEnd);
-    } catch(error) {
-	console.log(error);
-    }
-});
 /* Get weatherdata from given a station id and creationtime of accident */
 router.get('/getAccidentWeatherStation', function(req,res,next){
     try{
@@ -62,7 +52,27 @@ router.get('/getAccidentWeatherStation', function(req,res,next){
 	console.log(error);
     }
 });
-
+/* Get weatherdata for an accident in popupAccident */
+router.get('/getAccidentWeatherStationData', function(req,res){
+    try{
+    accidentTime = req["query"]["accidentTime"];
+    accidentStation = req["query"]["accidentStation"];
+    accident.getAccidentWeatherStationData(req,res,accidentTime,accidentStation);
+    } catch(error) {
+	console.log(error);
+    }
+});
+/* Get the closest station for the accident */
+router.get('/getAccidentStation', function(req,res){
+    try{
+    lon = req["query"]["lon"];
+    lat = req["query"]["lat"];
+    countyNum = req["query"]["countyNum"];
+    accident.getAccidentStation(req,res,lon,lat,countyNum);
+    } catch(error) {
+	console.log(error);
+    }
+});
 /* Find all accidents whose closest station is the station given */
 router.get('/findClosestAccidents', function(req,res,next){
     try{

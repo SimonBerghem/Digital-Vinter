@@ -7,7 +7,9 @@ var currentairhum = [];
 var currentairtempprov = [];
 var currentroadtempprov = [];
 var datacoordinates =[];
+var storedcounty = [];
 var storedstation = [];
+
 /**
  * Generats variables for the stations used as data for the current bar graphs. 
  * @param {*} typeofgraph A string which tells which data is sent in
@@ -54,6 +56,8 @@ var datacoordinates = [];
 var dataaccipoint = [];
 var storestation = [];
 var storedcolors = [];
+var averageTemp = [];
+
 /**
  ** Collects data and send to generate function
  ** @param {*} weatherdata  Humidity data
@@ -67,15 +71,23 @@ function datamultieplegrafaccidentcorrelation(weatherdata,station_name){
 
 	var datacoordinates = [];
 	var valuegraph = "accidentcorrelation";
+	var avgTemp = [];
+
 	for(var i = 0; i < weatherdata.length; i++){
-		datacoordinates.push({x:weatherdata[i].air_humidity, y:weatherdata[i].road_temperature, r:10});
+		datacoordinates.push({x:weatherdata[i].air_humidity, y:weatherdata[i].road_temperature, r:weatherdata[i].SeverityCode*4});
+		avgTemp.push({road_temperature:weatherdata[i]["AVG(road_temperature)"], air_humidity:weatherdata[i]["AVG(air_humidity)"]});
 	}
+
 	var colorforline = '#' + Math.random().toString(16).slice(2, 8).toUpperCase();
 	dataaccipoint.push(datacoordinates);
+	averageTemp = (avgTemp);
+	console.log(dataaccipoint);
+
 	storestation.push(station_name);
-	storedcolors.push(colorforline);	
-		
+	storedcolors.push(colorforline);
 }
+
+
 
 
 /************************************************
@@ -100,50 +112,204 @@ function accidentcorr(){
 	var speedCanvas = document.getElementById("myaccidentcorrelation").getContext('2d');
 	Chart.defaults.global.defaultFontFamily = "Lato";
 	Chart.defaults.global.defaultFontSize = 18;
-		
- 
-	var chartOptions = {
-		responsive: true,
-		plugins: {
-			title: {
-				display: true,
-				text: "accident", 
-			},
-			tooltip: {
-				mode: 'point'
-			}
-		}
-		
-	};
 
-	 	
 		lineChart6 = new Chart(speedCanvas, {
+			title: 'maybe',
 			type: 'bubble',
 			data: {
 				datasets:
 				(function (dataaccipoint) {
 					var out = [];
-				        for(var i=0; i<dataaccipoint.length; i++) {
-						
-						out.push({
-							label: storestation[i],
-							data: dataaccipoint[i],
-							borderColor:storedcolors[i] ,
-							backgroundColor: 'transparent' //colornamelist[stationnamelist.indexOf(stationame)],
-						});
-					}
-					return out;
+						for(var i=0; i<dataaccipoint.length; i++) {
+							out.push({
+								label: storestation[i],
+								title: 'test',
+								data: dataaccipoint[i],
+								borderColor: storedcolors[i], 
+								backgroundColor: storedcolors[i], //'transparent' //colornamelist[stationnamelist.indexOf(stationame)],
+							});
+						}
+						return out;
 				 })(dataaccipoint)
 				,
 			},
-			options: chartOptions
-			
-    		});
-        	lineChart6.update();
-	
 
+			options:{
+				tooltips: {
+					    enabled: false,
+
+            				    custom: function(tooltipModel) {
+
+						var tooltipEl = document.getElementById('chartjs-tooltip');
+			                // Create element on first render
+                			        if (!tooltipEl) {
+						    tooltipEl = document.createElement('div');
+                    			    	    tooltipEl.id = 'chartjs-tooltip';
+                    			    	    tooltipEl.innerHTML = '<table></table>';
+                    			    	    document.body.appendChild(tooltipEl);
+                			    	}
+
+                			// Hide if no tooltip
+                			    	if (tooltipModel.opacity === 0) {
+                    				    tooltipEl.style.opacity = 0;
+                    				    return;
+                			    	}
+
+			                // Set caret Position
+                			    	tooltipEl.classList.remove('above', 'below', 'no-transform');
+                			    	if (tooltipModel.yAlign) {
+                    				    tooltipEl.classList.add(tooltipModel.yAlign);
+                			    	} else {
+                    				    tooltipEl.classList.add('no-transform');
+                			    	}
+
+                			    	function getBody(bodyItem) {
+                    				    return bodyItem.lines;
+                			    	}
+
+                			// Set Text
+                			    	if (tooltipModel.body) {
+                    				    var titleLines = tooltipModel.title || [];
+                    				    var bodyLines = tooltipModel.body.map(getBody);
+                    				    var innerHtml = '<thead>';
+
+                    				    titleLines.forEach(function(title) {
+                        			    	innerHtml += '<tr><th>' + title + '</th></tr>';
+                    				    });
+                    				    innerHtml += '</thead><tbody>';
+
+                    				    bodyLines.forEach(function(body, i) {
+                        			    	var colors = tooltipModel.labelColors[i];
+                        			    	var style = 'background:' + colors.backgroundColor;
+                        			    	style += '; border-color:' + colors.borderColor;
+                        			    	style += '; border-width: 2px';
+                        			    	var span = '<span style="' + style + '"></span>';
+							var img = '<img src = "http://130.240.200.65:8000/SE_STA_VVIS1559/1_SE_STA_CAMERA_Geni_4830_K1_2021-03-08T14%3A34%3A10.000%2B01%3A00.Jpeg">';
+						 	innerHtml += '<tr><td>' + span + body + '<br> Medelvärde vägtemperatur senaste 24h: ' + averageTemp[i]["road_temperature"] + '<br>' + img + '</td></tr>';
+                    				    });
+                    				    innerHtml += '</tbody>';
+
+                    				    var tableRoot = tooltipEl.querySelector('table');
+                    				    console.log(tooltipEl);
+						    tableRoot.innerHTML = innerHtml;
+                			    	}
+
+                			// `this` will be the overall tooltip
+                			    	var position = this._chart.canvas.getBoundingClientRect();
+
+                			// Display, position, and set styles for font
+                			    	tooltipEl.style.opacity = 1;
+                			    	tooltipEl.style.position = 'absolute';                			    	tooltipEl.style.left = position.left + window.pageXOffset + tooltipModel.caretX + 'px';
+                			    	tooltipEl.style.top = position.top + window.pageYOffset + tooltipModel.caretY + 'px';
+                			    	tooltipEl.style.fontFamily = tooltipModel._bodyFontFamily;
+                			    	tooltipEl.style.fontSize = tooltipModel.bodyFontSize + 'px';
+                			    	tooltipEl.style.fontStyle = tooltipModel._bodyFontStyle;
+                			    	tooltipEl.style.padding = tooltipModel.yPadding + 'px ' + tooltipModel.xPadding + 'px';
+                			    	tooltipEl.style.pointerEvents = 'none'; 
+            				    } 
+				},
+
+				title: {
+				            display: true,
+				            text: 'Accident Correlation',
+				},
+				scales: {
+					yAxes: [{
+						scaleLabel: {
+							display: true,
+					               	labelString: "Luft tempratur"
+				 		}
+					}],
+					xAxes: [{
+						scaleLabel: {
+							display: true,
+					                labelString: "Luft Fuktighet (%)"
+				              	}
+					}]
+				}
+			},
+		});
+		lineChart6.update();
 }
 
+var datapointcounty = [];
+var storedcounty = [];
+
+
+
+function Datapointdecisionaccidentcounties(weatherdata,county){
+
+	var datacoordinates = [];
+	var valuegraph = "accidentcorrelation";
+	        for(var i = 0; i < weatherdata.length; i++){
+			                datacoordinates.push({x:weatherdata[i].air_humidity, y:weatherdata[i].road_temperature, r:weatherdata[i].SeverityCode*4});
+			        }
+	var colorforline = '#' + Math.random().toString(16).slice(2, 8).toUpperCase();
+        
+	datapointcounty.push(datacoordinates);
+        storedcounty.push(county);
+        storedcolors.push(colorforline);
+ 	
+}
+
+
+
+var lineChart5 = null;
+
+
+function accidentcorrcounty(){
+	console.log("test");
+	console.log(datapointcounty);
+	console.log("test1");
+	if(lineChart5 != null){
+	        lineChart5.destroy();
+        }
+        var speedCanvas = document.getElementById("myaccidentcorrelation").getContext('2d');
+        Chart.defaults.global.defaultFontFamily = "Lato";
+        Chart.defaults.global.defaultFontSize = 18;
+
+
+        lineChart5 = new Chart(speedCanvas, {
+	        type: 'bubble',
+                data: {
+	                datasets:
+                        (function (datapointcounty) {
+	                        var out = [];
+				for(var i=0; i<datapointcounty.length; i++) {
+	                                out.push({
+			                        label: storedcounty[i],
+	                                        title: 'test',
+						data: datapointcounty[i],
+                                                borderColor: storedcolors[i],
+                                                backgroundColor: storedcolors[i], //colornamelist[stationnamelist.indexOf(stationame)],
+                                        });
+	                        }
+                                return out;
+	                })(datapointcounty)
+	               ,
+            	},
+                options:{
+			title: {
+				display: true,
+				text: 'Accident Correlation',
+			},
+			scales: {
+				yAxes: [{
+					scaleLabel: {
+						display: true,
+						labelString: "Luft tempratur"																						                             }															                                       
+				}],
+				xAxes: [{
+					scaleLabel: {
+						display: true,
+						labelString: "Luft Fuktighet (%)"
+					}
+				}]
+			}					                        
+		},
+	});
+	lineChart5.update();
+}
 
                                                                  		                                      
 //test--------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1048,6 +1214,8 @@ function cleararrays(){
 	datagrafrictiontimestamp = [];	
 	storestation = [];
 	storedcolors = [];
+	storedcount = [];
+	datapointcounty = [];
 }
 
 

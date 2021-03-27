@@ -135,6 +135,8 @@
 </div>
 <a id="jumtotop" href="#options">HOPPA TILL TOPPEN</a>
 
+<div id="chartjs-tooltip"><table></table></div>
+
 <div id="type1">
   <button class="hidebut" id="Canvashidebutton" type="button" onclick="hideelements('type1','airtemp')">X</button> 
   <button class="hidebut" id="CanvasDownloadButton" type="button" onclick="CSVdownload(datagraftimestampair,datagrafair)">Ladda ner</button> 
@@ -205,8 +207,7 @@
    <canvas id="myaccidentcorrelation"></canvas>
  </div>	 
 
-
- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
  <script src="javascripts/map/stations.js"></script>
  <script src="javascripts/map/countyNames.js"></script>
  <script src="javascripts/graph/getWeatherData.js"></script>
@@ -266,8 +267,8 @@ if(stationsarrayid.length<=0){
     hidebyid("type"+y);
   }
   hidebyid("type12");
-  hidebyid("type15");
-  hidebyid("prov15"); 
+//  hidebyid("type15");
+//  hidebyid("prov15"); 
   
 }
 if(chosenCounties.length<=0){

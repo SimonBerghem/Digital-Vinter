@@ -12,6 +12,9 @@ use reqwest::header::CONTENT_TYPE;
 use quick_xml::Reader;
 use quick_xml::events::Event;
 
+//NYTT 2020-03-03
+use std::process::Command;
+
 use std::io;
 use std::fs::File;
 mod auth;
@@ -86,23 +89,71 @@ fn main() {
         //println!("{:?}: Traffic Flow Inserted ",Local::now().naive_local());
         thread::sleep(Duration::from_secs(900));
     });
-    
+
+    // Camera data    
     thread::spawn(move || loop {
         let fetch_thread = thread::spawn(|| {
-            fetch::fetch_xml(auth::URL_C, auth::USER_DATEX, auth::PASS_DATEX, "camera_data_cache.xml");
-            println!("{:?}: Camera file fetched from DATEX II", Local::now().naive_local());
+		let client = reqwest::blocking::Client::new();
+		let mut res = client.post("https://api.trafikinfo.trafikverket.se/v2/data.xml").header(USER_AGENT,"DATAEXLTU20").header(CONTENT_TYPE,"text/xml")
+    		.body("
+		<REQUEST>
+    		<LOGIN authenticationkey=\"d8b542b2dafe40f999f223c7aff04046\" />
+			<QUERY objecttype=\"Camera\" schemaversion=\"1\" includedeletedobjects=\"true\">
+				<FILTER>
+          		    	<AND>
+                 			<IN name=\"CountyNo\" value=\"1,25\" />
+					<EXISTS name=\"CameraGroup\" value=\"true\" />
+					<IN name=\"Status\" value=\"videoOrImagesAvailable\" />
+					<IN name=\"Type\" value=\"Väglagskamera\" />
+             		    	</AND>
+          			</FILTER>
+          			<INCLUDE>CountyNo</INCLUDE>
+          			<INCLUDE>Id</INCLUDE>
+          			<INCLUDE>PhotoUrl</INCLUDE>
+       	 			<INCLUDE>PhotoTime</INCLUDE>
+        			<INCLUDE>Geometry.WGS84</INCLUDE>
+				<INCLUDE>CameraGroup</INCLUDE>
+      			</QUERY>
+		</REQUEST>")
+		.send()
+		.unwrap();
+
+	println!("Status: {}",res.status());
+	let mut file = File::create("TESTFILECAM.xml")
+        .expect("Error creating file, station_data");
+	io::copy(&mut res, &mut file)
+    	.expect("Failed to read response to file");
+	//println!("Status: {}",res.text());
+	//println!("Headers:\n{}", res.headers());
+	let c = reqwest::blocking::Client::new();
+	let res = c.get("https://rust-lang.org").send().unwrap();
+    	println!("Status: {}", res.status());
+
         });
         // Wait for fetch to complete
         fetch_thread.join().unwrap();
     
 
         let camera_data = parse_xml::parse_cameras("camera_data_cache.xml");
-        database::insert_camera_data(camera_pool.clone(), camera_data);
+       // database::insert_camera_data(camera_pool.clone(), camera_data);
+        println!("{:?}: Camera file fetched from Trafikverket API I will now sleep for 30 min", Local::now().naive_local());
         
-        // Sleep for 15 min
-        thread::sleep(Duration::from_secs(900));
+	// Activate bash here
+	let mut pic = Command::new("camera_script.sh");
+	pic.status().expect("AAAAAAAAA");
+	
+
+        println!("{:?}: Done with cam job", Local::now().naive_local());
+
+        // Sleep for 30 min
+        thread::sleep(Duration::from_secs(1800));
+
+        println!("{:?}: 30 min done starting camera_script", Local::now().naive_local());
+
+
 
     });
+
     // Weather data fetched every 15 min from DATEX II, parsed and inserted to MYSQL
     thread::spawn(move || loop {
         let fetch_thread = thread::spawn(|| {
